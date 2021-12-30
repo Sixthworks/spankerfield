@@ -14,10 +14,6 @@ DWORD WINAPI InitThread(LPVOID reserved) noexcept
 	FILE* out{};
 	freopen_s(&out, "CONOUT$", "w", stdout);
 
-	const auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (!hConsole)
-		goto clean;
-
 	if (MH_Initialize() != MH_OK)
 		goto clean;
 
