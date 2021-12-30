@@ -26,6 +26,10 @@
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
+#if !(defined _M_X64)
+#error Only for x64 systems.
+#endif
+
 #include <d3d11.h>
 #include <string>
 #include <SimpleMath.h>

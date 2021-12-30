@@ -1,9 +1,9 @@
 ﻿#include <Windows.h>
 #include "SDK/sdk.h"
 #include "MinHook.h"
-#include "xorstr.h"
 
 #include "Rendering/base.h"
+#include "Utilities/xorstr.h"
 #include "Utilities/vtablehook.h"
 #include "Hooks/hooks.h"
 
@@ -18,21 +18,10 @@ DWORD WINAPI InitThread(LPVOID reserved) noexcept
 	if (!hConsole)
 		goto clean;
 
-	DxRenderer* pDxRenderer;
-	BorderInputNode* pBorderInputNode;
-
-	pDxRenderer = DxRenderer::GetInstance();
-	if (!pDxRenderer)
-		goto clean;
-
-	pBorderInputNode = BorderInputNode::GetInstance();
-	if (!pBorderInputNode)
-		goto clean;
-
 	if (MH_Initialize() != MH_OK)
 		goto clean;
 
-	Hooks::Hook(pDxRenderer, pBorderInputNode);
+	Hooks::Hook();
 	printf(xorstr_("Farewell!\n"));
 
 	return TRUE;
@@ -45,7 +34,7 @@ clean:
 void Deattach() {
 	ImSetup::KillImgui();
 	FreeConsole();
-	Hooks::UnHook(BorderInputNode::GetInstance());
+	Hooks::UnHook();
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)

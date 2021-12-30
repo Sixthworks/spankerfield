@@ -203,7 +203,7 @@
     <ClInclude Include="SDK\sdk.h" />
     <ClInclude Include="SDK\TypeInfo.h" />
     <ClInclude Include="Utilities\vtablehook.h" />
-    <ClInclude Include="xorstr.h" />
+    <ClInclude Include="Utilities\xorstr.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

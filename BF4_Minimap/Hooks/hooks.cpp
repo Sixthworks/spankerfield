@@ -64,8 +64,14 @@ namespace Hooks
 		}
 	}
 
-	void Hook(DxRenderer* pDxRenderer, BorderInputNode* pBorderInputNode)
+	void Hook()
 	{
+		DxRenderer* pDxRenderer = DxRenderer::GetInstance();
+		if (!pDxRenderer) return;
+
+		BorderInputNode* pBorderInputNode = BorderInputNode::GetInstance();
+		if (!pBorderInputNode) return;
+
 		MH_CreateHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
 		MH_EnableHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8]);
 		printf(xorstr_("Hooked Present.\n"));
@@ -78,10 +84,12 @@ namespace Hooks
 		printf(xorstr_("Hooked PreFrame.\n"));
 	}
 
-	void UnHook(BorderInputNode* pBorderInputNode)
+	void UnHook()
 	{
+		BorderInputNode* pBorderInputNode = BorderInputNode::GetInstance();
+		if (!pBorderInputNode) return;
+
 		MH_DisableHook(MH_ALL_HOOKS);
 		Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
-		printf(xorstr_("Unhooking.\n"));
 	}
 }

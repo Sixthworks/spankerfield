@@ -3,6 +3,6 @@
 
 namespace Hooks
 {
-	void Hook(DxRenderer* pDxRenderer, BorderInputNode* pBorderInputNode);
-	void UnHook(BorderInputNode* pBorderInputNode);
+	void Hook();
+	void UnHook();
 }

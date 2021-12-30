@@ -3,7 +3,7 @@
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_impl_dx11.h"
 #include "../SDK/sdk.h"
-#include "../xorstr.h"
+#include "../Utilities/xorstr.h"
 #include "rubik.h"
 #include <Windows.h>
 #include <d3d11.h>

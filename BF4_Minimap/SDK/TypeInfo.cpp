@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include "../xorstr.h"
 #include "sdk.h"
+#include "../Utilities/xorstr.h"
 
 TypeInfo::TypeInfoData* TypeInfo::GetTypeInfoData()
 {

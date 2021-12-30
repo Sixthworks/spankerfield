@@ -1,7 +1,7 @@
 #include "blacklist.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
-#include "../../xorstr.h"
+#include "../../Utilities/xorstr.h"
 #include "../../global.h"
 
 static const char* blacklisted[]

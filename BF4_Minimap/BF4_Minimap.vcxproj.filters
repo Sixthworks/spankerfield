@@ -98,7 +98,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xorstr.h">
+    <ClInclude Include="Utilities\xorstr.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="SDK\sdk.h">
