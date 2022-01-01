@@ -28,7 +28,7 @@ namespace Features
 			if (Player->m_IsSpectator)
 			{
 				const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-				m_pDrawing->AddText(300.f, 450.f + SpectatorOffset, ImColor::White(), 26.f, FL_NONE, u8"%s", PlayerName);
+				m_pDrawing->AddText(23.5f, 450.f + SpectatorOffset, ImColor::White(), 26.f, FL_NONE, u8"%s", PlayerName);
 
 				SpectatorOffset += 20;
 			}

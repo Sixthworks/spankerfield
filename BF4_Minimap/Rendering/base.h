@@ -14,7 +14,6 @@ namespace ImSetup
 	extern bool b_isMenuVisible;
 
 	void BeginDraw(IDXGISwapChain* pSwapChain);
-	void Fix_UI();
 	void Menu();
 	void EndDraw();
 	void KillImgui();

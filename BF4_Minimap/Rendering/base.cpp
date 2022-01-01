@@ -151,24 +151,17 @@ namespace ImSetup
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-	}
 
-	void Fix_UI()
-	{
 		BorderInputNode* pInput = BorderInputNode::GetInstance();
-		if (IsValidPtr(pInput) && IsValidPtr(pInput->m_pMouse))
-			if (IsValidPtr(pInput->m_pMouse->m_pDevice) && !pInput->m_pMouse->m_pDevice->m_CursorMode)
-				pInput->m_pMouse->m_pDevice->m_UIOwnsInput, pInput->m_pMouse->m_pDevice->m_UseRawMouseInput = b_isMenuVisible;
+		if (IsValidPtr(pInput) && IsValidPtr(pInput->m_pMouse) && IsValidPtr(pInput->m_pMouse->m_pDevice))
+			if (!pInput->m_pMouse->m_pDevice->m_CursorMode)
+				pInput->m_pMouse->m_pDevice->m_UIOwnsInput, pInput->m_pMouse->m_pDevice->m_UseRawMouseInput, ImGui::GetIO().MouseDrawCursor = b_isMenuVisible;
 	}
 
 	void Menu()
 	{
-		BorderInputNode* pInput = BorderInputNode::GetInstance();
-		if (IsValidPtr(pInput))
-			if (IsValidPtr(pInput->m_pMouse) && IsValidPtr(pInput->m_pMouse->m_pDevice) && !pInput->m_pMouse->m_pDevice->m_CursorMode)
-				ImGui::GetIO().MouseDrawCursor = b_isMenuVisible;
-
-		if (!b_isMenuVisible) return;
+		if (!b_isMenuVisible)
+			return;
 
 		auto& style = ImGui::GetStyle();
 		ImGui::SetNextWindowSize({ 690, 710 });

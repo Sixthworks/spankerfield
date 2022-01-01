@@ -15,7 +15,6 @@ namespace Features
 
 	void PreFrame(bool FFPB)
 	{
-		ImSetup::Fix_UI();
 		Minimap(FFPB);
 	}
 }

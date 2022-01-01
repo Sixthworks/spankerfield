@@ -86,10 +86,7 @@ namespace Hooks
 
 	void UnHook()
 	{
-		BorderInputNode* pBorderInputNode = BorderInputNode::GetInstance();
-		if (!pBorderInputNode) return;
-
 		MH_DisableHook(MH_ALL_HOOKS);
-		Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+		Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
 	}
 }
