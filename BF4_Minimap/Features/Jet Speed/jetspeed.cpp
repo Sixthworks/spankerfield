@@ -62,15 +62,15 @@ namespace Features
 			static bool LastFrameKeyPress = false;
 			if (pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowUp] || pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowDown])
 			{
-				auto velVec = LocalSoldier->GetVelocity();
-				auto velocity = sqrt(pow(velVec->x, 2) + pow(velVec->y, 2) + pow(velVec->z, 2)) * 3.6f;
+				auto VehicleVelocity = LocalSoldier->GetVelocity();
+				auto Velocity = sqrt(pow(VehicleVelocity->x, 2) + pow(VehicleVelocity->y, 2) + pow(VehicleVelocity->z, 2)) * 3.6f;
 
-				if (velocity > 315.0f)
+				if (Velocity > 315.0f)
 				{
 					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 1;
 					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
 				}
-				else if (velocity < 310.0f)
+				else if (Velocity < 310.0f)
 				{
 					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
 					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 1;
