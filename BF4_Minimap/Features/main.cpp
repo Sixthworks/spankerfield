@@ -9,7 +9,7 @@ namespace Features
 
 		ShowBlacklisted();
 		DrawSpectators();
-		DrawNames();
+		DrawESP();
 		DrawExplosives();
 	}
 

@@ -2,5 +2,5 @@
 
 namespace Features
 {
-	void DrawNames();
+	void DrawESP();
 }

@@ -2,7 +2,7 @@
 #include "Minimap/minimap.h"
 #include "Blacklist/blacklist.h"
 #include "Spectator List/spectators.h"
-#include "Nametags/nametags.h"
+#include "ESP/esp.h"
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
 
