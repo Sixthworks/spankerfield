@@ -59,7 +59,11 @@ namespace Features
 
 						Vector2 boxCords[2];
 						if (GetBoxCords(Transform, &boxCords[0]))
-							m_pDrawing->DrawEspBox(2, boxCords[0].x, boxCords[0].y, boxCords[1].x - boxCords[0].x, boxCords[1].y - boxCords[0].y, ImColor::Pink().Value.x, ImColor::Pink().Value.y, ImColor::Pink().Value.z, ImColor::Pink().Value.w);
+						{
+							float BoxWidth = boxCords[1].x - boxCords[0].x;
+							float BoxHeight = boxCords[1].y - boxCords[0].y;
+							m_pDrawing->AddText(boxCords[0].x + (BoxWidth / 2), boxCords[0].y + (BoxHeight / 2), ImColor::Pink(), 0.f, FL_CENTER_X, u8"%s", xorstr_("[#]"));
+						}
 					}
 				} while (explosives.next());
 			}

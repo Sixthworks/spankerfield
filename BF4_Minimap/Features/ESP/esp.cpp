@@ -139,7 +139,7 @@ namespace Features
 
 				/* Box */
 				ImColor Visible(102, 255, 255, 255);
-				ImColor NotVisible = ImColor::Yellow();
+				ImColor NotVisible = ImColor::White();
 				ImColor BoxColor = Soldier->m_Occluded ? NotVisible : Visible;
 				m_pDrawing->DrawEspBox(2, boxCords[0].x, boxCords[0].y, boxCords[1].x - boxCords[0].x, boxCords[1].y - boxCords[0].y, BoxColor.Value.x, BoxColor.Value.y, BoxColor.Value.z, BoxColor.Value.w);
 				
@@ -157,13 +157,15 @@ namespace Features
 				/* Info */
 				if (!Vehicle)
 				{
+					float r_Offset = 0.f;
 					/* Name */
-					m_pDrawing->AddText(boxCords[0].x - 1.5f, boxCords[0].y - 12.5f, ImColor::White(), 14.f, FL_NONE, u8"%s", PlayerName);
+					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y - 3.f, ImColor::White(), 14.f, FL_NONE, u8"%s", PlayerName);
+					r_Offset += 7.f;
 
 					/* Distance */
 					float abs_ceil_distance = abs(ceil(Meters));
 					std::string str = to_str(abs_ceil_distance) + "m";
-					m_pDrawing->AddText(boxCords[0].x - 1.5f, boxCords[1].y + 10.f, ImColor::White(), 14.f, FL_NONE, u8"%s", str.c_str());
+					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y + r_Offset, ImColor::White(), 14.f, FL_NONE, u8"%s", str.c_str());
 				}
 
 				/* Skeleton */
@@ -172,7 +174,7 @@ namespace Features
 				bool Dots = false;
 				if (Meters <= 22.5f) Dots = true;
 
-				ImColor SkeletonVisible = ImColor::Yellow();
+				ImColor SkeletonVisible = ImColor::Blue();
 				ImColor SkeletonNotVisible(199, 41, 41, 255);
 				ImColor SkeletonColor = Soldier->m_Occluded ? SkeletonNotVisible : SkeletonVisible;
 
