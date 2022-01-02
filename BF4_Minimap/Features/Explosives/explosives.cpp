@@ -40,8 +40,7 @@ namespace Features
 		const auto LocalSoldier = LocalPlayer->GetSoldier();
 		if (!LocalSoldier) return;
 
-		if (!LocalSoldier->IsAlive())
-			return;
+		if (!LocalSoldier->IsAlive()) return;
 
 		if (ClassInfos.ExplosionEntity)
 		{
@@ -51,7 +50,7 @@ namespace Features
 			{
 				do
 				{
-					auto* pExplosive = explosives.front()->getObject();
+					ClientExplosionEntity* pExplosive = explosives.front()->getObject();
 					if (IsValidPtr(pExplosive))
 					{
 						TransformAABBStruct Transform;

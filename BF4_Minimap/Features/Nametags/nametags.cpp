@@ -19,8 +19,7 @@ namespace Features
 		const auto LocalSoldier = LocalPlayer->GetSoldier();
 		if (!LocalSoldier) return;
 
-		if (!LocalSoldier->IsAlive())
-			return;
+		if (!LocalSoldier->IsAlive()) return;
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{

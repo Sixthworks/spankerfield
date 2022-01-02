@@ -4,7 +4,7 @@
 #include "../../Utilities/xorstr.h"
 #include "../../global.h"
 
-static const char* blacklisted[]
+static const char* Blacklisted[]
 {
 	xorstr_("RenKim1234"),
 	xorstr_("m_PMKevinRudSan"),
@@ -58,9 +58,9 @@ namespace Features
 				continue;
 
 			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-			for (int i = 0; i < sizeof(blacklisted); i++)
+			for (int i = 0; i < sizeof(Blacklisted); i++)
 			{
-				if (blacklisted[i] == PlayerName)
+				if (Blacklisted[i] == PlayerName)
 				{
 					m_pDrawing->AddText(g_Width / 2, 95.f + AdminsOffset, ImColor::Red(), 28.f, FL_CENTER_X, u8"%s", PlayerName);
 					AdminsOffset += 20;

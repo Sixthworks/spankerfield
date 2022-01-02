@@ -4,6 +4,7 @@
 #include "Spectator List/spectators.h"
 #include "Nametags/nametags.h"
 #include "Explosives/explosives.h"
+#include "Jet Speed/jetspeed.h"
 
 namespace Features
 {

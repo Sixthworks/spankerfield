@@ -152,7 +152,7 @@ namespace ImSetup
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		BorderInputNode* pInput = BorderInputNode::GetInstance();
+		const auto pInput = BorderInputNode::GetInstance();
 		if (IsValidPtr(pInput) && IsValidPtr(pInput->m_pMouse) && IsValidPtr(pInput->m_pMouse->m_pDevice))
 			if (!pInput->m_pMouse->m_pDevice->m_CursorMode)
 				pInput->m_pMouse->m_pDevice->m_UIOwnsInput, pInput->m_pMouse->m_pDevice->m_UseRawMouseInput, ImGui::GetIO().MouseDrawCursor = b_isMenuVisible;

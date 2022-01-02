@@ -66,10 +66,10 @@ namespace Hooks
 
 	void Hook()
 	{
-		DxRenderer* pDxRenderer = DxRenderer::GetInstance();
+		const auto pDxRenderer = DxRenderer::GetInstance();
 		if (!pDxRenderer) return;
 
-		BorderInputNode* pBorderInputNode = BorderInputNode::GetInstance();
+		const auto pBorderInputNode = BorderInputNode::GetInstance();
 		if (!pBorderInputNode) return;
 
 		MH_CreateHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));

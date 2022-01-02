@@ -16,5 +16,6 @@ namespace Features
 	void PreFrame(bool FFPB)
 	{
 		Minimap(FFPB);
+		SetJetSpeed();
 	}
 }
