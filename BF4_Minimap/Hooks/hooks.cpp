@@ -66,22 +66,27 @@ namespace Hooks
 
 	void Hook()
 	{
+		static bool Terminado = false;
 		const auto pDxRenderer = DxRenderer::GetInstance();
-		if (!pDxRenderer) return;
-
 		const auto pBorderInputNode = BorderInputNode::GetInstance();
-		if (!pBorderInputNode) return;
 
-		MH_CreateHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
-		MH_EnableHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8]);
-		printf(xorstr_("Hooked Present.\n"));
+		while (pDxRenderer && pBorderInputNode)
+		{
+			if (Terminado) break;
 
-		MH_CreateHook(&BitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
-		MH_EnableHook(&BitBlt);
-		printf(xorstr_("Hooked BitBlt.\n"));
+			MH_CreateHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
+			MH_EnableHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8]);
+			printf(xorstr_("Hooked Present.\n"));
 
-		PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
-		printf(xorstr_("Hooked PreFrame.\n"));
+			MH_CreateHook(&BitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
+			MH_EnableHook(&BitBlt);
+			printf(xorstr_("Hooked BitBlt.\n"));
+
+			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
+			printf(xorstr_("Hooked PreFrame.\n"));
+
+			Terminado = true;
+		}
 	}
 
 	void UnHook()
