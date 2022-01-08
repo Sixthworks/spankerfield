@@ -1,4 +1,4 @@
-# SpankerField_4
+# Spankerfield
 Comfortable hack for regular use with clean code.
 
 # Features
