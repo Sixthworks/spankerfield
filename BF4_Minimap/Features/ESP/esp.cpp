@@ -138,13 +138,13 @@ namespace Features
 				float MaxHealth = Vehicle ? MaxHealthVehicle : MaxHealthPlayer;
 
 				/* Box */
-				ImColor Visible(102, 255, 255, 255);
-				ImColor NotVisible = ImColor::White();
+				ImColor Visible = ImColor::Pink();
+				ImColor NotVisible = ImColor::Purple();
 				ImColor BoxColor = Soldier->m_Occluded ? NotVisible : Visible;
 				m_pDrawing->DrawEspBox(2, boxCords[0].x, boxCords[0].y, boxCords[1].x - boxCords[0].x, boxCords[1].y - boxCords[0].y, BoxColor.Value.x, BoxColor.Value.y, BoxColor.Value.z, BoxColor.Value.w);
 				
 				/* Health Bar */
-				float HealthBarWidth = max(BoxWidth, 16.0f);
+				float HealthBarWidth = max(BoxWidth, 8.0f);
 				float HealthBarHeight = max(BoxWidth / 50.0f, 3.0f);
 				float HealthBarWidthOffset = max((HealthBarWidth - BoxWidth) / 2, 0);
 				float HealthBarHeightOffset = 5.0f;
@@ -174,8 +174,8 @@ namespace Features
 				bool Dots = false;
 				if (Meters <= 22.5f) Dots = true;
 
-				ImColor SkeletonVisible = ImColor::Blue();
-				ImColor SkeletonNotVisible(199, 41, 41, 255);
+				ImColor SkeletonVisible = ImColor::Yellow();
+				ImColor SkeletonNotVisible = ImColor::Pink();
 				ImColor SkeletonColor = Soldier->m_Occluded ? SkeletonNotVisible : SkeletonVisible;
 
 				DrawBone(SkeletonColor, SoldierRagdollComponent, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, Dots);
