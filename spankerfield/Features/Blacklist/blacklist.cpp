@@ -58,7 +58,7 @@ namespace Features
 				continue;
 
 			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-			for (int i = 0; i < sizeof(Blacklisted); i++)
+			for (int i = 0; i < sizeof(Blacklisted) / sizeof(char*); i++)
 			{
 				if (Blacklisted[i] == PlayerName)
 				{

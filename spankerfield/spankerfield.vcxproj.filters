@@ -15,37 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="entry.cpp">
+    <ClCompile Include="Features\Blacklist\blacklist.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\sdk.cpp">
+    <ClCompile Include="Features\ESP\esp.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Minhook\hde\hde32.c">
+    <ClCompile Include="Features\Explosives\explosives.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Minhook\hde\hde64.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Minhook\buffer.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Minhook\hook.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Minhook\trampoline.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Spectator List\spectators.cpp">
+    <ClCompile Include="Features\Jet Speed\jetspeed.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Features\Minimap\minimap.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\vtablehook.cpp">
+    <ClCompile Include="Features\Spectator List\spectators.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Features\main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\hooks.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -69,28 +60,40 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="MinHook\hde\hde32.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\hde\hde64.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\buffer.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\hook.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\trampoline.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
     <ClCompile Include="Rendering\base.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\draw-list.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Nametags\nametags.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Explosives\explosives.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\w2s.cpp">
+    <ClCompile Include="SDK\sdk.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="SDK\TypeInfo.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Blacklist\blacklist.cpp">
+    <ClCompile Include="Utilities\vtablehook.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Hooks\hooks.cpp">
+    <ClCompile Include="Utilities\w2s.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="entry.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="global.cpp">
@@ -98,46 +101,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Utilities\xorstr.h">
+    <ClInclude Include="Features\Blacklist\blacklist.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\sdk.h">
+    <ClInclude Include="Features\ESP\esp.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="MinHook.h">
+    <ClInclude Include="Features\Explosives\explosives.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Minhook\hde\hde32.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\hde\hde64.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\hde\pstdint.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\hde\table32.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\hde\table64.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\buffer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Minhook\trampoline.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Spectator List\spectators.h">
+    <ClInclude Include="Features\Jet Speed\jetspeed.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Minimap\minimap.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\vtablehook.h">
+    <ClInclude Include="Features\Spectator List\spectators.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\main.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\hooks.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
@@ -167,34 +152,55 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\base.h">
+    <ClInclude Include="MinHook\hde\hde32.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\rubik.h">
+    <ClInclude Include="MinHook\hde\hde64.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\hde\pstdint.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\hde\table32.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\hde\table64.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\buffer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\trampoline.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\base.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\draw-list.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Nametags\nametags.h">
+    <ClInclude Include="Rendering\rubik.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\w2s.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Explosives\explosives.h">
+    <ClInclude Include="SDK\sdk.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="SDK\TypeInfo.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Blacklist\blacklist.h">
+    <ClInclude Include="Utilities\vtablehook.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Hooks\hooks.h">
+    <ClInclude Include="Utilities\w2s.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\xorstr.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="global.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

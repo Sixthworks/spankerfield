@@ -45,7 +45,7 @@ namespace Features
 		};
 
 		static bool InJet = false;
-		for (int i = 0; i < sizeof(Jets); i++)
+		for (int i = 0; i < sizeof(Jets) / sizeof(char*); i++)
 		{
 			if (VehicleData->m_NameSid == Jets[i])
 			{
