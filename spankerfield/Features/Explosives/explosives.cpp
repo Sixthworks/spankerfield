@@ -58,7 +58,7 @@ namespace Features
 						ExplosiveControllable->GetAABB(&Transform);
 
 						Vector2 boxCords[2];
-						if (GetBoxCords(Transform, &boxCords[0]))
+						if (Utilities::GetBoxCords(Transform, &boxCords[0]))
 						{
 							float BoxWidth = boxCords[1].x - boxCords[0].x;
 							float BoxHeight = boxCords[1].y - boxCords[0].y;

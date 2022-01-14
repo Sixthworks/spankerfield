@@ -1,8 +1,22 @@
 #include "w2s.h"
 #include "../global.h"
 
-namespace Features
+namespace Utilities
 {
+	TransformAABBStruct GetTransform(ClientPlayer* Player)
+	{
+		TransformAABBStruct Transform;
+
+		const auto Soldier = Player->GetSoldier();
+		if (!Soldier) 
+			return Transform;
+
+		ClientVehicleEntity* Vehicle = Player->GetVehicle();
+		Vehicle ? Vehicle->GetAABB(&Transform) : Soldier->GetAABB(&Transform);
+
+		return Transform;
+	}
+
 	inline bool WorldToScreen(const Vector3& pos, Vector2& out)
 	{
 		float w = g_ViewProj.m[0][3] * pos.x + g_ViewProj.m[1][3] * pos.y + g_ViewProj.m[2][3] * pos.z + g_ViewProj.m[3][3];
