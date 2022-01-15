@@ -1,10 +1,22 @@
 #include "minimap.h"
 #include "../../SDK/sdk.h"
+#include "../../Utilities/xorstr.h"
+#include "../../Utilities/other.h"
 
 namespace Features
 {
+	ULONGLONG LastOBSCheck;
+	static bool OBS = false;
 	void Minimap(bool FFPB)
 	{
+		ULONGLONG now = GetTickCount64();
+		if (now - LastOBSCheck > 5000)
+		{
+			OBS = Utilities::IsProcessRunning(L"obs64.exe");
+			LastOBSCheck = now;
+		}
+		if (OBS) return;
+
 		const auto GameContext = ClientGameContext::GetInstance();
 		if (!GameContext) return;
 

@@ -202,7 +202,7 @@ namespace Features
 				m_pDrawing->DrawBoxOutline(boxCords[0].x - HealthBarWidthOffset, boxCords[1].y + HealthBarHeightOffset, HealthBarWidth, HealthBarHeight, ImColor(0, 0, 0, 255));
 				m_pDrawing->DrawFillArea(boxCords[0].x - HealthBarWidthOffset, boxCords[1].y + HealthBarHeightOffset, HealthBarPercWidth, HealthBarHeight, HealthBarColor);
 
-				if (!Vehicle)
+				if (!IsValidPtr(Vehicle))
 				{
 					ImColor TextColor = Soldier->m_Occluded ? ImColor(39, 95, 239, 255) : ImColor::Orange();
 
