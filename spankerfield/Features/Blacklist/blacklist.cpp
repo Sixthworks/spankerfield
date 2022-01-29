@@ -6,32 +6,32 @@
 
 static const char* Blacklisted[]
 {
-	xorstr_("RenKim1234"),
-	xorstr_("m_PMKevinRudSan"),
-	xorstr_("Sovereign_Skies"),
-	xorstr_("skulls"),
-	xorstr_("supervillain321"),
-	xorstr_("Revolving_DCON"),
-	xorstr_("Voltolly"),
-	xorstr_("DoggGodd"),
-	xorstr_("Cmmd_mx"),
-	xorstr_("TheNotoriousDoge"),
-	xorstr_("Il-Scavenger-lI"),
-	xorstr_("BurtTheBlueberry"),
-	xorstr_("Torsten-AUR-"),
-	xorstr_("Riotranz"),
-	xorstr_("Kersplooshers"),
-	xorstr_("KarekCat"),
-	xorstr_("FrAnK-CaStLe_Kil"),
-	xorstr_("Striker77733"),
-	xorstr_("Infinatshadex"),
-	xorstr_("Flying_Autist"),
-	xorstr_("TheGodDamnPope"),
-	xorstr_("Fortunate_Frank"),
-	xorstr_("Gompyzone"),
-	xorstr_("GoodFood2K16"),
-	xorstr_("Angry_Cuban13"),
-	xorstr_("Daniel_Recker_95"),
+	"RenKim1234",
+	"m_PMKevinRudSan",
+	"Sovereign_Skies",
+	"skulls",
+	"supervillain321",
+	"Revolving_DCON",
+	"Voltolly",
+	"DoggGodd",
+	"Cmmd_mx",
+	"TheNotoriousDoge",
+	"Il-Scavenger-lI",
+	"BurtTheBlueberry",
+	"Torsten-AUR-",
+	"Riotranz",
+	"Kersplooshers",
+	"KarekCat",
+	"FrAnK-CaStLe_Kil",
+	"Striker77733",
+	"Infinatshadex",
+	"Flying_Autist",
+	"TheGodDamnPope",
+	"Fortunate_Frank",
+	"Gompyzone",
+	"GoodFood2K16",
+	"Angry_Cuban13",
+	"Daniel_Recker_95"
 };
 
 namespace Features
@@ -58,7 +58,7 @@ namespace Features
 				continue;
 
 			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-			for (int i = 0; i < sizeof(Blacklisted) / sizeof(char*); i++)
+			for (int i = 0; i < sizeof(Blacklisted) / sizeof(const char*); i++)
 			{
 				if (Blacklisted[i] == PlayerName)
 				{
