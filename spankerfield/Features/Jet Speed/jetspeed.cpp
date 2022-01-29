@@ -36,16 +36,16 @@ namespace Features
 
 		static const char* Jets[]
 		{
-			xorstr_("ID_P_VNAME_F35"),
-			xorstr_("ID_P_VNAME_J20"),
-			xorstr_("ID_P_VNAME_PAKFA"),
-			xorstr_("ID_P_VNAME_A10"),
-			xorstr_("ID_P_VNAME_SU39"),
-			xorstr_("ID_P_VNAME_Q5")
+			"ID_P_VNAME_F35",
+			"ID_P_VNAME_J20",
+			"ID_P_VNAME_PAKFA",
+			"ID_P_VNAME_A10",
+			"ID_P_VNAME_SU39",
+			"ID_P_VNAME_Q5"
 		};
 
 		static bool InJet = false;
-		for (int i = 0; i < sizeof(Jets) / sizeof(char*); i++)
+		for (int i = 0; i < sizeof(Jets) / sizeof(const char*); i++)
 		{
 			if (VehicleData->m_NameSid == Jets[i])
 			{
