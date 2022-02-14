@@ -3,6 +3,7 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 
 ### Features
 ```
+Good base with sorting, easy to add features.
 ImGui,
 Player blacklist,
 Player ESP,
