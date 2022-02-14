@@ -1,4 +1,7 @@
-### Features 
+### Note
+If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
+
+### Features
 ```
 ImGui,
 Player blacklist,
