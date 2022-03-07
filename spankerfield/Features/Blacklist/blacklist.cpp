@@ -57,12 +57,12 @@ namespace Features
 			if (Player == LocalPlayer)
 				continue;
 
-			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
+			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : xorstr_("Unknown");
 			for (const auto& bl : Blacklisted)
 			{
 				if (PlayerName == bl)
 				{
-					m_pDrawing->AddText(g_Width / 2, 95.f + AdminsOffset, ImColor::Red(), 28.f, FL_CENTER_X, u8"%s", PlayerName);
+					m_pDrawing->AddText(g_Width / 2, 95.f + AdminsOffset, ImColor::Red(), 28.f, FL_CENTER_X, xorstr_(u8"%s"), PlayerName);
 					AdminsOffset += 20;
 				}
 			}
