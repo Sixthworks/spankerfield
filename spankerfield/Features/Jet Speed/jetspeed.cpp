@@ -34,20 +34,20 @@ namespace Features
 		const auto VehicleData = reinterpret_cast<VehicleEntityData*>(LocalVehicle->m_Data);
 		if (!VehicleData) return;
 
-		static const char* Jets[]
+		std::vector<std::string> Jets
 		{
-			"ID_P_VNAME_F35",
-			"ID_P_VNAME_J20",
-			"ID_P_VNAME_PAKFA",
-			"ID_P_VNAME_A10",
-			"ID_P_VNAME_SU39",
-			"ID_P_VNAME_Q5"
+			xorstr_("ID_P_VNAME_F35"),
+			xorstr_("ID_P_VNAME_J20"),
+			xorstr_("ID_P_VNAME_PAKFA"),
+			xorstr_("ID_P_VNAME_A10"),
+			xorstr_("ID_P_VNAME_SU39"),
+			xorstr_("ID_P_VNAME_Q5")
 		};
 
 		static bool InJet = false;
-		for (int i = 0; i < sizeof(Jets) / sizeof(const char*); i++)
+		for (const auto& rs : Jets)
 		{
-			if (VehicleData->m_NameSid == Jets[i])
+			if (VehicleData->m_NameSid == rs)
 			{
 				InJet = true;
 				break;
