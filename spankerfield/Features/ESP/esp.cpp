@@ -55,7 +55,7 @@ namespace Features
 
 	std::string FormatVehicle(std::string VehName)
 	{
-		std::string Pattern = "_VNAME_";
+		std::string Pattern = xorstr_("_VNAME_");
 		size_t Index = VehName.find(Pattern);
 		std::string PlaceHolder = VehName;
 		if (Index >= 0)
@@ -112,7 +112,7 @@ namespace Features
 			Vector3 Pos = (Vector3)Transform.Transform.m[3];
 			Vector2 boxCords[2];
 
-			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
+			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : xorstr_("Unknown");
 			float HealthPlayer = 0.f;
 			float MaxHealthPlayer = 0.f;
 			float Meters = Distance(Pos, LocalPos);
@@ -175,7 +175,7 @@ namespace Features
 					if (IsValidPtr(Vehicle)) {
 						std::string str = FormatVehicle(VehicleName);
 
-						m_pDrawing->AddText(X, Y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, u8"%s", str.c_str());
+						m_pDrawing->AddText(X, Y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, xorstr_(u8"%s"), str.c_str());
 					}
 					else
 						m_pDrawing->DrawFillArea(X, Y, 4.5f, 4.5f, ImColor::Orange());
@@ -207,12 +207,12 @@ namespace Features
 					ImColor TextColor = Soldier->m_Occluded ? ImColor(39, 95, 239, 255) : ImColor::Orange();
 
 					float r_Offset = 0.f;
-					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y - 3.f, TextColor, 14.f, FL_NONE, u8"%s", PlayerName);
+					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y - 3.f, TextColor, 14.f, FL_NONE, xorstr_(u8"%s"), PlayerName);
 					r_Offset += 8.f;
 
 					float abs_ceil_distance = abs(ceil(Meters));
-					std::string str = to_str(abs_ceil_distance) + "m";
-					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y + r_Offset, TextColor, 14.f, FL_NONE, u8"%s", str.c_str());
+					std::string str = to_str(abs_ceil_distance) + xorstr_("m");
+					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y + r_Offset, TextColor, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
 				}
 
 				bool Dots = false;
