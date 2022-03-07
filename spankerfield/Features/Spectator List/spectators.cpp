@@ -1,6 +1,7 @@
 #include "spectators.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Utilities/xorstr.h"
 
 namespace Features
 {
@@ -27,8 +28,8 @@ namespace Features
 
 			if (Player->m_IsSpectator)
 			{
-				const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-				m_pDrawing->AddText(23.5f, 450.f + SpectatorOffset, ImColor::White(), 26.f, FL_NONE, u8"%s", PlayerName);
+				const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : xorstr_("Unknown");
+				m_pDrawing->AddText(23.5f, 450.f + SpectatorOffset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), PlayerName);
 
 				SpectatorOffset += 20;
 			}
