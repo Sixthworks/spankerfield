@@ -62,7 +62,7 @@ namespace Features
 						{
 							float BoxWidth = boxCords[1].x - boxCords[0].x;
 							float BoxHeight = boxCords[1].y - boxCords[0].y;
-							m_pDrawing->AddText(boxCords[0].x + (BoxWidth / 2), boxCords[0].y + (BoxHeight / 2), ImColor::Pink(), 0.f, FL_CENTER_X, u8"%s", xorstr_("[#]"));
+							m_pDrawing->AddText(boxCords[0].x + (BoxWidth / 2), boxCords[0].y + (BoxHeight / 2), ImColor::Pink(), 0.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("[#]"));
 						}
 					}
 				} while (explosives.next());
