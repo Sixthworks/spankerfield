@@ -1,7 +1,7 @@
 #pragma once
 #include "../../SDK/sdk.h"
 
-namespace Features
+namespace features
 {
-	void DrawExplosives();
+	void draw_explosives();
 }

@@ -1,4 +1,5 @@
 #include "explosives.h"
+#include "../../settings.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
 
@@ -18,51 +19,54 @@ void UpdateClassInfos()
 	ClassInfos.WarningComponent = FindClassInfo(xorstr_("ClientWarningSystemComponent"));
 }
 
-namespace Features
+namespace features
 {
-	void DrawExplosives()
+	void draw_explosives()
 	{
-		const auto GameContext = ClientGameContext::GetInstance();
-		if (!GameContext) return;
+		if (!settings::explosives) return;
 
-		const auto Level = GameContext->m_pLevel;
-		if (!Level) return;
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
 
-		const auto GameWorld = Level->m_pGameWorld;
-		if (!GameWorld) return;
+		const auto level = game_context->m_pLevel;
+		if (!level) return;
 
-		const auto PlayerManager = GameContext->m_pPlayerManager;
-		if (!PlayerManager) return;
+		const auto game_world = level->m_pGameWorld;
+		if (!game_world) return;
 
-		const auto LocalPlayer = PlayerManager->m_pLocalPlayer;
-		if (!LocalPlayer) return;
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
 
-		const auto LocalSoldier = LocalPlayer->GetSoldier();
-		if (!LocalSoldier) return;
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return;
 
-		if (!LocalSoldier->IsAlive()) return;
+		const auto local_soldier = local_player->GetSoldier();
+		if (!local_soldier) return;
+
+		if (!local_soldier->IsAlive()) return;
 
 		if (ClassInfos.ExplosionEntity)
 		{
-			EntityIterator<ClientExplosionEntity> explosives(GameWorld, ClassInfos.ExplosionEntity);
+			EntityIterator<ClientExplosionEntity> explosives(game_world, ClassInfos.ExplosionEntity);
 
 			if (explosives.front())
 			{
 				do
 				{
-					ClientExplosionEntity* pExplosive = explosives.front()->getObject();
-					if (IsValidPtr(pExplosive))
+					ClientExplosionEntity* explosive = explosives.front()->getObject();
+					if (IsValidPtr(explosive))
 					{
-						TransformAABBStruct Transform;
-						ClientControllableEntity* ExplosiveControllable = (ClientControllableEntity*)pExplosive;
-						ExplosiveControllable->GetAABB(&Transform);
+						TransformAABBStruct transform;
+						ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
+						explosive_controllable->GetAABB(&transform);
 
-						Vector2 boxCords[2];
-						if (Utilities::GetBoxCords(Transform, &boxCords[0]))
+						Vector2 box_coords[2];
+						if (utils::GetBoxCords(transform, &box_coords[0]))
 						{
-							float BoxWidth = boxCords[1].x - boxCords[0].x;
-							float BoxHeight = boxCords[1].y - boxCords[0].y;
-							m_pDrawing->AddText(boxCords[0].x + (BoxWidth / 2), boxCords[0].y + (BoxHeight / 2), ImColor::Pink(), 0.f, FL_CENTER_X, u8"%s", xorstr_("[#]"));
+							float box_width = box_coords[1].x - box_coords[0].x;
+							float box_height = box_coords[1].y - box_coords[0].y;
+
+							m_pDrawing->AddText(box_coords[0].x + (box_width / 2), box_coords[0].y + (box_height / 2), ImColor::Pink(), 0.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("[#]"));
 						}
 					}
 				} while (explosives.next());

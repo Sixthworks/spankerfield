@@ -1,6 +1,6 @@
 #include "vtablehook.h"
 
-namespace Utilities
+namespace utils
 {
 	PBYTE HookVTableFunction(PDWORD64* ppVTable, PBYTE pHook, SIZE_T iIndex)
 	{

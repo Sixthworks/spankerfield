@@ -6,8 +6,8 @@
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
 
-namespace Features
+namespace features
 {
-	void Draw(bool FFPB);
-	void PreFrame(bool FFPB);
+	void draw(bool FFPB);
+	void pre_frame(bool FFPB);
 }

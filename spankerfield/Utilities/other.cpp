@@ -3,7 +3,7 @@
 #include <Psapi.h>
 #include <TlHelp32.h>
 
-namespace Utilities
+namespace utils
 {
 	bool IsProcessRunning(const wchar_t* processName)
 	{

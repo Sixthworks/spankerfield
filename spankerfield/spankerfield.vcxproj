@@ -150,7 +150,6 @@
     <ClCompile Include="Features\main.cpp" />
     <ClCompile Include="Features\Minimap\minimap.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
-    <ClCompile Include="global.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -168,10 +167,12 @@
     <ClCompile Include="Rendering\draw-list.cpp" />
     <ClCompile Include="SDK\sdk.cpp" />
     <ClCompile Include="SDK\TypeInfo.cpp" />
+    <ClCompile Include="Utilities\other.cpp" />
     <ClCompile Include="Utilities\vtablehook.cpp" />
     <ClCompile Include="Utilities\w2s.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="settings.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="Features\ESP\esp.h" />
     <ClInclude Include="Features\Explosives\explosives.h" />
@@ -201,8 +202,10 @@
     <ClInclude Include="Rendering\base.h" />
     <ClInclude Include="Rendering\draw-list.h" />
     <ClInclude Include="Rendering\rubik.h" />
+    <ClInclude Include="Rendering\verdana.h" />
     <ClInclude Include="SDK\sdk.h" />
     <ClInclude Include="SDK\TypeInfo.h" />
+    <ClInclude Include="Utilities\other.h" />
     <ClInclude Include="Utilities\vtablehook.h" />
     <ClInclude Include="Utilities\w2s.h" />
     <ClInclude Include="Utilities\xorstr.h" />

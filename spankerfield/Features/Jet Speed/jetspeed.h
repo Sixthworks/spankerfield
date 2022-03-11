@@ -1,7 +1,7 @@
 #pragma once
 #include "../../SDK/sdk.h"
 
-namespace Features
+namespace features
 {
-	void SetJetSpeed();
+	void set_jet_speed();
 }

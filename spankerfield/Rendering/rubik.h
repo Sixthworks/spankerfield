@@ -1,4 +1,3 @@
-#pragma once
 #include "cstdint"
 
 const std::uint8_t font_rubik[220600] = {

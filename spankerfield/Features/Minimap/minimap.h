@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Features
+namespace features
 {
-	void Minimap(bool FFPB);
+	void spot_minimap(bool FFPB);
 }

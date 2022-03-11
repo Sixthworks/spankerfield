@@ -1,7 +1,7 @@
 #pragma once
 #include "../SDK/sdk.h"
 
-namespace Hooks
+namespace hooks
 {
 	void Hook();
 	void UnHook();

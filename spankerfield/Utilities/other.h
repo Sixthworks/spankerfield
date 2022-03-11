@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Utilities
+namespace utils
 {
 	bool IsProcessRunning(const wchar_t* processName);
 }

@@ -6,6 +6,7 @@
 #include "Utilities/xorstr.h"
 #include "Utilities/vtablehook.h"
 #include "Hooks/hooks.h"
+#include "global.h"
 
 DWORD WINAPI InitThread(LPVOID reserved) noexcept
 {
@@ -17,8 +18,7 @@ DWORD WINAPI InitThread(LPVOID reserved) noexcept
 	if (MH_Initialize() != MH_OK)
 		goto clean;
 
-	Hooks::Hook();
-	printf(xorstr_("Farewell!\n"));
+	hooks::Hook();
 
 	return TRUE;
 clean:
@@ -28,9 +28,9 @@ clean:
 }
 
 void Deattach() {
-	ImSetup::KillImgui();
 	FreeConsole();
-	Hooks::UnHook();
+	ImSetup::KillImgui();
+	hooks::UnHook();
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -42,5 +42,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	if (fdwReason == DLL_PROCESS_DETACH) {
 		Deattach();
 	}
+
 	return TRUE;
 }

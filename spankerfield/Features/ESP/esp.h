@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Features
+namespace features
 {
-	void DrawESP();
+	void draw_esp();
 }

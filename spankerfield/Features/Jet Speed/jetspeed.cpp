@@ -1,40 +1,43 @@
 #include "jetspeed.h"
+#include "../../settings.h"
 #include "../../Utilities/xorstr.h"
 
-namespace Features
+namespace features
 {
-	void SetJetSpeed()
+	void set_jet_speed()
 	{
-		const auto pBorderInputNode = BorderInputNode::GetInstance();
-		if (!pBorderInputNode) return;
+		if (!settings::jet_speed) return;
 
-		const auto GameContext = ClientGameContext::GetInstance();
-		if (!GameContext) return;
+		const auto border_input_node = BorderInputNode::GetInstance();
+		if (!border_input_node) return;
 
-		const auto Level = GameContext->m_pLevel;
-		if (!Level) return;
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
 
-		const auto GameWorld = Level->m_pGameWorld;
-		if (!GameWorld) return;
+		const auto level = game_context->m_pLevel;
+		if (!level) return;
 
-		const auto PlayerManager = GameContext->m_pPlayerManager;
-		if (!PlayerManager) return;
+		const auto game_world = level->m_pGameWorld;
+		if (!game_world) return;
 
-		const auto LocalPlayer = PlayerManager->m_pLocalPlayer;
-		if (!LocalPlayer) return;
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
 
-		const auto LocalSoldier = LocalPlayer->GetSoldier();
-		if (!LocalSoldier) return;
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return;
 
-		if (!LocalSoldier->IsAlive()) return;
+		const auto local_soldier = local_player->GetSoldier();
+		if (!local_soldier) return;
 
-		const auto LocalVehicle = LocalPlayer->GetVehicle();
-		if (!LocalVehicle) return;
+		if (!local_soldier->IsAlive()) return;
 
-		const auto VehicleData = reinterpret_cast<VehicleEntityData*>(LocalVehicle->m_Data);
-		if (!VehicleData) return;
+		const auto local_vehicle = local_player->GetVehicle();
+		if (!local_vehicle) return;
 
-		static const char* Jets[]
+		const auto vehicle_data = reinterpret_cast<VehicleEntityData*>(local_vehicle->m_Data);
+		if (!vehicle_data) return;
+
+		std::vector<std::string> Jets
 		{
 			xorstr_("ID_P_VNAME_F35"),
 			xorstr_("ID_P_VNAME_J20"),
@@ -44,46 +47,46 @@ namespace Features
 			xorstr_("ID_P_VNAME_Q5")
 		};
 
-		static bool InJet = false;
-		for (int i = 0; i < sizeof(Jets) / sizeof(char*); i++)
+		static bool using_jet = false;
+		for (const auto& rs : Jets)
 		{
-			if (VehicleData->m_NameSid == Jets[i])
+			if (vehicle_data->m_NameSid == rs)
 			{
-				InJet = true;
+				using_jet = true;
 				break;
 			}
 		}
 
-		if (InJet)
+		if (using_jet)
 		{
-			const auto pKeyboard = pBorderInputNode->m_pKeyboard;
-			if (!pKeyboard) return;
+			const auto keyboard = border_input_node->m_pKeyboard;
+			if (!keyboard) return;
 
-			static bool LastFrameKeyPress = false;
-			if (pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowUp] || pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowDown])
+			static bool key_press = false;
+			if (keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowUp] || keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowDown])
 			{
-				auto VehicleVelocity = LocalSoldier->GetVelocity();
-				auto Velocity = sqrt(pow(VehicleVelocity->x, 2) + pow(VehicleVelocity->y, 2) + pow(VehicleVelocity->z, 2)) * 3.6f;
+				auto vehicle_velocity = local_soldier->GetVelocity();
+				auto velocity = sqrt(pow(vehicle_velocity->x, 2) + pow(vehicle_velocity->y, 2) + pow(vehicle_velocity->z, 2)) * 3.6f;
 
-				if (Velocity > 315.0f)
+				if (velocity > 315.0f)
 				{
-					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 1;
-					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
+					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 1;
+					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
 				}
-				else if (Velocity < 310.0f)
+				else if (velocity < 310.0f)
 				{
-					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
-					pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 1;
+					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
+					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 1;
 				}
 
-				LastFrameKeyPress = true;
+				key_press = true;
 			}
-			else if (LastFrameKeyPress)
+			else if (key_press)
 			{
-				pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
-				pKeyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
+				keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
+				keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
 				
-				LastFrameKeyPress = false;
+				key_press = false;
 			}
 		}
 	}

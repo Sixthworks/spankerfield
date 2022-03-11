@@ -5,7 +5,7 @@
 #include "../Rendering/base.h"
 #include "../global.h"
 
-namespace Hooks
+namespace hooks
 {
 	namespace ScreenshotCleaner
 	{
@@ -14,10 +14,10 @@ namespace Hooks
 
 		BOOL hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
 		{
-			g_FairFight = true;
+			globals::g_FairFight = true;
 			Sleep(15);
 			bool result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
-			g_FairFight = false;
+			globals::g_FairFight = false;
 			return result;
 		}
 	}
@@ -34,17 +34,17 @@ namespace Hooks
 
 			if (pGameRenderer && pDxRenderer)
 			{
-				g_Height = pDxRenderer->m_pScreen->m_Height;
-				g_Width = pDxRenderer->m_pScreen->m_Width;
-				g_ViewProj = pGameRenderer->m_pRenderView->m_ViewProjection;
+				globals::g_Height = pDxRenderer->m_pScreen->m_Height;
+				globals::g_Width = pDxRenderer->m_pScreen->m_Width;
+				globals::g_ViewProj = pGameRenderer->m_pRenderView->m_ViewProjection;
 
 				static auto SSMODULE = (uintptr_t*)OFFSET_SSMODULE;
 				if (!IsValidPtr(SSMODULE)) return oPresent(pThis, SyncInterval, Flags);
-				g_PunkBuster = (*(int*)(*SSMODULE + 0x14) != -1);
+				globals::g_PunkBuster = (*(int*)(*SSMODULE + 0x14) != -1);
 
 				ImSetup::BeginDraw(pThis);
 				ImSetup::Menu();
-				Features::Draw(!g_PunkBuster && !g_FairFight);
+				features::draw(!globals::g_PunkBuster && !globals::g_FairFight);
 				ImSetup::EndDraw();
 			}
 
@@ -60,7 +60,7 @@ namespace Hooks
 		void hkPreFrame(uintptr_t pThis, uint64_t a2)
 		{
 			oPreFrameUpdate(pThis, a2);
-			Features::PreFrame(!g_PunkBuster && !g_FairFight);
+			features::pre_frame(!globals::g_PunkBuster && !globals::g_FairFight);
 		}
 	}
 
@@ -82,7 +82,7 @@ namespace Hooks
 			MH_EnableHook(&BitBlt);
 			printf(xorstr_("Hooked BitBlt.\n"));
 
-			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
+			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(utils::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
 			printf(xorstr_("Hooked PreFrame.\n"));
 
 			Terminado = true;
@@ -92,6 +92,6 @@ namespace Hooks
 	void UnHook()
 	{
 		MH_DisableHook(MH_ALL_HOOKS);
-		Utilities::HookVTableFunction(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+		utils::HookVTableFunction(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
 	}
 }

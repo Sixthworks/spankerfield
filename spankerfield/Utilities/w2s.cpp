@@ -1,7 +1,7 @@
 #include "w2s.h"
 #include "../global.h"
 
-namespace Utilities
+namespace utils
 {
 	TransformAABBStruct GetTransform(ClientPlayer* Player)
 	{
@@ -19,19 +19,20 @@ namespace Utilities
 
 	inline bool WorldToScreen(const Vector3& pos, Vector2& out)
 	{
-		float w = g_ViewProj.m[0][3] * pos.x + g_ViewProj.m[1][3] * pos.y + g_ViewProj.m[2][3] * pos.z + g_ViewProj.m[3][3];
+		float w = globals::g_ViewProj.m[0][3] * pos.x + globals::g_ViewProj.m[1][3] * pos.y + globals::g_ViewProj.m[2][3] * pos.z + globals::g_ViewProj.m[3][3];
 		if (w < 0.19)
 			return false;
-		float x = g_ViewProj.m[0][0] * pos.x + g_ViewProj.m[1][0] * pos.y + g_ViewProj.m[2][0] * pos.z + g_ViewProj.m[3][0];
-		float y = g_ViewProj.m[0][1] * pos.x + g_ViewProj.m[1][1] * pos.y + g_ViewProj.m[2][1] * pos.z + g_ViewProj.m[3][1];
 
-		auto hWidth = static_cast<float>(g_Width) / 2.0f;
-		auto hHeight = static_cast<float>(g_Height) / 2.0f;
+		float x = globals::g_ViewProj.m[0][0] * pos.x + globals::g_ViewProj.m[1][0] * pos.y + globals::g_ViewProj.m[2][0] * pos.z + globals::g_ViewProj.m[3][0];
+		float y = globals::g_ViewProj.m[0][1] * pos.x + globals::g_ViewProj.m[1][1] * pos.y + globals::g_ViewProj.m[2][1] * pos.z + globals::g_ViewProj.m[3][1];
+
+		auto hWidth = static_cast<float>(globals::g_Width) / 2.0f;
+		auto hHeight = static_cast<float>(globals::g_Height) / 2.0f;
 
 		auto out_x = hWidth + hWidth * x / w;
 		auto out_y = hHeight - hHeight * y / w;
 
-		if (out_x >= 0.0f && out_x < g_Width && out_y >= 0.0f && out_y < g_Height) {
+		if (out_x >= 0.0f && out_x < globals::g_Width && out_y >= 0.0f && out_y < globals::g_Height) {
 
 			out.x = out_x;
 			out.y = out_y;
@@ -40,6 +41,30 @@ namespace Utilities
 			return true;
 		}
 		return false;
+	}
+
+
+	inline bool WorldToScreen(const Vector3& origin, Vector3& screen)
+	{
+		float mX = static_cast<float>(globals::g_Width * 0.5f);
+		float mY = static_cast<float>(globals::g_Height * 0.5f);
+
+		float w = globals::g_ViewProj(0, 3) * origin.x + globals::g_ViewProj(1, 3) * origin.y + globals::g_ViewProj(2, 3) * origin.z + globals::g_ViewProj(3, 3);
+
+		if (w < 0.0001f)
+		{
+			screen.z = w;
+			return false;
+		}
+
+		float x = globals::g_ViewProj(0, 0) * origin.x + globals::g_ViewProj(1, 0) * origin.y + globals::g_ViewProj(2, 0) * origin.z + globals::g_ViewProj(3, 0);
+		float y = globals::g_ViewProj(0, 1) * origin.x + globals::g_ViewProj(1, 1) * origin.y + globals::g_ViewProj(2, 1) * origin.z + globals::g_ViewProj(3, 1);
+
+		screen.x = mX + mX * x / w;
+		screen.y = mY - mY * y / w;
+		screen.z = w;
+
+		return true;
 	}
 
 	inline bool WorldToScreen(Vector3& pos)
@@ -75,8 +100,8 @@ namespace Utilities
 				return false;
 		}
 
-		cords[0].x = g_Width;
-		cords[0].y = g_Height;
+		cords[0].x = globals::g_Width;
+		cords[0].y = globals::g_Height;
 		cords[1].x = 0;
 		cords[1].y = 0;
 

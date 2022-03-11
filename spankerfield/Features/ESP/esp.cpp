@@ -1,10 +1,11 @@
 #include "esp.h"
-#include <sstream>
+#include "../../settings.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
+#include <sstream>
 
-namespace Features
+namespace features
 {
 	template <typename Type> std::string to_str(const Type& t)
 	{
@@ -35,10 +36,10 @@ namespace Features
 		if (!pRag->GetBone(Bone2, Bone2Vec))
 			return;
 
-		if (!Utilities::WorldToScreen(Bone1Vec))
+		if (!utils::WorldToScreen(Bone1Vec))
 			return;
 
-		if (!Utilities::WorldToScreen(Bone2Vec))
+		if (!utils::WorldToScreen(Bone2Vec))
 			return;
 
 		auto pos1 = Vector2(Bone1Vec.x, Bone1Vec.y);
@@ -55,7 +56,7 @@ namespace Features
 
 	std::string FormatVehicle(std::string VehName)
 	{
-		std::string Pattern = "_VNAME_";
+		std::string Pattern = xorstr_("_VNAME_");
 		size_t Index = VehName.find(Pattern);
 		std::string PlaceHolder = VehName;
 		if (Index >= 0)
@@ -64,177 +65,196 @@ namespace Features
 		return PlaceHolder;
 	}
 
-	void DrawESP()
+	void draw_esp()
 	{
-		const auto GameContext = ClientGameContext::GetInstance();
-		if (!GameContext) return;
+		if (!settings::esp) return;
 
-		const auto PlayerManager = GameContext->m_pPlayerManager;
-		if (!PlayerManager) return;
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
 
-		const auto LocalPlayer = PlayerManager->m_pLocalPlayer;
-		if (!LocalPlayer) return;
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
 
-		const auto LocalSoldier = LocalPlayer->GetSoldier();
-		if (!LocalSoldier) return;
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return;
 
-		if (!LocalSoldier->IsAlive()) return;
+		const auto local_soldier = local_player->GetSoldier();
+		if (!local_soldier) return;
 
-		/* Radar */
-		float RadarX = 20.f;
-		float RadarY = 245.f;
-		float Width = 320.f;
-		float Height = 320.f;
-		m_pDrawing->DrawFillArea(RadarX, RadarY, Width, Height, ImColor::Black(160));
+		if (!local_soldier->IsAlive()) return;
+
+		if (settings::radar)
+		{
+			m_pDrawing->DrawFillArea(settings::radar_x, settings::radar_y, settings::radar_width, settings::radar_height, ImColor::Black(160));
+		}
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			ClientPlayer* Player = PlayerManager->m_ppPlayers[i];
-			if (!Player)
+			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			if (!player)
 				continue;
 
-			if (Player == LocalPlayer)
+			if (player == local_player)
 				continue;
 
-			if (Player->m_TeamId == LocalPlayer->m_TeamId)
+			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
-			ClientSoldierEntity* Soldier = Player->GetSoldier();
-			if (!Soldier) continue;
+			ClientSoldierEntity* soldier = player->GetSoldier();
+			if (!soldier) continue;
 
-			if (!Soldier->IsAlive())
+			if (!soldier->IsAlive())
 				continue;
 
-			TransformAABBStruct Transform = Utilities::GetTransform(Player);
-			TransformAABBStruct LocalTransform = Utilities::GetTransform(LocalPlayer);;
+			TransformAABBStruct transform = utils::GetTransform(player);
+			TransformAABBStruct local_transform = utils::GetTransform(local_player);;
 
-			Vector3 LocalPos = (Vector3)LocalTransform.Transform.m[3];
-			Vector3 Pos = (Vector3)Transform.Transform.m[3];
-			Vector2 boxCords[2];
+			Vector3 local_pos = (Vector3)local_transform.Transform.m[3];
+			Vector3 pos = (Vector3)transform.Transform.m[3];
+			Vector2 box_coords[2];
 
-			const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-			float HealthPlayer = 0.f;
-			float MaxHealthPlayer = 0.f;
-			float Meters = Distance(Pos, LocalPos);
-			RagdollComponent* RagdollComponent = Soldier->m_pRagdollComponent;
+			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+			float health_player = 0.f;
+			float max_health_player = 0.f;
+			float distance = Distance(pos, local_pos);
+			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 
-			ClientVehicleEntity* Vehicle = Player->GetVehicle();
-			char* VehicleName = nullptr;
-			float HealthVehicle = 0.f;
-			float MaxHealthVehicle = 0.f;
+			ClientVehicleEntity* vehicle = player->GetVehicle();
+			char* vehicle_name = nullptr;
+			float health_vehicle = 0.f;
+			float max_health_vehicle = 0.f;
 
-			if (IsValidPtr(Vehicle))
+			if (IsValidPtr(vehicle))
 			{
-				if (IsValidPtr(Vehicle->m_pHealthComp) && Vehicle->m_pHealthComp->m_VehicleHealth)
-					HealthVehicle = Vehicle->m_pHealthComp->m_VehicleHealth;
+				if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
+					health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
-				if (Vehicle->m_Data)
+				if (vehicle->m_Data)
 				{
-					auto VehicleData = reinterpret_cast<VehicleEntityData*>(Vehicle->m_Data);
-					if (IsValidPtr(VehicleData))
+					auto vehicle_data = reinterpret_cast<VehicleEntityData*>(vehicle->m_Data);
+					if (IsValidPtr(vehicle_data))
 					{
-						if (VehicleData->m_FrontHealthZone.m_MaxHealth)
-							MaxHealthVehicle = VehicleData->m_FrontHealthZone.m_MaxHealth;
+						if (vehicle_data->m_FrontHealthZone.m_MaxHealth)
+							max_health_vehicle = vehicle_data->m_FrontHealthZone.m_MaxHealth;
 
-						if (IsValidPtr(VehicleData->m_NameSid))
-							VehicleName = VehicleData->m_NameSid;
+						if (IsValidPtr(vehicle_data->m_NameSid))
+							vehicle_name = vehicle_data->m_NameSid;
 					}
 				}
 			}
 			else
 			{
-				if (IsValidPtr(Soldier->m_pHealthComp))
+				if (IsValidPtr(soldier->m_pHealthComp))
 				{
-					HealthPlayer = Soldier->m_pHealthComp->m_Health;
-					MaxHealthPlayer = Soldier->m_pHealthComp->m_MaxHealth;
+					health_player = soldier->m_pHealthComp->m_Health;
+					max_health_player = soldier->m_pHealthComp->m_MaxHealth;
 				}
 			}
 
-			bool AimingValid = IsValidPtr(LocalSoldier->m_pWeaponComponent) && IsValidPtr(LocalSoldier->m_pWeaponComponent->GetActiveSoldierWeapon()) && IsValidPtr(LocalSoldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming) && LocalSoldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
-			if (AimingValid)
+			if (settings::radar)
 			{
-				double Angle = -(double)LocalSoldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
-
-				float DifferenceZ = LocalPos.z - Pos.z;
-				float DifferenceX = LocalPos.x - Pos.x;
-				float X = DifferenceX * (float)cos(Angle) - DifferenceZ * (float)sin(Angle);
-				float Y = DifferenceX * (float)sin(Angle) + DifferenceZ * (float)cos(Angle);
-
-				X *= 2;
-				X += RadarX + (Width / 2.f);
-				Y *= 2;
-				Y += RadarY + (Height / 2.f);
-
-				if (X < RadarX) X = RadarX;
-				if (Y < RadarY) Y = RadarY;
-				if (X > RadarX + Width - 3) X = RadarX + Width - 3;
-				if (Y > RadarY + Height - 3) Y = RadarY + Height - 3;
-
-				if (Meters >= 0.f && Meters <= 1000.f)
+				bool valid_aiming = IsValidPtr(local_soldier->m_pWeaponComponent) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming) && local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
+				if (valid_aiming)
 				{
-					if (IsValidPtr(Vehicle)) {
-						std::string str = FormatVehicle(VehicleName);
+					double angle = -(double)local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
 
-						m_pDrawing->AddText(X, Y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, u8"%s", str.c_str());
+					float difference_z = local_pos.z - pos.z;
+					float difference_x = local_pos.x - pos.x;
+					float x = difference_x * (float)cos(angle) - difference_z * (float)sin(angle);
+					float y = difference_x * (float)sin(angle) + difference_z * (float)cos(angle);
+
+					x *= 2;
+					x += settings::radar_x + (settings::radar_width / 2.f);
+					y *= 2;
+					y += settings::radar_y + (settings::radar_height / 2.f);
+
+					if (x < settings::radar_x) x = settings::radar_x;
+					if (y < settings::radar_y) y = settings::radar_y;
+					if (x > settings::radar_x + settings::radar_width - 3) x = settings::radar_x + settings::radar_width - 3;
+					if (y > settings::radar_y + settings::radar_height - 3) y = settings::radar_y + settings::radar_height - 3;
+
+					if (distance >= 0.f && distance <= 1000.f)
+					{
+						if (IsValidPtr(vehicle)) {
+							std::string str = FormatVehicle(vehicle_name);
+
+							m_pDrawing->AddText(x, y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, xorstr_(u8"%s"), str.c_str());
+						}
+						else
+							m_pDrawing->DrawFillArea(x, y, 4.5f, 4.5f, ImColor::Orange());
 					}
-					else
-						m_pDrawing->DrawFillArea(X, Y, 4.5f, 4.5f, ImColor::Orange());
 				}
 			}
 
-			if (Utilities::GetBoxCords(Transform, &boxCords[0]))
+			if (utils::GetBoxCords(transform, &box_coords[0]))
 			{
-				float BoxWidth = boxCords[1].x - boxCords[0].x;
-				float BoxHeight = boxCords[1].y - boxCords[0].y;
-				float Health = Vehicle ? HealthVehicle : HealthPlayer;
-				float MaxHealth = Vehicle ? MaxHealthVehicle : MaxHealthPlayer;
+				float box_width = box_coords[1].x - box_coords[0].x;
+				float box_height = box_coords[1].y - box_coords[0].y;
+				float health = vehicle ? health_vehicle : health_player;
+				float max_health = vehicle ? max_health_vehicle : max_health_player;
 
-				ImColor BoxColor = Soldier->m_Occluded ? ImColor(39, 95, 239, 255) : ImColor(239, 39, 39, 255);
-				m_pDrawing->DrawEspBox(2, boxCords[0].x, boxCords[0].y, boxCords[1].x - boxCords[0].x, boxCords[1].y - boxCords[0].y, BoxColor.Value.x, BoxColor.Value.y, BoxColor.Value.z, BoxColor.Value.w);
-
-				float HealthBarWidth = max(BoxWidth, 5.0f);
-				float HealthBarHeight = max(BoxWidth / 50.0f, 3.0f);
-				float HealthBarWidthOffset = max((HealthBarWidth - BoxWidth) / 2, 0);
-				float HealthBarHeightOffset = 5.0f;
-				float HealthBarPercWidth = HealthBarWidth * (Health / MaxHealth);
-				ImColor HealthBarColor(BYTE(255 - max(Health - MaxHealth / 2, 0) * (255 / (MaxHealth / 2))), BYTE(255 - max(MaxHealth / 2 - Health, 0) * (255 / (MaxHealth / 2))), 0, 255);
-
-				m_pDrawing->DrawBoxOutline(boxCords[0].x - HealthBarWidthOffset, boxCords[1].y + HealthBarHeightOffset, HealthBarWidth, HealthBarHeight, ImColor(0, 0, 0, 255));
-				m_pDrawing->DrawFillArea(boxCords[0].x - HealthBarWidthOffset, boxCords[1].y + HealthBarHeightOffset, HealthBarPercWidth, HealthBarHeight, HealthBarColor);
-
-				if (!IsValidPtr(Vehicle))
+				if (settings::draw_box)
 				{
-					ImColor TextColor = Soldier->m_Occluded ? ImColor(39, 95, 239, 255) : ImColor::Orange();
-
-					float r_Offset = 0.f;
-					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y - 3.f, TextColor, 14.f, FL_NONE, u8"%s", PlayerName);
-					r_Offset += 8.f;
-
-					float abs_ceil_distance = abs(ceil(Meters));
-					std::string str = to_str(abs_ceil_distance) + "m";
-					m_pDrawing->AddText(boxCords[1].x + 3.5f, boxCords[0].y + r_Offset, TextColor, 14.f, FL_NONE, u8"%s", str.c_str());
+					ImColor box_color = soldier->m_Occluded ? settings::box_color_occluded : settings::box_color;
+					m_pDrawing->DrawEspBox(2, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
 				}
 
-				bool Dots = false;
-				if (Meters <= 22.5f)
-					Dots = true;
-
-				ImColor SkeletonColor = ImColor(140, 140, 140, 255);
-				if (IsValidPtr(RagdollComponent))
+				if (settings::draw_health)
 				{
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Spine2, UpdatePoseResultData::Spine1, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Spine1, UpdatePoseResultData::Spine, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Neck, UpdatePoseResultData::LeftShoulder, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::LeftShoulder, UpdatePoseResultData::LeftElbowRoll, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::RightShoulder, UpdatePoseResultData::RightElbowRoll, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::LeftElbowRoll, UpdatePoseResultData::LeftHand, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::RightElbowRoll, UpdatePoseResultData::RightHand, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Spine, UpdatePoseResultData::RightKneeRoll, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::Spine, UpdatePoseResultData::LeftKneeRoll, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::RightKneeRoll, UpdatePoseResultData::RightFoot, Dots);
-					DrawBone(SkeletonColor, RagdollComponent, UpdatePoseResultData::LeftKneeRoll, UpdatePoseResultData::LeftFoot, Dots);
+					ImColor hb_color(BYTE(255 - max(health - max_health / 2, 0) * (255 / (max_health / 2))), BYTE(255 - max(max_health / 2 - health, 0) * (255 / (max_health / 2))), 0, 255);
+					float hb_width = max(box_width, 5.0f);
+					float hb_height = max(box_width / 50.0f, 3.0f);
+					float hb_width_offset = max((hb_width - box_width) / 2, 0);
+					float hb_height_offset = 5.0f;
+					float hb_perc_width = hb_width * (health / max_health);
+
+					m_pDrawing->DrawBoxOutline(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_width, hb_height, ImColor(0, 0, 0, 255));
+					m_pDrawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_perc_width, hb_height, hb_color);
+				}
+
+				if (!IsValidPtr(vehicle))
+				{
+					ImColor text_color = soldier->m_Occluded ? settings::text_color_occluded : settings::text_color;
+					float coords = box_coords[0].y - 3.f;
+
+					if (settings::draw_name)
+					{
+						m_pDrawing->AddText(box_coords[1].x + 3.5f, coords, text_color, 14.f, FL_NONE, xorstr_(u8"%s"), nickname);
+						coords += 9.f;
+					}
+
+					if (settings::draw_distance)
+					{
+						float fmt_distance = abs(ceil(distance));
+						std::string str(to_str(fmt_distance) + xorstr_("m"));
+
+						m_pDrawing->AddText(box_coords[1].x + 3.5f, coords, text_color, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
+						coords += 9.f;
+					}
+				}
+
+				if (settings::draw_skeleton)
+				{
+					bool dots = false;
+					if (distance <= 22.5f)
+						dots = true;
+
+					if (IsValidPtr(ragdoll_component))
+					{
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Spine2, UpdatePoseResultData::Spine1, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Spine1, UpdatePoseResultData::Spine, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::LeftShoulder, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::LeftShoulder, UpdatePoseResultData::LeftElbowRoll, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::RightShoulder, UpdatePoseResultData::RightElbowRoll, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::LeftElbowRoll, UpdatePoseResultData::LeftHand, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::RightElbowRoll, UpdatePoseResultData::RightHand, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::RightKneeRoll, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::LeftKneeRoll, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::RightKneeRoll, UpdatePoseResultData::RightFoot, dots);
+						DrawBone(settings::skeleton_color, ragdoll_component, UpdatePoseResultData::LeftKneeRoll, UpdatePoseResultData::LeftFoot, dots);
+					}
 				}
 			}
 		}

@@ -1,57 +1,62 @@
 #include "minimap.h"
+#include "../../settings.h"
+#include "../../global.h"
 #include "../../SDK/sdk.h"
 #include "../../Utilities/xorstr.h"
 #include "../../Utilities/other.h"
 
-namespace Features
+namespace features
 {
-	ULONGLONG LastOBSCheck;
-	static bool OBS = false;
-	void Minimap(bool FFPB)
+	void spot_minimap(bool FFPB)
 	{
-		ULONGLONG now = GetTickCount64();
-		if (now - LastOBSCheck > 5000)
+		if (!settings::minimap) return;
+
+		if (settings::obs_check)
 		{
-			OBS = Utilities::IsProcessRunning(L"obs64.exe");
-			LastOBSCheck = now;
+			if (GetTickCount64() - globals::g_Last_OBS_Check > 5000)
+			{
+				globals::g_OBS = utils::IsProcessRunning(L"obs64.exe");
+				globals::g_Last_OBS_Check = GetTickCount64();
+			}
+
+			if (globals::g_OBS) return;
 		}
-		if (OBS) return;
 
-		const auto GameContext = ClientGameContext::GetInstance();
-		if (!GameContext) return;
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
 
-		const auto PlayerManager = GameContext->m_pPlayerManager;
-		if (!PlayerManager) return;
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
 
-		const auto LocalPlayer = PlayerManager->m_pLocalPlayer;
-		if (!LocalPlayer) return;
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return;
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			ClientPlayer* Player = PlayerManager->m_ppPlayers[i];
-			if (!Player)
+			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			if (!player)
 				continue;
 
-			if (Player == LocalPlayer)
+			if (player == local_player)
 				continue;
 
-			if (Player->m_TeamId == LocalPlayer->m_TeamId)
+			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
-			ClientVehicleEntity* Vehicle = Player->GetVehicle();
-			if (Vehicle)
+			ClientVehicleEntity* vehicle = player->GetVehicle();
+			if (IsValidPtr(vehicle))
 			{
-				Vehicle->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				vehicle->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
-				ClientSoldierEntity* Soldier = Player->GetSoldier();
-				if (!Soldier) continue;
+				ClientSoldierEntity* soldier = player->GetSoldier();
+				if (!soldier) continue;
 
-				if (!Soldier->IsAlive())
+				if (!soldier->IsAlive())
 					continue;
 
-				Soldier->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				soldier->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}

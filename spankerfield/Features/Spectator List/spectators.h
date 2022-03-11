@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Features
+namespace features
 {
-	void DrawSpectators();
+	void draw_spectators();
 }

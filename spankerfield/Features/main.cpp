@@ -1,21 +1,21 @@
 #include "main.h"
 #include "../Rendering/base.h"
 
-namespace Features
+namespace features
 {
-	void Draw(bool FFPB)
+	void draw(bool FFPB)
 	{
 		if (!FFPB) return;
 
-		ShowBlacklisted();
-		DrawSpectators();
-		DrawESP();
-		DrawExplosives();
+		draw_blacklisted();
+		draw_spectators();
+		draw_esp();
+		draw_explosives();
 	}
 
-	void PreFrame(bool FFPB)
+	void pre_frame(bool FFPB)
 	{
-		Minimap(FFPB);
-		SetJetSpeed();
+		spot_minimap(FFPB);
+		set_jet_speed();
 	}
 }

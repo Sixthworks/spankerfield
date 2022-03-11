@@ -1,36 +1,54 @@
 #include "spectators.h"
+#include "../../settings.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Utilities/xorstr.h"
 
-namespace Features
+namespace features
 {
-	void DrawSpectators()
+	void draw_spectators()
 	{
-		const auto GameContext = ClientGameContext::GetInstance();
-		if (!GameContext) return;
+		if (!settings::spectator_list) return;
 
-		const auto PlayerManager = GameContext->m_pPlayerManager;
-		if (!PlayerManager) return;
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
 
-		const auto LocalPlayer = PlayerManager->m_pLocalPlayer;
-		if (!LocalPlayer) return;
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
 
-		float SpectatorOffset = 0.f;
-		for (int i = 0; i < MAX_PLAYERS; i++)
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return;
+
+		if (settings::spectator_list_debug)
 		{
-			ClientPlayer* Player = PlayerManager->m_ppPlayers[i];
-			if (!Player)
-				continue;
+			static int spectator_dummies[4]{};
 
-			if (Player == LocalPlayer)
-				continue;
-
-			if (Player->m_IsSpectator)
+			float offset = 0.f;
+			for (int i = 0; i < sizeof(spectator_dummies) / sizeof(*spectator_dummies); i++)
 			{
-				const char* PlayerName = IsValidPtr(Player->m_Name) ? Player->m_Name : "Unknown";
-				m_pDrawing->AddText(23.5f, 450.f + SpectatorOffset, ImColor::White(), 26.f, FL_NONE, u8"%s", PlayerName);
+				m_pDrawing->AddText(settings::spectator_x, settings::spectator_y + offset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), xorstr_("Dummy"));
+				offset += 20;
+			}
+		}
+		else
+		{
+			float offset = 0.f;
+			for (int i = 0; i < MAX_PLAYERS; i++)
+			{
+				ClientPlayer* player = player_manager->m_ppPlayers[i];
+				if (!player)
+					continue;
 
-				SpectatorOffset += 20;
+				if (player == local_player)
+					continue;
+
+				if (player->m_IsSpectator)
+				{
+					const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+
+					m_pDrawing->AddText(settings::spectator_x, settings::spectator_y + offset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), nickname);
+					offset += 20;
+				}
 			}
 		}
 	}
