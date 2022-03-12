@@ -6,6 +6,7 @@ namespace settings
 
 	inline bool esp{ true };
 	inline bool draw_box{ true };
+	inline int box_style{ 2 };
 	inline ImColor box_color_occluded{ 24, 162, 162, 255 };
 	inline ImColor box_color{ 255, 51, 0, 255 };
 	inline bool draw_health{ true };

@@ -196,7 +196,7 @@ namespace features
 				if (settings::draw_box)
 				{
 					ImColor box_color = soldier->m_Occluded ? settings::box_color_occluded : settings::box_color;
-					m_pDrawing->DrawEspBox(2, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
+					m_pDrawing->DrawEspBox(settings::box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
 				}
 
 				if (settings::draw_health)
@@ -215,12 +215,12 @@ namespace features
 				if (!IsValidPtr(vehicle))
 				{
 					ImColor text_color = soldier->m_Occluded ? settings::text_color_occluded : settings::text_color;
-					float coords = box_coords[0].y - 3.f;
+					float base[2] = { box_coords[1].x + 3.5f, box_coords[0].y - 3.f };
 
 					if (settings::draw_name)
 					{
-						m_pDrawing->AddText(box_coords[1].x + 3.5f, coords, text_color, 14.f, FL_NONE, xorstr_(u8"%s"), nickname);
-						coords += 9.f;
+						m_pDrawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, xorstr_(u8"%s"), nickname);
+						base[1] += 9.f;
 					}
 
 					if (settings::draw_distance)
@@ -228,8 +228,8 @@ namespace features
 						float fmt_distance = abs(ceil(distance));
 						std::string str(to_str(fmt_distance) + xorstr_("m"));
 
-						m_pDrawing->AddText(box_coords[1].x + 3.5f, coords, text_color, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
-						coords += 9.f;
+						m_pDrawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
+						base[1] += 9.f;
 					}
 				}
 

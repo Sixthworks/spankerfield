@@ -167,9 +167,12 @@ namespace ImSetup
 			{
 				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &settings::blacklist);
 
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Draw ESP"), &settings::draw_box);
 				ImGui::Checkbox(xorstr_("Draw box"), &settings::draw_box);
-				
+				ImGui::SliderInt(xorstr_("Box style"), &settings::box_style, 1, 6);
+
 				ImGui::Text(xorstr_("Box color"));
 				static float box_colors_oc[4] = { settings::box_color_occluded.Value.x, settings::box_color_occluded.Value.y, settings::box_color_occluded.Value.z, settings::box_color_occluded.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Not visible##BX"), box_colors_oc))
@@ -201,6 +204,8 @@ namespace ImSetup
 				if (ImGui::ColorEdit4(xorstr_("##SKC"), skeleton_color))
 					settings::skeleton_color = { skeleton_color[0], skeleton_color[1], skeleton_color[2], skeleton_color[3] };
 
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Radar"), &settings::radar);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("X##RDR"), &settings::radar_x, 0, globals::g_Width);
@@ -210,8 +215,12 @@ namespace ImSetup
 				ImGui::SliderFloat(xorstr_("Y##RDR"), &settings::radar_y, 0, globals::g_Height);
 				ImGui::PopItemWidth();
 
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Draw explosives"), &settings::explosives);
 				ImGui::Checkbox(xorstr_("Jet speed"), &settings::jet_speed);
+
+				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Spectator list"), &settings::spectator_list);
 				ImGui::PushItemWidth(300.f);
@@ -221,6 +230,9 @@ namespace ImSetup
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Y##SP"), &settings::spectator_y, 0, globals::g_Height);
 				ImGui::PopItemWidth();
+
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Auto-spot"), &settings::minimap);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Unspot when OBS"), &settings::obs_check);
