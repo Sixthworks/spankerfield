@@ -1,21 +1,21 @@
 #include "main.h"
-#include "../Rendering/base.h"
+#include "../global.h"
 
-namespace features
+namespace big
 {
-	void draw(bool FFPB)
+	void features::draw()
 	{
-		if (!FFPB) return;
+		if (!(!g_globals.g_punkbuster && !g_globals.g_fairfight)) return;
 
-		draw_blacklisted();
-		draw_spectators();
-		draw_esp();
-		draw_explosives();
+		plugins::draw_blacklisted();
+		plugins::draw_spectators();
+		plugins::draw_esp();
+		plugins::draw_explosives();
 	}
 
-	void pre_frame(bool FFPB)
+	void features::pre_frame()
 	{
-		spot_minimap(FFPB);
-		set_jet_speed();
+		plugins::spot_minimap();
+		plugins::set_jet_speed();
 	}
 }

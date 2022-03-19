@@ -1,6 +1,7 @@
 #pragma once
+#include "../../common.h"
 
-namespace features
+namespace plugins
 {
 	void draw_esp();
 }

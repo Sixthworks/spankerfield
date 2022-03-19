@@ -1,8 +1,16 @@
 #pragma once
 #include "../SDK/sdk.h"
 
-namespace hooks
+namespace big
 {
-	void Hook();
-	void UnHook();
+	class hooking
+	{
+	public:
+		void initialize();
+		void uninitialize();
+		void enable();
+		void disable();
+	};
+
+	inline hooking* g_hooking{};
 }

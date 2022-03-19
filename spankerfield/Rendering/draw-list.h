@@ -1,9 +1,8 @@
-#include "../SDK/sdk.h"
+#include "../common.h"
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_internal.h"
 #include "../ImGui/imgui_impl_dx11.h"
 #include "../ImGui/imgui_impl_win32.h"
-#include <memory>
 
 enum
 {
@@ -40,4 +39,4 @@ public:
 	void DrawEspBox(int box_type, float x, float y, float w, float h, float r, float g, float b, float a);
 	void DrawDot(int x, int y, const ImColor& color);
 };
-extern std::unique_ptr<CDrawing>m_pDrawing;
+extern std::unique_ptr<CDrawing>m_drawing;

@@ -1,11 +1,5 @@
-#include "TypeInfo.h"
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
+#include "type_info.h"
 #include "sdk.h"
-#include "../Utilities/xorstr.h"
 
 TypeInfo::TypeInfoData* TypeInfo::GetTypeInfoData()
 {

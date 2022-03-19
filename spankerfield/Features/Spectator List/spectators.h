@@ -1,6 +1,6 @@
 #pragma once
 
-namespace features
+namespace plugins
 {
 	void draw_spectators();
 }

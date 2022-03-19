@@ -1,6 +1,9 @@
 #pragma once
+#include "../common.h"
 
-namespace utils
+namespace big
 {
-	bool IsProcessRunning(const wchar_t* processName);
+	bool punkbuster_check();
+	std::string current_time();
+	bool is_process_running(const wchar_t* process_name);
 }

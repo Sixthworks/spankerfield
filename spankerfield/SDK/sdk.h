@@ -1,4 +1,6 @@
 #pragma once
+#include "../common.h"
+
 #pragma warning (disable : 4200)
 
 #define OFFSET_DXRENDERER             0x142738080
@@ -26,20 +28,13 @@
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
-#if !(defined _M_X64)
+#if !(defined _WIN64)
 #error Only for x64 systems.
 #endif
 
-#include <d3d11.h>
-#include <string>
-#include <SimpleMath.h>
-#include "TypeInfo.h"
+#include "type_info.h"
 
-#ifdef _WIN64
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
-#else
-#define _PTR_MAX_VALUE ((PVOID)0xFFF00000)
-#endif
 __forceinline bool IsValidPtr(PVOID p) { return (p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && p != nullptr; }
 
 using namespace DirectX::SimpleMath;

@@ -5,21 +5,27 @@
 #include "../../Utilities/xorstr.h"
 #include "../../Utilities/other.h"
 
-namespace features
+using namespace big;
+namespace plugins
 {
-	void spot_minimap(bool FFPB)
+	void spot_minimap()
 	{
-		if (!settings::minimap) return;
+		if (!g_settings.minimap) return;
 
-		if (settings::obs_check)
+		if (g_settings.obs_check)
 		{
-			if (GetTickCount64() - globals::g_Last_OBS_Check > 5000)
+			if (GetTickCount64() - g_globals.g_obscheck > 5000)
 			{
-				globals::g_OBS = utils::IsProcessRunning(L"obs64.exe");
-				globals::g_Last_OBS_Check = GetTickCount64();
+#ifdef _WIN64
+g_globals.g_obs = is_process_running(L"obs64.exe");
+#else
+g_globals.g_obs = is_process_running(L"obs32.exe");
+#endif
+
+				g_globals.g_obscheck = GetTickCount64();
 			}
 
-			if (globals::g_OBS) return;
+			if (g_globals.g_obs) return;
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();
@@ -46,7 +52,7 @@ namespace features
 			ClientVehicleEntity* vehicle = player->GetVehicle();
 			if (IsValidPtr(vehicle))
 			{
-				vehicle->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				vehicle->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
@@ -56,7 +62,7 @@ namespace features
 				if (!soldier->IsAlive())
 					continue;
 
-				soldier->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = FFPB ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				soldier->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}

@@ -6,8 +6,14 @@
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
 
-namespace features
+namespace big
 {
-	void draw(bool FFPB);
-	void pre_frame(bool FFPB);
+	class features
+	{
+	public:
+		void draw();
+		void pre_frame();
+	};
+
+	inline features* g_features{};
 }

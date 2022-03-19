@@ -1,47 +1,71 @@
-﻿#include <Windows.h>
-#include "SDK/sdk.h"
-#include "MinHook.h"
-
-#include "Rendering/base.h"
+﻿#include "common.h"
+#include "Rendering/renderer.h"
 #include "Utilities/xorstr.h"
 #include "Utilities/vtablehook.h"
 #include "Hooks/hooks.h"
+#include "MinHook.h"
 #include "global.h"
 
-DWORD WINAPI InitThread(LPVOID reserved) noexcept
+BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 {
-	AllocConsole();
-	AttachConsole(GetCurrentProcessId());
-	FILE* out{};
-	freopen_s(&out, "CONOUT$", "w", stdout);
+	using namespace big;
 
-	if (MH_Initialize() != MH_OK)
-		goto clean;
+	switch (reason)
+	{
+	case DLL_PROCESS_ATTACH:
+		DisableThreadLibraryCalls(hmod);
+		
+		g_globals.g_hmodule = hmod;
+		g_globals.g_main_thread = CreateThread(nullptr, 0, [](PVOID) -> DWORD
+		{
+			g_globals.g_hwnd = FindWindowA(xorstr_("Battlefield 4"), NULL);
+			while (!g_globals.g_hwnd)
+				std::this_thread::sleep_for(std::chrono::seconds(1));
 
-	hooks::Hook();
+			auto logger_instance = std::make_unique<logger>();
+			try
+			{
+				auto renderer_instance = std::make_unique<renderer>();
+				LOG(INFO) << xorstr_("Renderer initialized.");
 
-	return TRUE;
-clean:
-	FreeConsole();
-	FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(reserved), 0);
-	return NULL;
-}
+				g_hooking->initialize();
+				LOG(INFO) << xorstr_("MinHook initialized.");
 
-void Deattach() {
-	FreeConsole();
-	ImSetup::KillImgui();
-	hooks::UnHook();
-}
+				g_hooking->enable();
+				LOG(INFO) << xorstr_("Hooking enabled.");
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-	if (fdwReason == DLL_PROCESS_ATTACH) {
-		DisableThreadLibraryCalls(hinstDLL);
-		CloseHandle(CreateThread(NULL, NULL, InitThread, hinstDLL, NULL, NULL));
+				while (g_globals.g_running)
+				{
+					if (GetAsyncKeyState(VK_END) & 0x8000)
+						g_globals.g_running = false;
+
+					Sleep(75);
+				}
+
+				g_hooking->disable();
+				LOG(INFO) << xorstr_("Hooking disabled.");
+
+				g_hooking->uninitialize();
+				LOG(INFO) << xorstr_("MinHook uninitialized.");
+
+				Sleep(500);
+
+				renderer_instance.reset();
+				LOG(INFO) << xorstr_("Renderer uninitialized.");
+			}
+			catch (std::exception const& ex)
+			{
+				LOG(WARNING) << ex.what();
+				MessageBoxA(nullptr, ex.what(), nullptr, MB_OK | MB_ICONEXCLAMATION);
+			}
+
+			LOG(INFO) << xorstr_("Farewell!");
+			logger_instance.reset();
+
+			CloseHandle(g_globals.g_main_thread);
+			FreeLibraryAndExitThread(g_globals.g_hmodule, 0);
+		}, nullptr, 0, &g_globals.g_main_thread_id);
 	}
-	if (fdwReason == DLL_PROCESS_DETACH) {
-		Deattach();
-	}
 
-	return TRUE;
+	return true;
 }

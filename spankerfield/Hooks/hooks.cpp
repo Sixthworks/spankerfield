@@ -1,11 +1,17 @@
 #include "hooks.h"
 #include "../MinHook.h"
 #include "../Utilities/vtablehook.h"
+#include "../Utilities/other.h"
 #include "../Features/main.h"
-#include "../Rendering/base.h"
+#include "../Rendering/renderer.h"
+#include "../Rendering/gui.h"
 #include "../global.h"
 
-namespace hooks
+#ifdef _WIN64
+#define GWL_WNDPROC GWLP_WNDPROC
+#endif
+
+namespace big
 {
 	namespace ScreenshotCleaner
 	{
@@ -14,10 +20,12 @@ namespace hooks
 
 		BOOL hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
 		{
-			globals::g_FairFight = true;
+			g_globals.g_fairfight = true;
 			Sleep(15);
 			bool result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
-			globals::g_FairFight = false;
+			g_globals.g_fairfight = false;
+
+			LOG(EVENT) << xorstr_("Fairfight screenshot taken");
 			return result;
 		}
 	}
@@ -34,24 +42,20 @@ namespace hooks
 
 			if (pGameRenderer && pDxRenderer)
 			{
-				globals::g_Height = pDxRenderer->m_pScreen->m_Height;
-				globals::g_Width = pDxRenderer->m_pScreen->m_Width;
-				globals::g_ViewProj = pGameRenderer->m_pRenderView->m_ViewProjection;
+				g_globals.g_height = pDxRenderer->m_pScreen->m_Height;
+				g_globals.g_width = pDxRenderer->m_pScreen->m_Width;
+				g_globals.g_viewproj = pGameRenderer->m_pRenderView->m_ViewProjection;
 
-				static auto SSMODULE = (uintptr_t*)OFFSET_SSMODULE;
-				if (!IsValidPtr(SSMODULE)) return oPresent(pThis, SyncInterval, Flags);
-				globals::g_PunkBuster = (*(int*)(*SSMODULE + 0x14) != -1);
+				if (punkbuster_check())
+					LOG(EVENT) << xorstr_("Punkbuster screenshot taken");
 
-				ImSetup::BeginDraw(pThis);
-				ImSetup::Menu();
-				features::draw(!globals::g_PunkBuster && !globals::g_FairFight);
-				ImSetup::EndDraw();
+				g_renderer->on_present();
 			}
 
 			return oPresent(pThis, SyncInterval, Flags);
 		}
 	}
-	
+
 	namespace PreFrame
 	{
 		using PreFrameUpdate_t = void(*)(uintptr_t pthis, uint64_t a2);
@@ -60,38 +64,99 @@ namespace hooks
 		void hkPreFrame(uintptr_t pThis, uint64_t a2)
 		{
 			oPreFrameUpdate(pThis, a2);
-			features::pre_frame(!globals::g_PunkBuster && !globals::g_FairFight);
+
+			g_features->pre_frame();
 		}
 	}
 
-	void Hook()
+	namespace WndProc
 	{
-		static bool Terminado = false;
-		const auto pDxRenderer = DxRenderer::GetInstance();
-		const auto pBorderInputNode = BorderInputNode::GetInstance();
+		WNDPROC oWndProc;
 
-		while (pDxRenderer && pBorderInputNode)
+		LRESULT hkWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		{
-			if (Terminado) break;
+			if (g_globals.g_running)
+			{
+				g_renderer->wndproc(hwnd, msg, wparam, lparam);
 
-			MH_CreateHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
-			MH_EnableHook((*reinterpret_cast<void***>(pDxRenderer->m_pScreen->m_pSwapChain))[8]);
-			printf(xorstr_("Hooked Present.\n"));
+				switch (msg) {
+				case WM_SIZE:
+					if (g_renderer->m_d3d_device != NULL && wparam != SIZE_MINIMIZED)
+					{
+						g_renderer->pre_reset();
+						g_renderer->m_dxgi_swapchain->ResizeBuffers(0, (UINT)LOWORD(lparam), (UINT)HIWORD(lparam), DXGI_FORMAT_UNKNOWN, 0);
+						g_renderer->post_reset();
+					}
+
+					return false;
+				}
+
+				if (g_gui.m_opened)
+				{
+					switch (msg) {
+					case WM_MOUSEMOVE: return false;
+					default:
+						break;
+					}
+
+					return true;
+				}
+			}
+
+			return CallWindowProcW(oWndProc, hwnd, msg, wparam, lparam);
+		}
+	}
+
+	void hooking::initialize()
+	{
+		MH_Initialize();
+	}
+
+	void hooking::uninitialize()
+	{
+		MH_Uninitialize();
+	}
+
+	void hooking::enable()
+	{
+		const auto dx_renderer = DxRenderer::GetInstance();
+		const auto border_input_node = BorderInputNode::GetInstance();
+		static bool terminate{ false };
+
+		while (dx_renderer && border_input_node)
+		{
+			if (terminate) break;
+
+			WndProc::oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc::hkWndProc)));
+			LOG(INFO) << xorstr_("Hooked WndProc.");
+
+			MH_CreateHook((*reinterpret_cast<void***>(dx_renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
+			MH_EnableHook((*reinterpret_cast<void***>(dx_renderer->m_pScreen->m_pSwapChain))[8]);
+			LOG(INFO) << xorstr_("Hooked Present.");
 
 			MH_CreateHook(&BitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
 			MH_EnableHook(&BitBlt);
-			printf(xorstr_("Hooked BitBlt.\n"));
+			LOG(INFO) << xorstr_("Hooked BitBlt.");
 
-			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(utils::HookVTableFunction(reinterpret_cast<PDWORD64*>(pBorderInputNode->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
-			printf(xorstr_("Hooked PreFrame.\n"));
+			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(hook_vtable_func(reinterpret_cast<PDWORD64*>(border_input_node->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
+			LOG(INFO) << xorstr_("Hooked PreFrame.");
 
-			Terminado = true;
+			terminate = !terminate;
 		}
 	}
 
-	void UnHook()
+	void hooking::disable()
 	{
-		MH_DisableHook(MH_ALL_HOOKS);
-		utils::HookVTableFunction(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+		SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc::oWndProc));
+		LOG(INFO) << xorstr_("Disabled WndProc.");
+
+		MH_DisableHook(&BitBlt);
+		LOG(INFO) << xorstr_("Disabled BitBlt.");
+
+		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
+		LOG(INFO) << xorstr_("Disabled Present.");
+
+		hook_vtable_func(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+		LOG(INFO) << xorstr_("Disabled PreFrame.");
 	}
 }

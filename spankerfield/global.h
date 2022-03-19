@@ -1,15 +1,25 @@
 #pragma once
 #include "SDK/sdk.h"
 
-namespace globals
+namespace big
 {
-	inline Vector3 g_ViewPos;
-	inline Vector2 g_ViewPos2D;
-	inline bool g_FairFight;
-	inline bool g_PunkBuster;
-	inline bool g_OBS;
-	inline Matrix g_ViewProj;
-	inline ULONGLONG g_Last_OBS_Check;
-	inline int g_Width{ 2560 };
-	inline int g_Height{ 1440 };
+	class globals
+	{
+	public:
+		HWND g_hwnd{};
+		HANDLE g_main_thread{};
+		DWORD g_main_thread_id{};
+		HINSTANCE g_hmodule{};
+		Matrix g_viewproj{};
+		ULONGLONG g_obscheck{};
+		ULONGLONG g_blcheck{};
+		bool g_running{ true };
+		bool g_fairfight;
+		bool g_punkbuster;
+		bool g_obs;
+		int g_width{ 2560 };
+		int g_height{ 1440 };
+	};
+
+	inline globals g_globals;
 }

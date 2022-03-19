@@ -1,8 +1,8 @@
 #include "vtablehook.h"
 
-namespace utils
+namespace big
 {
-	PBYTE HookVTableFunction(PDWORD64* ppVTable, PBYTE pHook, SIZE_T iIndex)
+	PBYTE hook_vtable_func(PDWORD64* ppVTable, PBYTE pHook, SIZE_T iIndex)
 	{
 		DWORD dwOld = 0;
 		VirtualProtect((void*)((*ppVTable) + iIndex), sizeof(PDWORD64), PAGE_EXECUTE_READWRITE, &dwOld);

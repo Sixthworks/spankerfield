@@ -19,11 +19,12 @@ void UpdateClassInfos()
 	ClassInfos.WarningComponent = FindClassInfo(xorstr_("ClientWarningSystemComponent"));
 }
 
-namespace features
+using namespace big;
+namespace plugins
 {
 	void draw_explosives()
 	{
-		if (!settings::explosives) return;
+		if (!g_settings.explosives) return;
 
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return;
@@ -61,12 +62,12 @@ namespace features
 						explosive_controllable->GetAABB(&transform);
 
 						Vector2 box_coords[2];
-						if (utils::GetBoxCords(transform, &box_coords[0]))
+						if (GetBoxCords(transform, &box_coords[0]))
 						{
 							float box_width = box_coords[1].x - box_coords[0].x;
 							float box_height = box_coords[1].y - box_coords[0].y;
 
-							m_pDrawing->AddText(box_coords[0].x + (box_width / 2), box_coords[0].y + (box_height / 2), ImColor::Pink(), 0.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("[#]"));
+							m_drawing->AddText(box_coords[0].x + (box_width / 2), box_coords[0].y + (box_height / 2), ImColor::Pink(), 0.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("[#]"));
 						}
 					}
 				} while (explosives.next());

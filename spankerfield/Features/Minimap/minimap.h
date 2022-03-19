@@ -1,6 +1,6 @@
 #pragma once
 
-namespace features
+namespace plugins
 {
-	void spot_minimap(bool FFPB);
+	void spot_minimap();
 }

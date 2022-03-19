@@ -1,6 +1,6 @@
 #include "draw-list.h"
 
-std::unique_ptr<CDrawing>m_pDrawing = std::make_unique<CDrawing>();
+std::unique_ptr<CDrawing>m_drawing = std::make_unique<CDrawing>();
 
 void CDrawing::AddImage(const ImVec2& position, const ImVec2& size, const ImTextureID pTexture, const ImColor& color)
 {

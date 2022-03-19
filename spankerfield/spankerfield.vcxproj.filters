@@ -75,16 +75,13 @@
     <ClCompile Include="MinHook\trampoline.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\base.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\draw-list.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="SDK\sdk.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\TypeInfo.cpp">
+    <ClCompile Include="SDK\type_info.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\vtablehook.cpp">
@@ -99,11 +96,47 @@
     <ClCompile Include="Utilities\other.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\crashhandler_windows.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\filesink.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\g3log.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\logcapture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\loglevels.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\logmessage.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\logworker.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\stacktrace_windows.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\g3log\time.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\renderer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\gui.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\path.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Features\Blacklist\blacklist.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Features\ESP\esp.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -173,9 +206,6 @@
     <ClInclude Include="MinHook\trampoline.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\base.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\draw-list.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -185,7 +215,7 @@
     <ClInclude Include="SDK\sdk.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\TypeInfo.h">
+    <ClInclude Include="SDK\type_info.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\vtablehook.h">
@@ -203,13 +233,91 @@
     <ClInclude Include="MinHook.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\verdana.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Utilities\other.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="settings.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="logger.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\active.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\atomicbool.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\crashhandler.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\filesink.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\future.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\g3log.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\logcapture.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\loglevels.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\logmessage.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\logworker.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\moveoncopy.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\shared_queue.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\sink.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\sinkhandle.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\sinkwrapper.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\stacktrace_windows.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\stlpatch_future.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\time.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\filesinkhelper.ipp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g2log.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\g3log\g3log\generated_definitions.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\renderer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\gui.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Blacklist\blacklist.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\path.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

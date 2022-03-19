@@ -2,11 +2,12 @@
 #include "../../settings.h"
 #include "../../Utilities/xorstr.h"
 
-namespace features
+using namespace big;
+namespace plugins
 {
 	void set_jet_speed()
 	{
-		if (!settings::jet_speed) return;
+		if (!g_settings.jet_speed) return;
 
 		const auto border_input_node = BorderInputNode::GetInstance();
 		if (!border_input_node) return;

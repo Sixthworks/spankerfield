@@ -133,6 +133,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>common.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="common.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Features\Blacklist\blacklist.cpp" />
     <ClCompile Include="Features\ESP\esp.cpp" />
@@ -163,17 +165,32 @@
     <ClCompile Include="MinHook\hde\hde64.c" />
     <ClCompile Include="MinHook\hook.c" />
     <ClCompile Include="MinHook\trampoline.c" />
-    <ClCompile Include="Rendering\base.cpp" />
     <ClCompile Include="Rendering\draw-list.cpp" />
+    <ClCompile Include="Rendering\gui.cpp" />
+    <ClCompile Include="Rendering\renderer.cpp" />
     <ClCompile Include="SDK\sdk.cpp" />
-    <ClCompile Include="SDK\TypeInfo.cpp" />
+    <ClCompile Include="SDK\type_info.cpp" />
+    <ClCompile Include="Utilities\g3log\crashhandler_windows.cpp" />
+    <ClCompile Include="Utilities\g3log\filesink.cpp" />
+    <ClCompile Include="Utilities\g3log\g3log.cpp" />
+    <ClCompile Include="Utilities\g3log\logcapture.cpp" />
+    <ClCompile Include="Utilities\g3log\loglevels.cpp" />
+    <ClCompile Include="Utilities\g3log\logmessage.cpp" />
+    <ClCompile Include="Utilities\g3log\logworker.cpp" />
+    <ClCompile Include="Utilities\g3log\stacktrace_windows.cpp" />
+    <ClCompile Include="Utilities\g3log\time.cpp" />
     <ClCompile Include="Utilities\other.cpp" />
+    <ClCompile Include="Utilities\path.cpp" />
     <ClCompile Include="Utilities\vtablehook.cpp" />
     <ClCompile Include="Utilities\w2s.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="settings.h" />
+    <ClInclude Include="common.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
+    <ClInclude Include="logger.h" />
+    <ClInclude Include="Rendering\gui.h" />
+    <ClInclude Include="Rendering\renderer.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="Features\ESP\esp.h" />
     <ClInclude Include="Features\Explosives\explosives.h" />
     <ClInclude Include="Features\Jet Speed\jetspeed.h" />
@@ -199,13 +216,33 @@
     <ClInclude Include="MinHook\hde\table32.h" />
     <ClInclude Include="MinHook\hde\table64.h" />
     <ClInclude Include="MinHook\trampoline.h" />
-    <ClInclude Include="Rendering\base.h" />
     <ClInclude Include="Rendering\draw-list.h" />
     <ClInclude Include="Rendering\rubik.h" />
-    <ClInclude Include="Rendering\verdana.h" />
     <ClInclude Include="SDK\sdk.h" />
-    <ClInclude Include="SDK\TypeInfo.h" />
+    <ClInclude Include="SDK\type_info.h" />
+    <ClInclude Include="Utilities\g3log\filesinkhelper.ipp" />
+    <ClInclude Include="Utilities\g3log\g2log.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\active.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\atomicbool.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\crashhandler.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\filesink.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\future.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\g3log.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\generated_definitions.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\logcapture.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\loglevels.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\logmessage.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\logworker.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\moveoncopy.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\shared_queue.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\sink.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\sinkhandle.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\sinkwrapper.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\stacktrace_windows.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\stlpatch_future.hpp" />
+    <ClInclude Include="Utilities\g3log\g3log\time.hpp" />
     <ClInclude Include="Utilities\other.h" />
+    <ClInclude Include="Utilities\path.h" />
     <ClInclude Include="Utilities\vtablehook.h" />
     <ClInclude Include="Utilities\w2s.h" />
     <ClInclude Include="Utilities\xorstr.h" />
@@ -216,11 +253,15 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\directxtk_desktop_win10.2021.11.8.1\build\native\directxtk_desktop_win10.targets" Condition="Exists('..\packages\directxtk_desktop_win10.2021.11.8.1\build\native\directxtk_desktop_win10.targets')" />
+    <Import Project="..\packages\fmt.7.0.1\build\fmt.targets" Condition="Exists('..\packages\fmt.7.0.1\build\fmt.targets')" />
+    <Import Project="..\packages\nlohmann.json.3.10.4\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.10.4\build\native\nlohmann.json.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\directxtk_desktop_win10.2021.11.8.1\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_win10.2021.11.8.1\build\native\directxtk_desktop_win10.targets'))" />
+    <Error Condition="!Exists('..\packages\fmt.7.0.1\build\fmt.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\fmt.7.0.1\build\fmt.targets'))" />
+    <Error Condition="!Exists('..\packages\nlohmann.json.3.10.4\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.10.4\build\native\nlohmann.json.targets'))" />
   </Target>
 </Project>
