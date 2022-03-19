@@ -22,9 +22,7 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 ```
 ImGui–based user interface,
 Unloading at runtime,
-Log console
-G3LOG,
-Logs saved to files,
+Log console with g3log,
 Sorted features,
 Rendering through ImGui,
 Player blacklist,
@@ -35,7 +33,8 @@ Conrollable jet speed,
 Auto-spot,
 Spectator list,
 PunkBuster bypass,
-FairFight sbypass.
+FairFight sbypass,
+XorString.
 ```
 
 ### How to compile
