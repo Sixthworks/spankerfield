@@ -11,7 +11,7 @@ namespace big
 		float esp_distance { 10000.f };
 
 		bool draw_box{ true };
-		int box_style{ 2 };
+		int box_style{ 4 };
 		ImColor box_color_occluded{ 24, 162, 162, 255 };
 		ImColor box_color{ 255, 51, 0, 255 };
 		
