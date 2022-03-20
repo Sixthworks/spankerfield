@@ -52,7 +52,7 @@ namespace plugins
 		if (players.contains(name))
 			return;
 
-		players[name][xorstr_("time_added")] = current_time();
+		players[name][xorstr_("Time added")] = current_time();
 
 		save_json(players);
 		parse_blacklist();
@@ -61,13 +61,19 @@ namespace plugins
 	void delete_from_blacklist(std::string name)
 	{
 		nlohmann::json players = get_json();
-
-		if (players[name].is_null())
-			return;
-
+		LOG(INFO) << name;
 		players.erase(name);
 
 		save_json(players);
+
+		// For instant changes, apparently parsing again is not enough.
+		auto it = std::find(blacklisted.begin(), blacklisted.end(), name);
+		if (*it == name)
+		{
+			int index = it - blacklisted.begin();
+			blacklisted.erase(blacklisted.begin() + index);
+		}
+
 		parse_blacklist();
 	}
 

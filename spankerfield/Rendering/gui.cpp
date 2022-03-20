@@ -133,7 +133,7 @@ namespace big
 
 				ImGui::Text(xorstr_("Skeleton color"));
 				static float skeleton_color[4] = { g_settings.skeleton_color.Value.x, g_settings.skeleton_color.Value.y, g_settings.skeleton_color.Value.z, g_settings.skeleton_color.Value.w };
-				if (ImGui::ColorEdit4(xorstr_("##SKC"), skeleton_color))
+				if (ImGui::ColorEdit4(xorstr_("Bones##SKC"), skeleton_color))
 					g_settings.skeleton_color = { skeleton_color[0], skeleton_color[1], skeleton_color[2], skeleton_color[3] };
 
 				ImGui::Separator();
@@ -168,7 +168,7 @@ namespace big
 
 				ImGui::Text(xorstr_("Spectators color"));
 				static float spectators_color[4] = { g_settings.spectator_color.Value.x, g_settings.spectator_color.Value.y, g_settings.spectator_color.Value.z, g_settings.spectator_color.Value.w };
-				if (ImGui::ColorEdit4(xorstr_("##SPC"), spectators_color))
+				if (ImGui::ColorEdit4(xorstr_("Text##SPC"), spectators_color))
 					g_settings.spectator_color = { spectators_color[0], spectators_color[1], spectators_color[2], spectators_color[3] };
 
 				ImGui::Separator();
@@ -186,7 +186,6 @@ namespace big
 
 				ImGui::Separator();
 
-				int selected = 0;
 				if (ImGui::TreeNode(xorstr_("Blacklisted players")))
 				{
 					int i = 0;
@@ -194,7 +193,7 @@ namespace big
 					{
 						if (ImGui::Selectable(rs.c_str(), false))
 						{
-							selected = i;
+							plugins::selected = i;
 					    }
 
 						i++;
@@ -204,7 +203,13 @@ namespace big
 				}
 
 				if (ImGui::Button(xorstr_("Delete player from blacklist")))
-					plugins::delete_from_blacklist(plugins::blacklisted.at(selected));
+				{
+					std::string nickname = plugins::blacklisted.at(plugins::selected);
+					if (!nickname.empty())
+					{
+						plugins::delete_from_blacklist(nickname);
+					}
+				}
 
 				ImGui::Separator();
 
@@ -224,6 +229,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Spectator list dummies"), &g_settings.spectator_list_debug);
 
 				ImGui::Separator();
+
+				ImGui::Text(xorstr_("Compilation date: %s"), __DATE__);
 
 				if (ImGui::Button(xorstr_("Unload")))
 					g_globals.g_running = false;
