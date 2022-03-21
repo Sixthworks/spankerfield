@@ -54,6 +54,5 @@ Symbols: Multi-Byte.
 
 ### Planning to do
 ```
-Config system (JSON),
 Player list with battlelog API.
 ```
