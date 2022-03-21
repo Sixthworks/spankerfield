@@ -6,9 +6,9 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 
 ![image](https://user-images.githubusercontent.com/52250786/159128801-58025d95-d63e-43af-ac32-ce3faf6b76be.png)
 
-![image](https://user-images.githubusercontent.com/52250786/159128828-42514400-6cab-423b-ae21-5dcb0d41163c.png)
+![image](https://user-images.githubusercontent.com/52250786/159335963-cb53262b-df16-44cc-b3f9-9040b34206b9.png)
 
-![image](https://user-images.githubusercontent.com/52250786/159128847-40244180-1aba-4821-ade6-f28110e12a05.png)
+![image](https://user-images.githubusercontent.com/52250786/159335820-aa252595-bbea-4219-8aa2-0ff478649aab.png)
 
 
 ### Gameplay images
