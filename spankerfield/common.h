@@ -49,8 +49,9 @@
 
 #include <regex>
 
-#include "Utilities/xorstr.h"
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
+
+#include "Utilities/xorstr.h"
 
 #include "logger.h"

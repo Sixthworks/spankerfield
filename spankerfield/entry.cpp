@@ -1,10 +1,10 @@
 ﻿#include "common.h"
 #include "Rendering/renderer.h"
-#include "Utilities/xorstr.h"
 #include "Utilities/vtablehook.h"
 #include "Hooks/hooks.h"
 #include "MinHook.h"
 #include "global.h"
+#include "settings.h"
 
 BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 {
@@ -33,6 +33,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				g_hooking->enable();
 				LOG(INFO) << xorstr_("Hooking enabled.");
+
+				g_config.load();
+				LOG(INFO) << xorstr_("Configuration loaded.");
 
 				while (g_globals.g_running)
 				{

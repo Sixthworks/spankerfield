@@ -9,10 +9,17 @@
 using namespace big;
 namespace plugins
 {
-	nlohmann::json get_json()
+	std::filesystem::path get_path()
 	{
 		auto file_path = get_appdata_folder();
 		file_path /= xorstr_("Blacklisted.json");
+
+		return file_path;
+	}
+
+	nlohmann::json get_json()
+	{
+		auto file_path = get_path();
 
 		nlohmann::json players;
 		std::ifstream file(file_path);
@@ -25,8 +32,7 @@ namespace plugins
 
 	void save_json(nlohmann::json json)
 	{
-		auto file_path = get_appdata_folder();
-		file_path /= xorstr_("Blacklisted.json");
+		auto file_path = get_path();
 
 		std::ofstream rest(file_path, std::ios::out | std::ios::trunc);
 		rest << json.dump(4);

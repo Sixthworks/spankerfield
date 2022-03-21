@@ -1,9 +1,9 @@
 #include "gui.h"
 #include "renderer.h"
 #include "../common.h"
-#include "../ImGui/imgui.h"
-#include "../settings.h"
 #include "../global.h"
+#include "../settings.h"
+#include "../ImGui/imgui.h"
 #include "../Features/main.h"
 
 namespace big
@@ -88,7 +88,9 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Main")))
 			{
 				ImGui::Checkbox(xorstr_("Draw ESP"), &g_settings.esp);
-				ImGui::SliderFloat(xorstr_("ESP distance"), &g_settings.esp_distance, 1.f, 10000.f);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Distance##ESP"), &g_settings.esp_distance, 1.f, 10000.f);
+				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
@@ -115,7 +117,7 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw skeleton"), &g_settings.draw_skeleton);
-				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.draw_skeleton);
+				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.use_dots);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.dots_distance, 1.f, 5000.f);
 				ImGui::PopItemWidth();
@@ -147,7 +149,7 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Y##RDR"), &g_settings.radar_y, 0, g_globals.g_height);
 				ImGui::PopItemWidth();
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Radar distance"), &g_settings.radar_distance, 1.f, 10000.f);
+				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
@@ -226,6 +228,18 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Settings")))
 			{
+				ImGui::Separator();
+				
+				ImGui::Text(xorstr_("Config"));
+
+				if (ImGui::Button(xorstr_("Load")))
+					g_config.load();
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(xorstr_("Save")))
+					g_config.attempt_save();
+
 				ImGui::Checkbox(xorstr_("Spectator list dummies"), &g_settings.spectator_list_debug);
 
 				ImGui::Separator();
