@@ -8,6 +8,7 @@
 using namespace big;
 namespace plugins
 {
+	static bool set = false;
 	void draw_spectators()
 	{
 		if (!g_settings.spectator_list) return;
@@ -54,8 +55,12 @@ namespace plugins
 		else
 		{
 			ImGuiWindowFlags flags = g_gui.m_opened ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar;
-			ImGui::SetNextWindowSize(ImVec2(250, 125.f));
-			ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f));
+			if (!set)
+			{
+				ImGui::SetNextWindowSize(ImVec2(250, 125.f));
+				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f));
+				set = true;
+			}
 
 			if (ImGui::Begin(xorstr_("Spectator list"), nullptr, flags))
 			{
