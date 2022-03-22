@@ -1,14 +1,20 @@
 ﻿#include "common.h"
 #include "Rendering/renderer.h"
 #include "Utilities/vtablehook.h"
+#include "Utilities/thread_pool.h"
 #include "Hooks/hooks.h"
 #include "MinHook.h"
 #include "global.h"
 #include "settings.h"
 
-BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
+
+BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 {
 	using namespace big;
+
+	const auto dx_renderer = DxRenderer::GetInstance();
+	while (!dx_renderer)
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	switch (reason)
 	{
@@ -27,6 +33,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 			{
 				auto renderer_instance = std::make_unique<renderer>();
 				LOG(INFO) << xorstr_("Renderer initialized.");
+
+				auto thread_pool_instance = std::make_unique<thread_pool>();
+				LOG(INFO) << xorstr_("Thread pool initialized.");
 
 				g_hooking->initialize();
 				LOG(INFO) << xorstr_("MinHook initialized.");
@@ -55,6 +64,10 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				renderer_instance.reset();
 				LOG(INFO) << xorstr_("Renderer uninitialized.");
+
+				g_thread_pool->destroy();
+				thread_pool_instance.reset();
+				LOG(INFO) << xorstr_("Thread pool uninitialized.");
 			}
 			catch (std::exception const& ex)
 			{

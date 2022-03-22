@@ -121,7 +121,7 @@ namespace big
 	{
 		const auto dx_renderer = DxRenderer::GetInstance();
 		const auto border_input_node = BorderInputNode::GetInstance();
-		static bool terminate{ false };
+		bool terminate{};
 
 		while (dx_renderer && border_input_node)
 		{
@@ -141,7 +141,7 @@ namespace big
 			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(hook_vtable_func(reinterpret_cast<PDWORD64*>(border_input_node->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
 			LOG(INFO) << xorstr_("Hooked PreFrame.");
 
-			terminate = !terminate;
+			terminate = true;
 		}
 	}
 

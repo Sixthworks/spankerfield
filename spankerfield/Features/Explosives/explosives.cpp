@@ -3,25 +3,25 @@
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
 
-struct ClassInfos_s
-{
-	ClassInfo* MissileEntity = nullptr;
-	ClassInfo* ExplosionEntity = nullptr;
-	ClassInfo* VehicleEntity = nullptr;
-	ClassInfo* WarningComponent = nullptr;
-}ClassInfos;
-
-void UpdateClassInfos()
-{
-	ClassInfos.MissileEntity = FindClassInfo(xorstr_("VeniceClientMissileEntity"));
-	ClassInfos.ExplosionEntity = FindClassInfo(xorstr_("ClientExplosionPackEntity"));
-	ClassInfos.VehicleEntity = FindClassInfo(xorstr_("ClientVehicleEntity"));
-	ClassInfos.WarningComponent = FindClassInfo(xorstr_("ClientWarningSystemComponent"));
-}
-
 using namespace big;
 namespace plugins
 {
+	struct class_info_s
+	{
+		ClassInfo* MissileEntity = nullptr;
+		ClassInfo* ExplosionEntity = nullptr;
+		ClassInfo* VehicleEntity = nullptr;
+		ClassInfo* WarningComponent = nullptr;
+	}class_info;
+
+	void update_info()
+	{
+		class_info.MissileEntity = FindClassInfo(xorstr_("VeniceClientMissileEntity"));
+		class_info.ExplosionEntity = FindClassInfo(xorstr_("ClientExplosionPackEntity"));
+		class_info.VehicleEntity = FindClassInfo(xorstr_("ClientVehicleEntity"));
+		class_info.WarningComponent = FindClassInfo(xorstr_("ClientWarningSystemComponent"));
+	}
+
 	void draw_explosives()
 	{
 		if (!g_settings.explosives) return;
@@ -46,9 +46,9 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		if (ClassInfos.ExplosionEntity)
+		if (class_info.ExplosionEntity)
 		{
-			EntityIterator<ClientExplosionEntity> explosives(game_world, ClassInfos.ExplosionEntity);
+			EntityIterator<ClientExplosionEntity> explosives(game_world, class_info.ExplosionEntity);
 
 			if (explosives.front())
 			{
@@ -74,6 +74,6 @@ namespace plugins
 			}
 		}
 		else
-			UpdateClassInfos();
+			update_info();
 	}
 }

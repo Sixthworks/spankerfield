@@ -3,6 +3,7 @@
 #include "../../settings.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Rendering/gui.h"
 
 using namespace big;
 namespace plugins
@@ -20,37 +21,50 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return;
 
-		if (g_settings.spectator_list_debug)
-		{
-			static int spectator_dummies[4]{};
+		// Vector for storing spectator names
+		std::vector<std::string> spectators{};
 
-			float offset = 0.f;
-			for (int i = 0; i < sizeof(spectator_dummies) / sizeof(*spectator_dummies); i++)
+		// Filling the vector with spectators
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			if (!player)
+				continue;
+
+			if (player == local_player)
+				continue;
+
+			if (player->m_IsSpectator)
 			{
-				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, g_settings.spectator_color, 26.f, FL_NONE, xorstr_(u8"%s"), xorstr_("Dummy"));
+				const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+
+				spectators.push_back(nickname);
+			}
+		}
+
+		if (g_settings.raw_drawing)
+		{
+			float offset = 0.f;
+			for (const auto& rs : spectators)
+			{
+				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), rs.c_str());
 				offset += 20;
 			}
 		}
 		else
 		{
-			float offset = 0.f;
-			for (int i = 0; i < MAX_PLAYERS; i++)
+			ImGuiWindowFlags flags = g_gui.m_opened ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar;
+			ImGui::SetNextWindowSize(ImVec2(250, 125.f));
+			ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f));
+
+			if (ImGui::Begin(xorstr_("Spectator list"), nullptr, flags))
 			{
-				ClientPlayer* player = player_manager->m_ppPlayers[i];
-				if (!player)
-					continue;
-
-				if (player == local_player)
-					continue;
-
-				if (player->m_IsSpectator)
+				for (const auto& rs : spectators)
 				{
-					const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
-
-					m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), nickname);
-					offset += 20;
+					ImGui::Text(rs.c_str());
 				}
 			}
+			ImGui::End();
 		}
 	}
 }

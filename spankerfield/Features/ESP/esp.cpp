@@ -7,14 +7,7 @@
 using namespace big;
 namespace plugins
 {
-	template <typename Type> std::string to_str(const Type& t)
-	{
-		std::ostringstream os;
-		os << t;
-		return os.str();
-	}
-
-	float Distance(const Vector3& point1, const Vector3& point2)
+	float get_distance(const Vector3& point1, const Vector3& point2)
 	{
 		float distance = sqrt((point1.x - point2.x) * (point1.x - point2.x) +
 			(point1.y - point2.y) * (point1.y - point2.y) +
@@ -23,7 +16,7 @@ namespace plugins
 		return distance;
 	}
 
-	void DrawBone(const ImColor& color, RagdollComponent* pRag, UpdatePoseResultData::BONES Bone1, UpdatePoseResultData::BONES Bone2, bool Dots)
+	void draw_bone(const ImColor& color, RagdollComponent* pRag, UpdatePoseResultData::BONES Bone1, UpdatePoseResultData::BONES Bone2, bool Dots)
 	{
 		if (!IsValidPtr(pRag))
 			return;
@@ -54,7 +47,7 @@ namespace plugins
 		m_drawing->AddLine(ImVec2(pos1.x, pos1.y), ImVec2(pos2.x, pos2.y), color);
 	}
 
-	std::string FormatVehicle(std::string VehName)
+	std::string format_vehicle(std::string VehName)
 	{
 		std::string Pattern = xorstr_("_VNAME_");
 		size_t Index = VehName.find(Pattern);
@@ -120,7 +113,7 @@ namespace plugins
 			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
 			float health_player = 0.f;
 			float max_health_player = 0.f;
-			float distance = Distance(pos, local_pos);
+			float distance = get_distance(pos, local_pos);
 			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 
 			ClientVehicleEntity* vehicle = player->GetVehicle();
@@ -179,7 +172,7 @@ namespace plugins
 					if (distance >= 0.f && distance <= g_settings.radar_distance)
 					{
 						if (IsValidPtr(vehicle)) {
-							std::string str = FormatVehicle(vehicle_name);
+							std::string str = format_vehicle(vehicle_name);
 
 							m_drawing->AddText(x, y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, xorstr_(u8"%s"), str.c_str());
 						}
@@ -228,8 +221,7 @@ namespace plugins
 
 					if (g_settings.draw_distance)
 					{
-						float fmt_distance = abs(ceil(distance));
-						std::string str(to_str(fmt_distance) + xorstr_("m"));
+						std::string str(fmt::format(xorstr_("{}{}"), abs(ceil(distance)), xorstr_("m")));
 
 						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
 						base[1] += 9.f;
@@ -247,19 +239,19 @@ namespace plugins
 
 					if (IsValidPtr(ragdoll_component))
 					{
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine2, UpdatePoseResultData::Spine1, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine1, UpdatePoseResultData::Spine, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::LeftShoulder, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftShoulder, UpdatePoseResultData::LeftElbowRoll, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightShoulder, UpdatePoseResultData::RightElbowRoll, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftElbowRoll, UpdatePoseResultData::LeftHand, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightElbowRoll, UpdatePoseResultData::RightHand, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::RightKneeRoll, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::LeftKneeRoll, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightKneeRoll, UpdatePoseResultData::RightFoot, dots);
-						DrawBone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftKneeRoll, UpdatePoseResultData::LeftFoot, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine2, UpdatePoseResultData::Spine1, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine1, UpdatePoseResultData::Spine, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::LeftShoulder, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftShoulder, UpdatePoseResultData::LeftElbowRoll, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightShoulder, UpdatePoseResultData::RightElbowRoll, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftElbowRoll, UpdatePoseResultData::LeftHand, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightElbowRoll, UpdatePoseResultData::RightHand, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::RightKneeRoll, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::Spine, UpdatePoseResultData::LeftKneeRoll, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::RightKneeRoll, UpdatePoseResultData::RightFoot, dots);
+						draw_bone(g_settings.skeleton_color, ragdoll_component, UpdatePoseResultData::LeftKneeRoll, UpdatePoseResultData::LeftFoot, dots);
 					}
 				}
 			}

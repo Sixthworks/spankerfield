@@ -75,15 +75,14 @@ namespace big
 		colors[ImGuiCol_TabUnfocused] = ImColor(33, 43, 105);
 		colors[ImGuiCol_TabUnfocusedActive] = ImColor(34, 122, 180);
 
-		ImGui::SetNextWindowSize({ 690, 710 });
-		ImGui::SetNextWindowBgAlpha(1.f);
+		ImGui::SetNextWindowSize(ImVec2(690, 710));
 	}
 
 	void gui::dx_on_tick()
 	{
-		if (ImGui::Begin(xorstr_("Spankerfield##")))
+		if (ImGui::Begin(xorstr_("Spankerfield")))
 		{
-			ImGui::BeginTabBar(xorstr_("tabbar"));
+			ImGui::BeginTabBar(xorstr_("Tab bar"));
 
 			if (ImGui::BeginTabItem(xorstr_("Main")))
 			{
@@ -102,11 +101,11 @@ namespace big
 				ImGui::Text(xorstr_("Box color"));
 				static float box_colors_oc[4] = { g_settings.box_color_occluded.Value.x, g_settings.box_color_occluded.Value.y, g_settings.box_color_occluded.Value.z, g_settings.box_color_occluded.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Not visible##BX"), box_colors_oc))
-					g_settings.box_color_occluded = { box_colors_oc[0], box_colors_oc[1], box_colors_oc[2], box_colors_oc[3] };
+					g_settings.box_color_occluded = ImColor(box_colors_oc[0], box_colors_oc[1], box_colors_oc[2], box_colors_oc[3]);
 
 				static float box_colors[4] = { g_settings.box_color.Value.x, g_settings.box_color.Value.y, g_settings.box_color.Value.z, g_settings.box_color.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Visible##BX"), box_colors))
-					g_settings.box_color = { box_colors[0], box_colors[1], box_colors[2], box_colors[3] };
+					g_settings.box_color = ImColor(box_colors[0], box_colors[1], box_colors[2], box_colors[3]);
 
 				ImGui::Checkbox(xorstr_("Draw health"), &g_settings.draw_health);
 				ImGui::SameLine();
@@ -127,16 +126,16 @@ namespace big
 				ImGui::Text(xorstr_("Text color"));
 				static float text_color_oc[4] = { g_settings.text_color_occluded.Value.x, g_settings.text_color_occluded.Value.y, g_settings.text_color_occluded.Value.z, g_settings.text_color_occluded.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Not visible##TX"), text_color_oc))
-					g_settings.text_color_occluded = { text_color_oc[0], text_color_oc[1], text_color_oc[2], text_color_oc[3] };
+					g_settings.text_color_occluded = ImColor(text_color_oc[0], text_color_oc[1], text_color_oc[2], text_color_oc[3]);
 
 				static float text_colors[4] = { g_settings.text_color.Value.x, g_settings.text_color.Value.y, g_settings.text_color.Value.z, g_settings.text_color.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Visible##TX"), text_colors))
-					g_settings.text_color = { text_colors[0], text_colors[1], text_colors[2], text_colors[3] };
+					g_settings.text_color = ImColor(text_colors[0], text_colors[1], text_colors[2], text_colors[3]);
 
 				ImGui::Text(xorstr_("Skeleton color"));
 				static float skeleton_color[4] = { g_settings.skeleton_color.Value.x, g_settings.skeleton_color.Value.y, g_settings.skeleton_color.Value.z, g_settings.skeleton_color.Value.w };
 				if (ImGui::ColorEdit4(xorstr_("Bones##SKC"), skeleton_color))
-					g_settings.skeleton_color = { skeleton_color[0], skeleton_color[1], skeleton_color[2], skeleton_color[3] };
+					g_settings.skeleton_color = ImColor(skeleton_color[0], skeleton_color[1], skeleton_color[2], skeleton_color[3]);
 
 				ImGui::Separator();
 
@@ -160,6 +159,8 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Spectator list"), &g_settings.spectator_list);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Raw drawing"), &g_settings.raw_drawing);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("X##SP"), &g_settings.spectator_x, 0, g_globals.g_width);
 				ImGui::PopItemWidth();
@@ -240,11 +241,7 @@ namespace big
 				if (ImGui::Button(xorstr_("Save")))
 					g_config.attempt_save();
 
-				ImGui::Checkbox(xorstr_("Spectator list dummies"), &g_settings.spectator_list_debug);
-
 				ImGui::Separator();
-
-				ImGui::Text(xorstr_("Compilation date: %s"), __DATE__);
 
 				if (ImGui::Button(xorstr_("Unload")))
 					g_globals.g_running = false;

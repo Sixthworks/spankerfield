@@ -8,6 +8,7 @@
 #include "../ImGui/imgui_impl_dx11.h"
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_internal.h"
+#include "../Utilities/path.h"
 #include "../Features/main.h"
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -28,6 +29,9 @@ namespace big
 		}
 
 		m_d3d_device->GetImmediateContext(m_d3d_device_context.GetAddressOf());
+
+		auto file_path = get_appdata_folder();
+		file_path /= xorstr_("imgui.ini");
 
 		ImGui::CreateContext();
 

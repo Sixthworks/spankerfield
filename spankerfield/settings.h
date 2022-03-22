@@ -38,7 +38,7 @@ namespace big
 		bool jet_speed{ true };
 
 		bool spectator_list{ true };
-		bool spectator_list_debug;
+		bool raw_drawing;
 		float spectator_x{ 23.5f };
 		float spectator_y{ 565.f };
 		ImColor spectator_color{ 255, 255, 255, 255 };
@@ -105,7 +105,7 @@ namespace big
 			g_settings.jet_speed = j["settings"]["jet_speed"];
 
 			g_settings.spectator_list = j["settings"]["spectator_list"];
-			g_settings.spectator_list_debug = j["settings"]["spectator_list_debug"];
+			g_settings.raw_drawing = j["settings"]["raw_drawing"];
 			g_settings.spectator_x = j["settings"]["spectator_x"];
 			g_settings.spectator_y = j["settings"]["spectator_y"];
 			// g_settings.spectator_color = get_color(j["settings"]["spectator_color"]);
@@ -145,7 +145,7 @@ namespace big
 						{ "explosives", g_settings.explosives },
 						{ "jet_speed", g_settings.jet_speed },
 						{ "spectator_list", g_settings.spectator_list },
-						{ "spectator_list_debug", g_settings.spectator_list_debug },
+						{ "raw_drawing", g_settings.raw_drawing },
 						{ "spectator_x", g_settings.spectator_x },
 						{ "spectator_y", g_settings.spectator_y },
 						// { "spectator_color", format_color(g_settings.spectator_color) },
