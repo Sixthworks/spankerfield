@@ -2,11 +2,11 @@
 If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
 
 ### Menu images
-![image](https://user-images.githubusercontent.com/52250786/159491570-34d85fa8-d070-4e14-98e1-fb798e773676.png)
+![menu_main](https://user-images.githubusercontent.com/52250786/160295437-1f0d9e7f-d831-4f97-a5db-d540c2bda38e.jpg)
 
 ![image](https://user-images.githubusercontent.com/52250786/159128801-58025d95-d63e-43af-ac32-ce3faf6b76be.png)
 
-![image](https://user-images.githubusercontent.com/52250786/159335963-cb53262b-df16-44cc-b3f9-9040b34206b9.png)
+![image](https://user-images.githubusercontent.com/52250786/160295503-2c1fd8c9-e6ea-4190-a32f-9f82792ee80d.png)
 
 ![image](https://user-images.githubusercontent.com/52250786/159335820-aa252595-bbea-4219-8aa2-0ff478649aab.png)
 
@@ -28,6 +28,7 @@ Unloading at runtime,
 Log console with g3log,
 Sorted features,
 Rendering through ImGui,
+Aimbot,
 Player blacklist,
 Player ESP,
 Vehicle ESP,
