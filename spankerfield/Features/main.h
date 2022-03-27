@@ -5,6 +5,7 @@
 #include "ESP/esp.h"
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
+#include "Aimbot/aimbot.h"
 
 namespace big
 {
@@ -12,7 +13,7 @@ namespace big
 	{
 	public:
 		void draw();
-		void pre_frame();
+		void pre_frame(float delta_time);
 	};
 
 	inline features* g_features{};

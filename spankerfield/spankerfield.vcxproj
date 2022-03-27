@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="common.cpp" />
     <ClCompile Include="entry.cpp" />
+    <ClCompile Include="Features\Aimbot\aimbot.cpp" />
     <ClCompile Include="Features\Blacklist\blacklist.cpp" />
     <ClCompile Include="Features\ESP\esp.cpp" />
     <ClCompile Include="Features\Explosives\explosives.cpp" />
@@ -179,14 +180,17 @@
     <ClCompile Include="Utilities\g3log\logworker.cpp" />
     <ClCompile Include="Utilities\g3log\stacktrace_windows.cpp" />
     <ClCompile Include="Utilities\g3log\time.cpp" />
+    <ClCompile Include="Utilities\math.cpp" />
     <ClCompile Include="Utilities\other.cpp" />
     <ClCompile Include="Utilities\path.cpp" />
+    <ClCompile Include="Utilities\poly_solver.cpp" />
     <ClCompile Include="Utilities\thread_pool.cpp" />
     <ClCompile Include="Utilities\vtablehook.cpp" />
     <ClCompile Include="Utilities\w2s.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
+    <ClInclude Include="Features\Aimbot\aimbot.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\gui.h" />
@@ -242,8 +246,10 @@
     <ClInclude Include="Utilities\g3log\g3log\stacktrace_windows.hpp" />
     <ClInclude Include="Utilities\g3log\g3log\stlpatch_future.hpp" />
     <ClInclude Include="Utilities\g3log\g3log\time.hpp" />
+    <ClInclude Include="Utilities\math.h" />
     <ClInclude Include="Utilities\other.h" />
     <ClInclude Include="Utilities\path.h" />
+    <ClInclude Include="Utilities\poly_solver.h" />
     <ClInclude Include="Utilities\thread_pool.h" />
     <ClInclude Include="Utilities\vtablehook.h" />
     <ClInclude Include="Utilities\w2s.h" />

@@ -17,7 +17,7 @@ namespace big
 		return Transform;
 	}
 
-	inline bool WorldToScreen(const Vector3& pos, Vector2& out)
+	bool WorldToScreen(const Vector3& pos, Vector2& out)
 	{
 		float w = g_globals.g_viewproj.m[0][3] * pos.x + g_globals.g_viewproj.m[1][3] * pos.y + g_globals.g_viewproj.m[2][3] * pos.z + g_globals.g_viewproj.m[3][3];
 		if (w < 0.19)
@@ -44,7 +44,7 @@ namespace big
 	}
 
 
-	inline bool WorldToScreen(const Vector3& origin, Vector3& screen)
+	bool WorldToScreen(const Vector3& origin, Vector3& screen)
 	{
 		float mX = static_cast<float>(g_globals.g_width * 0.5f);
 		float mY = static_cast<float>(g_globals.g_height * 0.5f);
@@ -67,12 +67,12 @@ namespace big
 		return true;
 	}
 
-	inline bool WorldToScreen(Vector3& pos)
+	bool WorldToScreen(Vector3& pos)
 	{
 		return WorldToScreen(pos, reinterpret_cast<Vector2&>(pos));
 	}
 
-	auto MultiplyMat(const Vector3& vec, const Matrix* mat)
+	Vector3 MultiplyMat(const Vector3& vec, const Matrix* mat)
 	{
 		return Vector3(mat->_11 * vec.x + mat->_21 * vec.y + mat->_31 * vec.z,
 			mat->_12 * vec.x + mat->_22 * vec.y + mat->_32 * vec.z,

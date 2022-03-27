@@ -1,5 +1,6 @@
 #include "ImGui/imgui.h"
 #include "Utilities/path.h"
+#include "SDK/sdk.h"
 
 namespace big
 {
@@ -7,6 +8,15 @@ namespace big
 	{
 	public:
 		bool blacklist{ true };
+
+		bool aimbot;
+		bool fov_method{ true };
+		bool draw_fov;
+		float aim_fov{ 90.f };
+		float min_time_to_target{ 1.5f };
+		float max_time_to_target{ 3.0f };
+		int aim_key{ VK_RBUTTON };
+		UpdatePoseResultData::BONES aim_bone{ UpdatePoseResultData::BONES::Spine2 };
 
 		bool esp{ true };
 		float esp_distance { 10000.f };
@@ -55,44 +65,30 @@ namespace big
 		nlohmann::json default_options;
 		nlohmann::json options;
 
-		std::string format_color(ImColor color)
-		{
-			char buffer[64];
-			sprintf_s(buffer, sizeof(buffer), "%f %f %f %f", color.Value.x, color.Value.y, color.Value.z, color.Value.w);
-
-			return buffer;
-		}
-
-		ImColor get_color(std::string color)
-		{
-			float x = 0, y = 0, z = 0, w = 0;
-			sscanf_s(color.c_str(), "%f %f %f %f", &x, &y, &z, &w);
-
-			return ImColor(x, y, z, w);
-		}
-
 		void from_json(const nlohmann::json& j)
 		{
 			g_settings.blacklist = j["settings"]["blacklist"];
+
+			g_settings.aimbot = j["settings"]["aimbot"];
+			g_settings.fov_method = j["settings"]["fov_method"];
+			g_settings.draw_fov = j["settings"]["draw_fov"];
+			g_settings.aim_fov = j["settings"]["aim_fov"];
+			g_settings.min_time_to_target = j["settings"]["min_time_to_target"];
+			g_settings.max_time_to_target = j["settings"]["max_time_to_target"];
 
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
 
 			g_settings.draw_box = j["settings"]["draw_box"];
 			g_settings.box_style = j["settings"]["box_style"];
-			// g_settings.box_color_occluded = get_color(j["settings"]["box_color_occluded"]);
-			// g_settings.box_color = get_color(j["settings"]["box_color"]);
 
 			g_settings.draw_health = j["settings"]["draw_health"];
 			g_settings.draw_name = j["settings"]["draw_name"];
 			g_settings.draw_distance = j["settings"]["draw_distance"];
-			// g_settings.text_color_occluded = get_color(j["settings"]["text_color_occluded"]);
-			// g_settings.text_color = get_color(j["settings"]["text_color"]);
 
 			g_settings.draw_skeleton = j["settings"]["draw_skeleton"];
 			g_settings.use_dots = j["settings"]["use_dots"];
 			g_settings.dots_distance = j["settings"]["dots_distance"];
-			// g_settings.skeleton_color = get_color(j["settings"]["skeleton_color"]);
 
 			g_settings.radar = j["settings"]["radar"];
 			g_settings.radar_x = j["settings"]["radar_x"];
@@ -108,8 +104,7 @@ namespace big
 			g_settings.raw_drawing = j["settings"]["raw_drawing"];
 			g_settings.spectator_x = j["settings"]["spectator_x"];
 			g_settings.spectator_y = j["settings"]["spectator_y"];
-			// g_settings.spectator_color = get_color(j["settings"]["spectator_color"]);
-
+			
 			g_settings.minimap = j["settings"]["minimap"];
 			g_settings.obs_check = j["settings"]["obs_check"];
 		}
@@ -125,17 +120,18 @@ namespace big
 						{ "esp_distance", g_settings.esp_distance },
 						{ "draw_box", g_settings.draw_box },
 						{ "box_style", g_settings.box_style },
-						// { "box_color_occluded", format_color(g_settings.box_color) },
-						// { "box_color", format_color(g_settings.box_color) },
 						{ "draw_health", g_settings.draw_health },
 						{ "draw_name", g_settings.draw_name },
 						{ "draw_distance", g_settings.draw_distance },
-						// { "text_color_occluded", format_color(g_settings.text_color_occluded) },
-						// { "text_color", format_color(g_settings.text_color) },
 						{ "draw_skeleton", g_settings.draw_skeleton },
 						{ "use_dots", g_settings.use_dots },
 						{ "dots_distance", g_settings.dots_distance },
-						// { "skeleton_color", format_color(g_settings.skeleton_color) },
+						{ "aimbot", g_settings.aimbot },
+						{ "fov_method", g_settings.fov_method },
+						{ "draw_fov", g_settings.draw_fov },
+						{ "aim_fov", g_settings.aim_fov },
+						{ "min_time_to_target", g_settings.min_time_to_target },
+						{ "max_time_to_target", g_settings.max_time_to_target },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },
@@ -148,7 +144,6 @@ namespace big
 						{ "raw_drawing", g_settings.raw_drawing },
 						{ "spectator_x", g_settings.spectator_x },
 						{ "spectator_y", g_settings.spectator_y },
-						// { "spectator_color", format_color(g_settings.spectator_color) },
 						{ "minimap", g_settings.minimap },
 						{ "obs_check", g_settings.obs_check },
 					},

@@ -24,8 +24,6 @@ namespace big
 			Sleep(15);
 			bool result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
 			g_globals.g_fairfight = false;
-
-			LOG(EVENT) << xorstr_("Fairfight screenshot taken");
 			return result;
 		}
 	}
@@ -46,8 +44,7 @@ namespace big
 				g_globals.g_width = pDxRenderer->m_pScreen->m_Width;
 				g_globals.g_viewproj = pGameRenderer->m_pRenderView->m_ViewProjection;
 
-				if (punkbuster_check())
-					LOG(EVENT) << xorstr_("Punkbuster screenshot taken");
+				punkbuster_check();
 
 				g_renderer->on_present();
 			}
@@ -58,14 +55,14 @@ namespace big
 
 	namespace PreFrame
 	{
-		using PreFrameUpdate_t = void(*)(uintptr_t pthis, uint64_t a2);
+		using PreFrameUpdate_t = void(*)(float dt);
 		PreFrameUpdate_t oPreFrameUpdate = nullptr;
 
-		void hkPreFrame(uintptr_t pThis, uint64_t a2)
+		void hkPreFrame(float delta_time)
 		{
-			oPreFrameUpdate(pThis, a2);
+			oPreFrameUpdate(delta_time);
 
-			g_features->pre_frame();
+			g_features->pre_frame(delta_time);
 		}
 	}
 

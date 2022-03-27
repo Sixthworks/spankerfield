@@ -1,6 +1,7 @@
 #include "other.h"
 #include "../SDK/sdk.h"
 #include "../global.h"
+#include <random>
 
 namespace big
 {
@@ -8,12 +9,30 @@ namespace big
 	{
 		static auto screenshot_module = (uintptr_t*)OFFSET_SSMODULE;
 		if (!IsValidPtr(screenshot_module))
-			return true; // Don't draw just in case.
+			return true;
 
 		bool status = (*(int*)(*screenshot_module + 0x14) != -1);
 		g_globals.g_punkbuster = status;
 
 		return status;
+	}
+
+	int generate_random_int(int min, int max)
+	{
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist6(min, max);
+
+		return dist6(rng);
+	}
+
+	float generate_random_float(float min, float max)
+	{
+		std::random_device rd;
+		std::default_random_engine eng(rd());
+		std::uniform_real_distribution<> distr(min, max);
+
+		return (float)distr(eng);
 	}
 
 	std::string current_time()

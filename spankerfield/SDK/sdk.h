@@ -25,6 +25,8 @@
 #define OFFSET_FIRSTTYPEINFO		  0x1423E41B8
 #define OFFSET_GETENTITYLIST		  0x1407CD5D0
 
+#define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
+
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 

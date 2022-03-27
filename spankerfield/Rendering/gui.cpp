@@ -86,6 +86,28 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Main")))
 			{
+				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
+				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.fov_method);
+				if (g_settings.fov_method)
+				{
+					ImGui::Separator();
+
+					ImGui::Checkbox(xorstr_("Draw FOV"), &g_settings.draw_fov);
+
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("FOV (pixels)##Aimbot"), &g_settings.aim_fov, 0.f, 10000.f);
+					ImGui::PopItemWidth();
+
+					ImGui::Separator();
+				}
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Minimum time to target (seconds)##Aimbot"), &g_settings.min_time_to_target, 0.f, g_settings.max_time_to_target);
+				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.max_time_to_target, 0.f, 10.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Draw ESP"), &g_settings.esp);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Distance##ESP"), &g_settings.esp_distance, 1.f, 10000.f);
