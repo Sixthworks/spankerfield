@@ -49,7 +49,7 @@ Visual Studio 2022 (v143),
 C++ Standart - ISO C++17,
 C Standart - Old MSVC,
 Preprocessor arguments: _CRT_SECURE_NO_WARNINGS,
-Symbols: Multi-Byte.
+Symbols: Unicode.
 ```
 
 ### Planning to do
