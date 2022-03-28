@@ -1,20 +1,10 @@
 #include "jetspeed.h"
 #include "../../settings.h"
-#include "../../Utilities/xorstr.h"
+#include "../../Utilities/other.h"
 
 using namespace big;
 namespace plugins
 {
-	std::vector<std::string> jets
-	{
-		xorstr_("ID_P_VNAME_F35"),
-		xorstr_("ID_P_VNAME_J20"),
-		xorstr_("ID_P_VNAME_PAKFA"),
-		xorstr_("ID_P_VNAME_A10"),
-		xorstr_("ID_P_VNAME_SU39"),
-		xorstr_("ID_P_VNAME_Q5")
-	};
-
 	void set_jet_speed()
 	{
 		if (!g_settings.jet_speed) return;
@@ -48,16 +38,7 @@ namespace plugins
 		const auto vehicle_data = reinterpret_cast<VehicleEntityData*>(local_vehicle->m_Data);
 		if (!vehicle_data) return;
 
-		static bool using_jet = false;
-		for (const auto& rs : jets)
-		{
-			if (vehicle_data->m_NameSid == rs)
-			{
-				using_jet = true;
-				break;
-			}
-		}
-
+		static bool using_jet = is_jet(vehicle_data->m_NameSid);
 		if (using_jet)
 		{
 			const auto keyboard = border_input_node->m_pKeyboard;

@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "renderer.h"
+#include "bone_manager.h"
 #include "../common.h"
 #include "../global.h"
 #include "../settings.h"
@@ -101,9 +102,34 @@ namespace big
 					ImGui::Separator();
 				}
 
+				ImGui::Text(xorstr_("Aim bone"));
+
+				static const char* text = g_settings.aim_bone < bone_map.size() ? bone_map[(UpdatePoseResultData::BONES)g_settings.aim_bone].c_str() : xorstr_("Unknown");
+				ImGui::PushItemWidth(300.f);
+				if (ImGui::DragInt(xorstr_("##BS"), &g_settings.aim_bone, 1.0f, 0, bone_map.size() - 1))
+				{
+					if (g_settings.aim_bone >= 0 && g_settings.aim_bone < bone_map.size())
+					{
+						auto it = bone_map.begin();
+						std::advance(it, g_settings.aim_bone);
+
+						g_settings.aim_bone = it->first;
+						text = it->second.c_str();
+					}
+				}
+				ImGui::PopItemWidth();
+
+				if (text != "")
+				{
+					ImGui::SameLine();
+					ImGui::Text(text);
+				}
+
+				ImGui::Separator();
+
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Minimum time to target (seconds)##Aimbot"), &g_settings.min_time_to_target, 0.f, g_settings.max_time_to_target);
-				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.max_time_to_target, 0.f, 10.f);
+				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.max_time_to_target, g_settings.min_time_to_target, 10.f);
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();

@@ -1,23 +1,10 @@
 #include "w2s.h"
+#include "other.h"
 #include "../global.h"
 
 namespace big
 {
-	TransformAABBStruct GetTransform(ClientPlayer* Player)
-	{
-		TransformAABBStruct Transform;
-
-		const auto Soldier = Player->GetSoldier();
-		if (!Soldier) 
-			return Transform;
-
-		ClientVehicleEntity* Vehicle = Player->GetVehicle();
-		Vehicle ? Vehicle->GetAABB(&Transform) : Soldier->GetAABB(&Transform);
-
-		return Transform;
-	}
-
-	bool WorldToScreen(const Vector3& pos, Vector2& out)
+	bool world_to_screen(const Vector3& pos, Vector2& out)
 	{
 		float w = g_globals.g_viewproj.m[0][3] * pos.x + g_globals.g_viewproj.m[1][3] * pos.y + g_globals.g_viewproj.m[2][3] * pos.z + g_globals.g_viewproj.m[3][3];
 		if (w < 0.19)
@@ -44,7 +31,7 @@ namespace big
 	}
 
 
-	bool WorldToScreen(const Vector3& origin, Vector3& screen)
+	bool world_to_screen(const Vector3& origin, Vector3& screen)
 	{
 		float mX = static_cast<float>(g_globals.g_width * 0.5f);
 		float mY = static_cast<float>(g_globals.g_height * 0.5f);
@@ -67,36 +54,36 @@ namespace big
 		return true;
 	}
 
-	bool WorldToScreen(Vector3& pos)
+	bool world_to_screen(Vector3& pos)
 	{
-		return WorldToScreen(pos, reinterpret_cast<Vector2&>(pos));
+		return world_to_screen(pos, reinterpret_cast<Vector2&>(pos));
 	}
 
-	Vector3 MultiplyMat(const Vector3& vec, const Matrix* mat)
+	Vector3 multiply_mat(const Vector3& vec, const Matrix* mat)
 	{
 		return Vector3(mat->_11 * vec.x + mat->_21 * vec.y + mat->_31 * vec.z,
 			mat->_12 * vec.x + mat->_22 * vec.y + mat->_32 * vec.z,
 			mat->_13 * vec.x + mat->_23 * vec.y + mat->_33 * vec.z);
 	}
 
-	bool GetBoxCords(const TransformAABBStruct& TransAABB, Vector2* cords) {
+	bool get_box_coords(const TransformAABBStruct& TransAABB, Vector2* cords) {
 		Vector3 corners[8];
 		Vector3 pos = (Vector3)TransAABB.Transform.m[3];
 		Vector3 min = Vector3(TransAABB.AABB.m_Min.x, TransAABB.AABB.m_Min.y, TransAABB.AABB.m_Min.z);
 		Vector3 max = Vector3(TransAABB.AABB.m_Max.x, TransAABB.AABB.m_Max.y, TransAABB.AABB.m_Max.z);
-		corners[2] = pos + MultiplyMat(Vector3(max.x, min.y, min.z), &TransAABB.Transform);
-		corners[3] = pos + MultiplyMat(Vector3(max.x, min.y, max.z), &TransAABB.Transform);
-		corners[4] = pos + MultiplyMat(Vector3(min.x, min.y, max.z), &TransAABB.Transform);
-		corners[5] = pos + MultiplyMat(Vector3(min.x, max.y, max.z), &TransAABB.Transform);
-		corners[6] = pos + MultiplyMat(Vector3(min.x, max.y, min.z), &TransAABB.Transform);
-		corners[7] = pos + MultiplyMat(Vector3(max.x, max.y, min.z), &TransAABB.Transform);
-		min = pos + MultiplyMat(min, &TransAABB.Transform);
-		max = pos + MultiplyMat(max, &TransAABB.Transform);
+		corners[2] = pos + multiply_mat(Vector3(max.x, min.y, min.z), &TransAABB.Transform);
+		corners[3] = pos + multiply_mat(Vector3(max.x, min.y, max.z), &TransAABB.Transform);
+		corners[4] = pos + multiply_mat(Vector3(min.x, min.y, max.z), &TransAABB.Transform);
+		corners[5] = pos + multiply_mat(Vector3(min.x, max.y, max.z), &TransAABB.Transform);
+		corners[6] = pos + multiply_mat(Vector3(min.x, max.y, min.z), &TransAABB.Transform);
+		corners[7] = pos + multiply_mat(Vector3(max.x, max.y, min.z), &TransAABB.Transform);
+		min = pos + multiply_mat(min, &TransAABB.Transform);
+		max = pos + multiply_mat(max, &TransAABB.Transform);
 		corners[0] = min;
 		corners[1] = max;
 
 		for (auto& v3 : corners) {
-			if (!WorldToScreen(v3))
+			if (!world_to_screen(v3))
 				return false;
 		}
 

@@ -3,59 +3,40 @@
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
+#include "../../Utilities/other.h"
 
 using namespace big;
 namespace plugins
 {
-	float get_distance(const Vector3& point1, const Vector3& point2)
+	void draw_bone(const ImColor& color, RagdollComponent* ragdoll, UpdatePoseResultData::BONES bone_1, UpdatePoseResultData::BONES bone_2, bool dots)
 	{
-		float distance = sqrt((point1.x - point2.x) * (point1.x - point2.x) +
-			(point1.y - point2.y) * (point1.y - point2.y) +
-			(point1.z - point2.z) * (point1.z - point2.z));
-
-		return distance;
-	}
-
-	void draw_bone(const ImColor& color, RagdollComponent* pRag, UpdatePoseResultData::BONES Bone1, UpdatePoseResultData::BONES Bone2, bool Dots)
-	{
-		if (!IsValidPtr(pRag))
+		if (!IsValidPtr(ragdoll))
 			return;
 
-		Vector3 Bone1Vec;
-		if (!pRag->GetBone(Bone1, Bone1Vec))
+		Vector3 bone_1_vec;
+		if (!ragdoll->GetBone(bone_1, bone_1_vec))
 			return;
 
-		Vector3 Bone2Vec;
-		if (!pRag->GetBone(Bone2, Bone2Vec))
+		Vector3 bone_2_vec;
+		if (!ragdoll->GetBone(bone_2, bone_2_vec))
 			return;
 
-		if (!WorldToScreen(Bone1Vec))
+		if (!world_to_screen(bone_1_vec))
 			return;
 
-		if (!WorldToScreen(Bone2Vec))
+		if (!world_to_screen(bone_2_vec))
 			return;
 
-		auto pos1 = Vector2(Bone1Vec.x, Bone1Vec.y);
-		auto pos2 = Vector2(Bone2Vec.x, Bone2Vec.y);
+		auto pos_1 = Vector2(bone_1_vec.x, bone_1_vec.y);
+		auto pos_2 = Vector2(bone_2_vec.x, bone_2_vec.y);
 
-		if (Dots)
+		if (dots)
 		{
-			m_drawing->DrawFillArea(pos1.x, pos1.y, 3.5f, 3.5f, color);
-			m_drawing->DrawFillArea(pos2.x, pos2.y, 3.5f, 3.5f, color);
+			m_drawing->DrawFillArea(pos_1.x, pos_1.y, 3.5f, 3.5f, color);
+			m_drawing->DrawFillArea(pos_2.x, pos_2.y, 3.5f, 3.5f, color);
 		}
 
-		m_drawing->AddLine(ImVec2(pos1.x, pos1.y), ImVec2(pos2.x, pos2.y), color);
-	}
-
-	std::string format_vehicle(std::string VehName)
-	{
-		std::string Pattern = xorstr_("_VNAME_");
-		size_t Index = VehName.find(Pattern);
-		std::string PlaceHolder = VehName;
-		if (Index >= 0)
-			PlaceHolder.erase(PlaceHolder.begin(), PlaceHolder.begin() + (Index + Pattern.length()));
-
-		return PlaceHolder;
+		m_drawing->AddLine(ImVec2(pos_1.x, pos_1.y), ImVec2(pos_2.x, pos_2.y), color);
 	}
 
 	void draw_esp()
@@ -103,40 +84,35 @@ namespace plugins
 			if (!soldier->IsAlive())
 				continue;
 
-			TransformAABBStruct transform = GetTransform(player);
-			TransformAABBStruct local_transform = GetTransform(local_player);;
+			TransformAABBStruct transform = get_transform(player);
+			TransformAABBStruct local_transform = get_transform(local_player);;
 
 			Vector3 local_pos = (Vector3)local_transform.Transform.m[3];
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 			Vector2 box_coords[2];
 
 			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
-			float health_player = 0.f;
-			float max_health_player = 0.f;
 			float distance = get_distance(pos, local_pos);
+			float health_player = 0.f, max_health_player = 0.f;
 			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 
 			ClientVehicleEntity* vehicle = player->GetVehicle();
 			char* vehicle_name = nullptr;
-			float health_vehicle = 0.f;
-			float max_health_vehicle = 0.f;
+			float health_vehicle = 0.f, max_health_vehicle = 0.f;
 
 			if (IsValidPtr(vehicle))
 			{
 				if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
 					health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
-				if (vehicle->m_Data)
+				VehicleEntityData* data = get_vehicle_data(vehicle);
+				if (IsValidPtr(data))
 				{
-					auto vehicle_data = reinterpret_cast<VehicleEntityData*>(vehicle->m_Data);
-					if (IsValidPtr(vehicle_data))
-					{
-						if (vehicle_data->m_FrontHealthZone.m_MaxHealth)
-							max_health_vehicle = vehicle_data->m_FrontHealthZone.m_MaxHealth;
+					if (data->m_FrontHealthZone.m_MaxHealth)
+						max_health_vehicle = data->m_FrontHealthZone.m_MaxHealth;
 
-						if (IsValidPtr(vehicle_data->m_NameSid))
-							vehicle_name = vehicle_data->m_NameSid;
-					}
+					if (IsValidPtr(data->m_NameSid))
+						vehicle_name = data->m_NameSid;
 				}
 			}
 			else
@@ -182,7 +158,7 @@ namespace plugins
 				}
 			}
 
-			if (GetBoxCords(transform, &box_coords[0]) && distance <= g_settings.esp_distance)
+			if (get_box_coords(transform, &box_coords[0]) && distance <= g_settings.esp_distance)
 			{
 				float box_width = box_coords[1].x - box_coords[0].x;
 				float box_height = box_coords[1].y - box_coords[0].y;

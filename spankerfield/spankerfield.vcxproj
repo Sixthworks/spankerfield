@@ -193,6 +193,7 @@
     <ClInclude Include="Features\Aimbot\aimbot.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\gui.h" />
     <ClInclude Include="Rendering\renderer.h" />
     <ClInclude Include="settings.h" />

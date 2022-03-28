@@ -16,7 +16,7 @@ namespace big
 		float min_time_to_target{ 1.5f };
 		float max_time_to_target{ 3.0f };
 		int aim_key{ VK_RBUTTON };
-		UpdatePoseResultData::BONES aim_bone{ UpdatePoseResultData::BONES::Spine2 };
+		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
 		bool esp{ true };
 		float esp_distance { 10000.f };
@@ -75,6 +75,7 @@ namespace big
 			g_settings.aim_fov = j["settings"]["aim_fov"];
 			g_settings.min_time_to_target = j["settings"]["min_time_to_target"];
 			g_settings.max_time_to_target = j["settings"]["max_time_to_target"];
+			g_settings.aim_bone = j["settings"]["aim_bone"];
 
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
@@ -132,6 +133,7 @@ namespace big
 						{ "aim_fov", g_settings.aim_fov },
 						{ "min_time_to_target", g_settings.min_time_to_target },
 						{ "max_time_to_target", g_settings.max_time_to_target },
+						{ "aim_bone", g_settings.aim_bone },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },

@@ -62,7 +62,7 @@ namespace plugins
 						explosive_controllable->GetAABB(&transform);
 
 						Vector2 box_coords[2];
-						if (GetBoxCords(transform, &box_coords[0]))
+						if (get_box_coords(transform, &box_coords[0]))
 						{
 							float box_width = box_coords[1].x - box_coords[0].x;
 							float box_height = box_coords[1].y - box_coords[0].y;

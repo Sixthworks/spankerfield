@@ -209,11 +209,11 @@ namespace big
 				continue;
 
 			Vector3 head_vec;
-			if (!ragdoll->GetBone(g_settings.aim_bone, head_vec))
+			if (!ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec))
 				continue;
 
 			Vector3 screen_vec;
-			if (!WorldToScreen(head_vec, screen_vec))
+			if (!world_to_screen(head_vec, screen_vec))
 				continue;
 
 			Vector2 screen_size = get_screen_size();
@@ -314,7 +314,8 @@ namespace plugins
 		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, target.m_Player->GetSoldier(), temporary_aim, shoot_space);
 		target.m_WorldPosition = temporary_aim;
 
-		// Smooth out
+		if (g_settings.max_time_to_target <= 0.f) return;
+
 		if (target.m_Player != m_PreviousTarget.m_Player)
 		{
 			Vector2 vec_rand = { generate_random_float(g_settings.min_time_to_target, g_settings.max_time_to_target), generate_random_float(g_settings.min_time_to_target, g_settings.max_time_to_target) };
