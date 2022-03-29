@@ -35,7 +35,7 @@ namespace plugins
 		const auto local_vehicle = local_player->GetVehicle();
 		if (!local_vehicle) return;
 
-		const auto vehicle_data = reinterpret_cast<VehicleEntityData*>(local_vehicle->m_Data);
+		const auto vehicle_data = get_vehicle_data(local_vehicle);
 		if (!vehicle_data) return;
 
 		static bool using_jet = is_jet(vehicle_data->m_NameSid);

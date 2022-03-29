@@ -257,9 +257,7 @@ namespace big
 				{
 					std::string nickname = plugins::blacklisted.at(plugins::selected);
 					if (!nickname.empty())
-					{
 						plugins::delete_from_blacklist(nickname);
-					}
 				}
 
 				ImGui::Separator();

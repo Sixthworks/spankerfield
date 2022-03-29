@@ -39,7 +39,7 @@ g_globals.g_obs = is_process_running(L"obs32.exe");
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			const auto player = player_manager->m_ppPlayers[i];
 			if (!player)
 				continue;
 
@@ -49,20 +49,33 @@ g_globals.g_obs = is_process_running(L"obs32.exe");
 			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
-			ClientVehicleEntity* vehicle = player->GetVehicle();
+			const auto vehicle = player->GetVehicle();
 			if (IsValidPtr(vehicle))
 			{
-				vehicle->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				const auto data = get_vehicle_data(vehicle);
+				if (!data) continue;
+
+				char* name = data->m_NameSid;
+				if (!name) continue;
+
+				if (name == xorstr_("ID_P_XP1_VNAME_BOMBER")) continue;
+
+				const auto components = vehicle->m_pComponents;
+				if (!components) continue;
+
+				components->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
-				ClientSoldierEntity* soldier = player->GetSoldier();
+				const auto soldier = player->GetSoldier();
 				if (!soldier) continue;
 
-				if (!soldier->IsAlive())
-					continue;
+				if (!soldier->IsAlive()) continue;
 
-				soldier->m_pComponents->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				const auto components = soldier->m_pComponents;
+				if (!components) continue;
+
+				components->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}

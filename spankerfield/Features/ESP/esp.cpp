@@ -105,8 +105,8 @@ namespace plugins
 				if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
 					health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
-				VehicleEntityData* data = get_vehicle_data(vehicle);
-				if (IsValidPtr(data))
+				const auto data = get_vehicle_data(vehicle);
+				if (data)
 				{
 					if (data->m_FrontHealthZone.m_MaxHealth)
 						max_health_vehicle = data->m_FrontHealthZone.m_MaxHealth;

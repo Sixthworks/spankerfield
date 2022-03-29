@@ -7,14 +7,13 @@
 #include "global.h"
 #include "settings.h"
 
-
 BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 {
 	using namespace big;
 
-	const auto dx_renderer = DxRenderer::GetInstance();
-	while (!dx_renderer)
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+	// Wait for that before proceeding, after it's up everything else should be too
+	while (!GetModuleHandleW(L"ntdll.dll"))
+		std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	switch (reason)
 	{
