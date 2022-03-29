@@ -37,7 +37,26 @@
 #include "type_info.h"
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
-__forceinline bool IsValidPtr(PVOID p) { return (p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && p != nullptr; }
+
+constexpr bool IsValidPtr(PVOID p)
+{
+	return (p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && p != nullptr;
+}
+
+#define MIN_VTABLE ((uint64_t)0x140000000)
+#define MAX_VTABLE ((uint64_t)0x14FFFFFFF)
+
+constexpr bool IsValidPtrWithVTable(void* p)
+{
+	if (IsValidPtr(p))
+	{
+		void* vtable = *reinterpret_cast<void**>(p);
+		if (IsValidPtr(vtable) && reinterpret_cast<uint64_t>(vtable) > MIN_VTABLE && reinterpret_cast<uint64_t>(vtable) < MAX_VTABLE)
+			return true;
+	}
+
+	return false;
+}
 
 using namespace DirectX::SimpleMath;
 

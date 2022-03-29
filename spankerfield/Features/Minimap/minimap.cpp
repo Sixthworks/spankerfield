@@ -52,18 +52,13 @@ g_globals.g_obs = is_process_running(L"obs32.exe");
 			const auto vehicle = player->GetVehicle();
 			if (IsValidPtr(vehicle))
 			{
-				const auto data = get_vehicle_data(vehicle);
-				if (!data) continue;
-
-				char* name = data->m_NameSid;
-				if (!name) continue;
-
-				if (name == xorstr_("ID_P_XP1_VNAME_BOMBER")) continue;
-
 				const auto components = vehicle->m_pComponents;
 				if (!components) continue;
 
-				components->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
+				if (!IsValidPtrWithVTable(map)) continue;
+
+				map->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
@@ -75,7 +70,10 @@ g_globals.g_obs = is_process_running(L"obs32.exe");
 				const auto components = soldier->m_pComponents;
 				if (!components) continue;
 
-				components->GetComponentByClassId<ClientSpottingTargetComponent>(378)->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
+				if (!IsValidPtrWithVTable(map)) continue;
+
+				map->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}
