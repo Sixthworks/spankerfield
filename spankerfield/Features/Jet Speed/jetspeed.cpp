@@ -38,8 +38,7 @@ namespace plugins
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
 		if (!vehicle_data) return;
 
-		static bool using_jet = is_jet(vehicle_data->m_NameSid);
-		if (using_jet)
+		if (vehicle_data->IsInJet())
 		{
 			const auto keyboard = border_input_node->m_pKeyboard;
 			if (!keyboard) return;

@@ -106,13 +106,13 @@ namespace plugins
 					health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
 				const auto data = get_vehicle_data(vehicle);
-				if (data)
+				if (IsValidPtrWithVTable(data))
 				{
-					if (data->m_FrontHealthZone.m_MaxHealth)
-						max_health_vehicle = data->m_FrontHealthZone.m_MaxHealth;
+					if (data->m_MaxHealth)
+						max_health_vehicle = data->m_MaxHealth;
 
-					if (IsValidPtr(data->m_NameSid))
-						vehicle_name = data->m_NameSid;
+					if (data->m_NameID)
+						vehicle_name = data->m_NameID;
 				}
 			}
 			else

@@ -1263,6 +1263,272 @@ public:
 	}
 }; //0x0010
 
+
+class VehicleData
+{
+private: char pad_0000[240]; //0x0000
+public:  char* m_ObjectName; //0x00F0 vehicles.heli.scout
+private: char pad_00F8[56]; //0x00F8
+public:  char* m_ObjectPath; //0x0130 Gameplay/Vehicles/AH6/AH6_Littlebird
+private: char pad_0138[16]; //0x0138
+public:
+	float m_MaxHealth; //0x0148
+	char pad[156];
+	float m_TopHitHeight; //0x01E8
+	float m_TopHitAngle; //0x01EC
+	float m_RegenerationDelay; //0x01F0
+	float m_RegenerationRate; //0x01F4
+	float m_ArmorMultiplier; //0x01F8
+	float m_RegenerationDelayMultiplier; //0x01FC
+	float m_RegenerationRateMultiplier; //0x0200
+	float m_EmergencyRepairHealth; //0x0204
+	float m_DecayDelay; //0x0208
+	float m_DecayRate; //0x020C
+	void* m_CriticallyDamagedEffect; //0x0210
+	float m_CriticalDamageTime; //0x0218
+	char _0x021C[4];
+	void* m_PreExplosionEffect; //0x0220
+	float m_PreExplosionTime; //0x0228
+	char _0x022C[4];
+	void* m_Explosion; //0x0230
+	void* m_Mesh; //0x0238
+	void* m_CockpitMesh; //0x0240
+	char* m_NameID; //0x0248 ID_P_VNAME_AH6
+	__int32 m_MaxPlayersInVehicle; //0x0250
+	float m_MinSpeedForMineActivation; //0x0254
+	float m_UpsideDownDamage; //0x0258
+	float m_UpsideDownDamageDelay; //0x025C
+	float m_UpsideDownAngle; //0x0260
+	float m_WaterDamage; //0x0264
+	float m_BelowWaterDamageDelay; //0x0268
+	float m_WaterDamageOffset; //0x026C
+	float m_VelocityDamageThreshold; //0x0270
+	float m_VelocityDamageMagnifier; //0x0274
+	float m_RepairRateModifier; //0x0278
+	float m_KillSoldierCollisionSpeedThreshold; //0x027C
+	float m_ExitSpeedThreshold; //0x0280
+	float m_ExitDirectionSpeedThreshold; //0x0284
+	float m_FLIRValue; //0x0288
+	__int32 m_MPMode; //0x028C
+	float m_ExitCameraSwitchDelay; //0x0290
+	char pad_0294[24]; //0x0294
+	float m_LockingTimeMultiplier; //0x02AC
+	char pad_02B0[16]; //0x02B0
+	float m_HighAltitudeLockHeight; //0x02C0
+	char _0x02C4[4];
+	void* m_Sound; //0x02C8
+	void* m_VoiceOverInfo; //0x02D0
+	float m_NametagHeightScale; //0x02D8
+	float m_SpottingFovScale; //0x02DC
+	bool m_AllowVehicleOutsideCombatAreas; //0x02E0
+	bool m_UseTopZone; //0x02E1
+	bool m_HealthZonesShareDamage; //0x02E2
+	bool m_UseProtectedShields; //0x02E3
+	bool m_ShowPlayerHealth; //0x02E4
+	bool m_ForegroundRenderCockpitMesh; //0x02E5
+	bool m_MotionBlurMask; //0x02E6
+	bool m_SuppressDamageByPassengers; //0x02E7
+	bool m_IsAffectedByEMP; //0x02E8
+	bool m_CanTakeDynamicFireDamage; //0x02E9
+	bool m_ThrowOutSoldierInsideOnWaterDamage; //0x02EA
+	bool m_IgnoreSoldierCollisionNormal; //0x02EB
+	bool m_ChoseExitPointByDirection; //0x02EC
+	bool m_ExitAllowed; //0x02ED
+	bool m_EnableGroundmapLighting; //0x02EE
+	bool m_UseAsTeamSpawner; //0x02EF
+	bool m_IsLockable; //0x02F0
+	bool m_NeverReportVehicleAsEmpty; //0x02F1
+	bool m_UseLowAltitudeHeatSignature; //0x02F2
+	bool m_UseSpottingTargetComponentForRaycast; //0x02F3
+	bool m_EquipmentFakeVehicle; //0x02F4
+	bool m_ExplosionPacksAttachable; //0x02F5
+	bool m_DamageGiverOverrideOwnerVehicle; //0x02F6
+	char _0x02F7[9];
+public:
+
+	enum class VehicleType
+	{
+		UNUSED = 0X0,
+		LOCALPLAYER = 0X1,
+		LOCALDIRECTION = 0X2,
+		FRIENDLYPLAYER = 0X3,
+		ENEMYPLAYER = 0X4,
+		NEUTRALPLAYER = 0X5,
+		SQUADMEMBER = 0X6,
+		SQUADLEADER = 0X7,
+		SQUADLEADERTARGETED = 0X8,
+		VEHICLE = 0X9,
+		PRIMARYOBJECTIVE = 0XA,
+		PRIMARYOBJECTIVEBLINK = 0XB,
+		SECONDARYOBJECTIVE = 0XC,
+		AREAMAPMARKER = 0XD,
+		OBJECTIVEDESTROY = 0XE,
+		OBJECTIVESCOUT = 0XF,
+		OBJECTIVEDEFEND = 0X10,
+		OBJECTIVEMOVETO = 0X11,
+		OBJECTIVEATTACK = 0X12,
+		OBJECTIVEFOLLOW = 0X13,
+		OBJECTIVEGENERAL = 0X14,
+		UAV = 0X15,
+		AMMOCRATE = 0X16,
+		MEDICBAG = 0X17,
+		C4 = 0X18,
+		ATMINE = 0X19,
+		STATIONARYWEAPON = 0X1A,
+		NORTH = 0X1B,
+		SOUTH = 0X1C,
+		WEST = 0X1D,
+		EAST = 0X1E,
+		NEUTRALFLAG = 0X1F,
+		FRIENDLYFLAG = 0X20,
+		ENEMYFLAG = 0X21,
+		FRIENDLYBASE = 0X22,
+		ENEMYBASE = 0X23,
+		TEAM1FLAG = 0X24,
+		TEAM2FLAG = 0X25,
+		NEUTRALFLAGLIT = 0X26,
+		FRIENDLYFLAGLIT = 0X27,
+		ENEMYFLAGLIT = 0X28,
+		SELECTABLESPAWNPOINT = 0X29,
+		SELECTEDSPAWNPOINT = 0X2A,
+		NONSELECTABLESPAWNPOINT = 0X2B,
+		FRIENDLYFLAGUNDERATTACK = 0X2C,
+		ENEMYFLAGUNDERATTACK = 0X2D,
+		ORDERATTACK = 0X2E,
+		ORDERDEFEND = 0X2F,
+		ORDERATTACKOBSERVED = 0X30,
+		ORDERDEFENDOBSERVED = 0X31,
+		BOAT = 0X32,
+		CAR = 0X33,
+		JEEP = 0X34,
+		HELIATTACK = 0X35,
+		HELISCOUT = 0X36,
+		TANK = 0X37,
+		TANKIFV = 0X38,
+		TANKARTY = 0X39,
+		TANKAA = 0X3A,
+		TANKAT = 0X3B,
+		JET = 0X3C,
+		JETBOMBER = 0X3D,
+		STATIONARY = 0X3E,
+		STRATEGIC = 0X3F,
+		MOTIONRADARSWEEP = 0X40,
+		NEEDBACKUP = 0X41,
+		NEEDAMMO = 0X42,
+		NEEDMEDIC = 0X43,
+		NEEDPICKUP = 0X44,
+		NEEDREPAIR = 0X45,
+		KITASSAULT = 0X46,
+		KITDEMOLITION = 0X47,
+		KITRECON = 0X48,
+		KITSPECIALIST = 0X49,
+		KITSUPPORT = 0X4A,
+		KITMEDIC = 0X4B,
+		KITENGINEER = 0X4C,
+		KITPICKUPASSAULT = 0X4D,
+		KITPICKUPDEMOLITION = 0X4E,
+		KITPICKUPRECON = 0X4F,
+		KITPICKUPSPECIALIST = 0X50,
+		KITPICKUPSUPPORT = 0X51,
+		KITPICKUPMEDIC = 0X52,
+		KITPICKUPENGINEER = 0X53,
+		PICKUP = 0X54,
+		TAGGEDVEHICLE = 0X55,
+		LASERPAINTEDVEHICLE = 0X56,
+		HELITARGETENEMY = 0X57,
+		HELITARGETFRIENDLY = 0X58,
+		ARTILLERYTARGET = 0X59,
+		NEUTRALFLAGATTACKER = 0X5A,
+		FRIENDLYFLAGATTACKER = 0X5B,
+		ENEMYFLAGATTACKER = 0X5C,
+		LASERTARGET = 0X5D,
+		OBJECTIVEATTACKER = 0X5E,
+		OBJECTIVEDEFENDER = 0X5F,
+		HEALTHBARBACKGROUND = 0X60,
+		HEALTHBAR = 0X61,
+		RADARSWEEPCOMPONENT = 0X62,
+		BLANK = 0X63,
+		LOCALPLAYERBIGICON = 0X64,
+		LOCALPLAYEROUTOFMAP = 0X65,
+		PRIMARYOBJECTIVELARGE = 0X66,
+		TARGETUNLOCKED = 0X67,
+		TARGETLOCKED = 0X68,
+		TARGETLOCKING = 0X69,
+		ARTILLERYSTRIKENAMETAG = 0X6A,
+		ARTILLERYSTRIKEMINIMAP = 0X6B,
+		CAPTUREPOINTCONTESTED = 0X6C,
+		CAPTUREPOINTDEFENDED = 0X6D,
+		ROUNDBAR = 0X6E,
+		ROUNDBARBG = 0X6F,
+		ROUNDBARBGPLATE = 0X70,
+		SNAPOVALARROW = 0X71,
+		SQUADLEADERBG = 0X72,
+		VEHICLEBG = 0X73,
+		NONTAKEABLECONTROLPOINT = 0X74,
+		SPOTTEDPOSITION = 0X75,
+		GRENADE = 0X76,
+		REVIVE = 0X77,
+		REPAIR = 0X78,
+		INTERACT = 0X79,
+		VOIP = 0X7A,
+		CLAYMORE = 0X7B,
+		EODBOT = 0X7C,
+		EXPLOSIVE = 0X7D,
+		LASERDESIGNATOR = 0X7E,
+		MAV = 0X7F,
+		MORTAR = 0X80,
+		RADIOBEACON = 0X81,
+		UGS = 0X82,
+		PERCETAGEBARMIDDLE = 0X83,
+		PERCETAGEBAREDGE = 0X84,
+		PERCENTAGEBARBACKGROUND = 0X85,
+		TANKLC = 0X86,
+		HELITRANS = 0X87,
+		STATICAT = 0X88,
+		STATICAA = 0X89,
+		SPRINTBOOST = 0X8A,
+		AMMOBOOST = 0X8B,
+		EXPLOSIVEBOOST = 0X8C,
+		EXPLOSIVERESISTBOOST = 0X8D,
+		SUPPRESSIONBOOST = 0X8E,
+		SUPPRESSIONRESISTBOOST = 0X8F,
+		GRENADEBOOST = 0X90,
+		HEALSPEEDBOOST = 0X91,
+		NEEDAMMOHIGHLIGHT = 0X92,
+		NEEDMEDICHIGHLIGHT = 0X93,
+		NEEDREPAIRHIGHLIGHT = 0X94,
+		NEEDPICKUPHIGHLIGHT = 0X95,
+		PLAYERDEAD = 0X96,
+		PLAYER = 0X97,
+		FLAG = 0X98,
+		BASE = 0X99,
+		OBJECTIVENEUTRALBOMB = 0X9A,
+		OBJECTIVEFRIENDLYBOMB = 0X9B,
+		OBJECTIVEENEMYBOMB = 0X9C,
+		OBJECTIVEENEMYHVT = 0X9D,
+		OBJECTIVEFRIENDLYHVT = 0X9E,
+		CANSUPPLYAMMO = 0X9F,
+		CANSUPPLYMEDIC = 0XA0,
+		CANSUPPLYREPAIR = 0XA1,
+		COUNT = 0XA2,
+	};
+	enum class VehicleCategory
+	{
+		UNUSED,
+		GROUND,
+		AIR,
+		WATER
+	};
+
+	bool IsInJet();
+	bool IsInHeli();
+	VehicleType GetVehicleType();
+	VehicleCategory GetVehicleCategory();
+	bool IsAirVehicle();
+	bool IsGroundVehicle();
+	bool IsWaterVehicle();
+};
+
 class ClientControllableEntity
 {
 public:
@@ -1346,7 +1612,7 @@ public:
 	unsigned char m_OcclusionFlags; //0x0012 
 	char _0x0013[13]; //0x0013 
 	char _0x0020[16];
-	__int64 m_Data; //0x0030 
+	VehicleData* m_Data; //0x0030 
 	ComponentCollection* m_pComponents;
 	char _0x0038[192];
 	float m_Velocity; //0x0100 

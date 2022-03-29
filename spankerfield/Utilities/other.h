@@ -3,11 +3,10 @@
 
 namespace big
 {
-	VehicleEntityData* get_vehicle_data(ClientVehicleEntity* vehicle);
+	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle);
 	TransformAABBStruct get_transform(ClientPlayer* player);
 	float get_distance(const Vector3& point1, const Vector3& point2);
 	std::string format_vehicle(std::string vehicle);
-	bool is_jet(const char* vehicle);
 
 	bool punkbuster_check();
 

@@ -4,16 +4,9 @@
 
 namespace big
 {
-	VehicleEntityData* get_vehicle_data(ClientVehicleEntity* vehicle)
+	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle)
 	{
-		if (vehicle->m_Data)
-		{
-			auto data = reinterpret_cast<VehicleEntityData*>(vehicle->m_Data);
-			if (IsValidPtr(data))
-				return data;
-		}
-
-		return nullptr;
+		return vehicle->m_Data;
 	}
 
 	TransformAABBStruct get_transform(ClientPlayer* player)
@@ -48,27 +41,6 @@ namespace big
 			placeholder.erase(placeholder.begin(), placeholder.begin() + (index + pattern.length()));
 
 		return placeholder;
-	}
-
-	std::vector<std::string> jets
-	{
-		xorstr_("ID_P_VNAME_F35"),
-		xorstr_("ID_P_VNAME_J20"),
-		xorstr_("ID_P_VNAME_PAKFA"),
-		xorstr_("ID_P_VNAME_A10"),
-		xorstr_("ID_P_VNAME_SU39"),
-		xorstr_("ID_P_VNAME_Q5")
-	};
-
-	bool is_jet(const char* vehicle)
-	{
-		for (const auto& jet : jets)
-		{
-			if (jet == vehicle)
-				return true;
-		}
-
-		return false;
 	}
 
 	bool punkbuster_check()
