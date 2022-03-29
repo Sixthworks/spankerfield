@@ -19,6 +19,8 @@ namespace big
 		m_PlayerManager.update_players();
 		plugins::aimbot(delta_time);
 
+		plugins::overheat_control();
+
 		plugins::spot_minimap();
 		plugins::set_jet_speed();
 	}

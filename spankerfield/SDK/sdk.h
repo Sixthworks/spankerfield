@@ -138,6 +138,7 @@ class ParachuteComponent;
 class ClientSpottingComponent;
 class ClientSpottingTargetComponent;
 class ClientExplosionEntity;
+class WeaponComponentData;
 class ClientGameWorld;
 class VaultComponent;
 class SoldierSuppressionComponent;
@@ -322,11 +323,269 @@ public:
 	}
 };//Size=0x0088
 
+enum InputConceptIdentifiers
+{
+	ConceptMoveFB = 0x0,
+	ConceptMoveLR = 0x1,
+	ConceptMoveForward = 0x2,
+	ConceptMoveBackward = 0x3,
+	ConceptMoveLeft = 0x4,
+	ConceptMoveRight = 0x5,
+	ConceptYaw = 0x6,
+	ConceptPitch = 0x7,
+	ConceptRoll = 0x8,
+	ConceptRecenterCamera = 0x9,
+	ConceptFire = 0xa,
+	ConceptAltFire = 0xb,
+	ConceptFireCountermeasure = 0xc,
+	ConceptReload = 0xd,
+	ConceptZoom = 0xe,
+	ConceptToggleCamera = 0xf,
+	ConceptSprint = 0x10,
+	ConceptCrawl = 0x11,
+	ConceptToggleWeaponLight = 0x12,
+	ConceptSelectPartyMember0 = 0x13,
+	ConceptSelectPartyMember1 = 0x14,
+	ConceptSelectPartyMember2 = 0x15,
+	ConceptSelectPartyMember3 = 0x16,
+	ConceptLockTarget = 0x17,
+	ConceptCrosshairMoveX = 0x18,
+	ConceptCrosshairMoveY = 0x19,
+	ConceptTacticalMenu = 0x1a,
+	ConceptConversationSelect = 0x1b,
+	ConceptConversationSkip = 0x1c,
+	ConceptConversationChangeSelection = 0x1d,
+	ConceptJump = 0x1e,
+	ConceptCrouch = 0x1f,
+	ConceptCrouchOnHold = 0x20,
+	ConceptProne = 0x21,
+	ConceptInteract = 0x22,
+	ConceptPickUp = 0x23,
+	ConceptDrop = 0x24,
+	ConceptBreathControl = 0x25,
+	ConceptParachute = 0x26,
+	ConceptSwitchInventoryItem = 0x27,
+	ConceptSelectInventoryItem1 = 0x28,
+	ConceptSelectInventoryItem2 = 0x29,
+	ConceptSelectInventoryItem3 = 0x2a,
+	ConceptSelectInventoryItem4 = 0x2b,
+	ConceptSelectInventoryItem5 = 0x2c,
+	ConceptSelectInventoryItem6 = 0x2d,
+	ConceptSelectInventoryItem7 = 0x2e,
+	ConceptSelectInventoryItem8 = 0x2f,
+	ConceptSelectInventoryItem9 = 0x30,
+	ConceptSwitchToPrimaryWeapon = 0x31,
+	ConceptSwitchToGrenadeLauncher = 0x32,
+	ConceptSwitchToStaticGadget = 0x33,
+	ConceptSwitchToDynamicGadget1 = 0x34,
+	ConceptSwitchToDynamicGadget2 = 0x35,
+	ConceptMeleeAttack = 0x36,
+	ConceptThrowGrenade = 0x37,
+	ConceptCycleFireMode = 0x38,
+	ConceptChangeVehicle = 0x39,
+	ConceptBrake = 0x3a,
+	ConceptHandBrake = 0x3b,
+	ConceptClutch = 0x3c,
+	ConceptGearUp = 0x3d,
+	ConceptGearDown = 0x3e,
+	ConceptGearSwitch = 0x3f,
+	ConceptNextPosition = 0x40,
+	ConceptSelectPosition1 = 0x41,
+	ConceptSelectPosition2 = 0x42,
+	ConceptSelectPosition3 = 0x43,
+	ConceptSelectPosition4 = 0x44,
+	ConceptSelectPosition5 = 0x45,
+	ConceptSelectPosition6 = 0x46,
+	ConceptSelectPosition7 = 0x47,
+	ConceptSelectPosition8 = 0x48,
+	ConceptCameraPitch = 0x49,
+	ConceptCameraYaw = 0x4a,
+	ConceptMapZoom = 0x4b,
+	ConceptMapInnerZoom = 0x4c,
+	ConceptMapSize = 0x4d,
+	ConceptMapThreeDimensional = 0x4e,
+	ConceptScoreboard = 0x4f,
+	ConceptScoreboardAndMenuCombo = 0x50,
+	ConceptMenu = 0x51,
+	ConceptSpawnMenu = 0x52,
+	ConceptCancel = 0x53,
+	ConceptCommMenu1 = 0x54,
+	ConceptCommMenu2 = 0x55,
+	ConceptCommMenu3 = 0x56,
+	ConceptAccept = 0x57,
+	ConceptDecline = 0x58,
+	ConceptSelect = 0x59,
+	ConceptBack = 0x5a,
+	ConceptActivate = 0x5b,
+	ConceptDeactivate = 0x5c,
+	ConceptEdit = 0x5d,
+	ConceptView = 0x5e,
+	ConceptParentNavigateLeft = 0x5f,
+	ConceptParentNavigateRight = 0x60,
+	ConceptMenuZoomIn = 0x61,
+	ConceptMenuZoomOut = 0x62,
+	ConceptPanX = 0x63,
+	ConceptPanY = 0x64,
+	ConceptBattledashToggle = 0x65,
+	ConceptVoiceFunction1 = 0x66,
+	ConceptSquadVoice = 0x67,
+	ConceptSayAllChat = 0x68,
+	ConceptTeamChat = 0x69,
+	ConceptSquadChat = 0x6a,
+	ConceptSquadLeaderChat = 0x6b,
+	ConceptToggleChat = 0x6c,
+	ConceptQuicktimeInteractDrag = 0x6d,
+	ConceptQuicktimeFire = 0x6e,
+	ConceptQuicktimeBlock = 0x6f,
+	ConceptQuicktimeFastMelee = 0x70,
+	ConceptQuicktimeJumpClimb = 0x71,
+	ConceptQuicktimeCrouchDuck = 0x72,
+	ConceptFreeCameraMoveUp = 0x73,
+	ConceptFreeCameraMoveDown = 0x74,
+	ConceptFreeCameraMoveLR = 0x75,
+	ConceptFreeCameraMoveFB = 0x76,
+	ConceptFreeCameraMoveUD = 0x77,
+	ConceptFreeCameraRotateX = 0x78,
+	ConceptFreeCameraRotateY = 0x79,
+	ConceptFreeCameraRotateZ = 0x7a,
+	ConceptFreeCameraIncreaseSpeed = 0x7b,
+	ConceptFreeCameraDecreaseSpeed = 0x7c,
+	ConceptFreeCameraFOVModifier = 0x7d,
+	ConceptFreeCameraChangeFOV = 0x7e,
+	ConceptFreeCameraSwitchSpeed = 0x7f,
+	ConceptFreeCameraTurboSpeed = 0x80,
+	ConceptFreeCameraActivator1 = 0x81,
+	ConceptFreeCameraActivator2 = 0x82,
+	ConceptFreeCameraActivator3 = 0x83,
+	ConceptFreeCameraMayaInputActivator = 0x84,
+	ConceptTargetedCameraDistance = 0x85,
+	ConceptTargetedCameraRotateX = 0x86,
+	ConceptTargetedCameraRotateY = 0x87,
+	ConceptTargetedCameraChangeSpeed = 0x88,
+	ConceptLThumb = 0x89,
+	ConceptRThumb = 0x8a,
+	ConceptLeftStickX = 0x8b,
+	ConceptLeftStickY = 0x8c,
+	ConceptRightStickX = 0x8d,
+	ConceptRightStickY = 0x8e,
+	ConceptButtonDPadLeft = 0x8f,
+	ConceptButtonDPadRight = 0x90,
+	ConceptButtonDPadUp = 0x91,
+	ConceptButtonDPadDown = 0x92,
+	ConceptButtonA = 0x93,
+	ConceptButtonB = 0x94,
+	ConceptButtonX = 0x95,
+	ConceptButtonY = 0x96,
+	ConceptButtonSelect = 0x97,
+	ConceptButtonStart = 0x98,
+	ConceptButtonL1 = 0x99,
+	ConceptButtonL2 = 0x9a,
+	ConceptButtonR1 = 0x9b,
+	ConceptButtonR2 = 0x9c,
+	ConceptButtonLeftThumb = 0x9d,
+	ConceptButtonRightThumb = 0x9e,
+	ConceptToggleMinimapType = 0x9f,
+	ConceptDeployZoom = 0xa0,
+	ConceptMenuDigitalUp = 0xa1,
+	ConceptMenuDigitalDown = 0xa2,
+	ConceptMenuDigitalLeft = 0xa3,
+	ConceptMenuDigitalRight = 0xa4,
+	ConceptRightStickUp = 0xa5,
+	ConceptRightStickDown = 0xa6,
+	ConceptRightStickLeft = 0xa7,
+	ConceptRightStickRight = 0xa8,
+	ConceptMultipleSelect = 0xa9,
+	ConceptSelectAll = 0xaa,
+	ConceptMinimize = 0xab,
+	ConceptMoveCameraUp = 0xac,
+	ConceptMoveCameraDown = 0xad,
+	ConceptMoveCameraLeft = 0xae,
+	ConceptMoveCameraRight = 0xaf,
+	ConceptSelectSquad1 = 0xb0,
+	ConceptSelectSquad2 = 0xb1,
+	ConceptSelectSquad3 = 0xb2,
+	ConceptSelectSquad4 = 0xb3,
+	ConceptSelectSquad5 = 0xb4,
+	ConceptSelectSquad6 = 0xb5,
+	ConceptSelectSquad7 = 0xb6,
+	ConceptSelectSquad8 = 0xb7,
+	ConceptSelectSquad9 = 0xb8,
+	ConceptSpectatorViewPrev = 0xb9,
+	ConceptSpectatorViewNext = 0xba,
+	ConceptSpectatorTargetPrev = 0xbb,
+	ConceptSpectatorTargetNext = 0xbc,
+	ConceptSpectatorViewTableTop = 0xbd,
+	ConceptSpectatorViewFirstPerson = 0xbe,
+	ConceptSpectatorViewThirdPerson = 0xbf,
+	ConceptSpectatorViewFreeCam = 0xc0,
+	ConceptSpectatorViewPlayer1 = 0xc1,
+	ConceptSpectatorViewPlayer2 = 0xc2,
+	ConceptSpectatorViewPlayer3 = 0xc3,
+	ConceptSpectatorViewPlayer4 = 0xc4,
+	ConceptSpectatorViewPlayer5 = 0xc5,
+	ConceptSpectatorViewPlayer6 = 0xc6,
+	ConceptSpectatorViewPlayer7 = 0xc7,
+	ConceptSpectatorViewPlayer8 = 0xc8,
+	ConceptSpectatorViewPlayer9 = 0xc9,
+	ConceptSpectatorViewPlayer10 = 0xca,
+	ConceptSpectatorViewPlayer11 = 0xcb,
+	ConceptSpectatorViewPlayer12 = 0xcc,
+	ConceptSpectatorViewPlayer13 = 0xcd,
+	ConceptSpectatorViewPlayer14 = 0xce,
+	ConceptSpectatorViewPlayer15 = 0xcf,
+	ConceptSpectatorViewPlayer16 = 0xd0,
+	ConceptSpectatorViewOptions = 0xd1,
+	ConceptSpectatorHudVisibility = 0xd2,
+	ConceptAnalogZoom = 0xd3,
+	ConceptSpectatorTargetPrevInSquad = 0xd4,
+	ConceptSpectatorTargetNextInSquad = 0xd5,
+	ConceptSpectatorTargetPrevOnTeam = 0xd6,
+	ConceptSpectatorTargetNextOnTeam = 0xd7,
+	ConceptSpectatorFreeCameraIncreaseSpeed = 0xd8,
+	ConceptSpectatorFreeCameraDecreaseSpeed = 0xd9,
+	ConceptSpectatorFreeCameraSwitchSpeed = 0xda,
+	ConceptSpectatorFreeCameraMoveLR = 0xdb,
+	ConceptSpectatorFreeCameraMoveUD = 0xdc,
+	ConceptSpectatorFreeCameraMoveFB = 0xdd,
+	ConceptSpectatorFreeCameraRotateX = 0xde,
+	ConceptSpectatorFreeCameraRotateY = 0xdf,
+	ConceptSpectatorFreeCameraRotateZ = 0xe0,
+	ConceptSpectatorFreeCameraTurboSpeed = 0xe1,
+	ConceptSpectatorFreeCameraFOVModifier = 0xe2,
+	ConceptSpectatorFreeCameraChangeFOV = 0xe3,
+	ConceptSpectatorSquadLeft = 0xe4,
+	ConceptSpectatorSquadRight = 0xe5,
+	ConceptSpectatorSquadUp = 0xe6,
+	ConceptSpectatorSquadDown = 0xe7,
+	ConceptSpectatorSquadActivate = 0xe8,
+	ConceptTwinkleReload = 0xe9,
+	ConceptTwinkleAccept = 0xea,
+	ConceptTwinkleDecline = 0xeb,
+	ConceptTwinkleOption1 = 0xec,
+	ConceptTwinkleOption2 = 0xed,
+	ConceptTwinkleOption3 = 0xee,
+	ConceptTwinkleOption4 = 0xef,
+	ConceptTwinklePrevious = 0xf0,
+	ConceptTwinkleNext = 0xf1,
+	ConceptTwinkleHome = 0xf2,
+	ConceptTwinkleEnd = 0xf3,
+	ConceptTwinkleUp = 0xf4,
+	ConceptTwinkleDown = 0xf5,
+	ConceptTwinkleLeft = 0xf6,
+	ConceptTwinkleRight = 0xf7,
+	ConceptTwinkleSelect = 0xf8,
+	ConceptTwinkleStart = 0xf9,
+	ConceptTwinkleScrollUp = 0xfa,
+	ConceptTwinkleScrollDown = 0xfb,
+	ConceptUndefined = 0xfc,
+	ConceptSize = 0xfd,
+};
+
 class InputCache
 {
 public:
 	char _0x0000[4];
-	float m_Event[223]; //0x0004 
+	float m_Event[/*223*/253];
 };//Size=0x0008
 
 enum InputDeviceMouseButtons
@@ -1986,34 +2245,151 @@ public:
 	char _0x00C8[48];
 };//Size=0x0044
 
+enum class WeaponClass
+{
+	_12gauge = 0x0,
+	_338Magnum = 0x1,
+	_357Magnum = 0x2,
+	_44Magnum = 0x3,
+	_45cal = 0x4,
+	_46x30mm = 0x5,
+	_50cal = 0x6,
+	_545x45mmWP = 0x7,
+	_556x45mmNATO = 0x8,
+	_57x28mm = 0x9,
+	_58x42mm = 0xa,
+	_762x39mmWP = 0xb,
+	_762x51mmNATO = 0xc,
+	_762x54mmR = 0xd,
+	_9x19mm = 0xe,
+	_9x39mm = 0xf,
+	Assault = 0x10,
+	Shotgun = 0x11,
+	Smg = 0x12,
+	Lmg = 0x13,
+	Sniper = 0x14,
+	Ugl = 0x15,
+	Hgr = 0x16,
+	At = 0x17,
+	ATMine = 0x18,
+	C4 = 0x19,
+	BallisticShield = 0x1a,
+	AutoInjector = 0x1b,
+	Knife = 0x1c,
+	LaserDesignator = 0x1d,
+	LaserPainter = 0x1e,
+	MedKit = 0x1f,
+	MortarStrike = 0x20,
+	PowerTool = 0x21,
+	TracerDart = 0x22,
+	RadioBeacon = 0x23,
+	EodBot = 0x24,
+	ReconMav = 0x25,
+	UGS = 0x26,
+	Unarmed = 0x27,
+	Count = 0x28,
+	None = 0x29,
+};
+
+class WeaponEntityData
+{
+public:
+	char pad[0x80];
+	WeaponClass m_WeaponClass; // 0x80
+	//unsigned char _0x84[0x4];
+	//Array<WeaponStateData> m_WeaponStates; // 0x88
+	//WeaponFiringData* m_WeaponFiring; // 0x90
+	//WeaponData* m_CustomWeaponType; // 0x98
+	//GameAIWeaponData* m_AIData; // 0xa0
+	//unsigned char _0xa8[0x8];
+}; // size = 0xb0
+
+class WeaponComponentData
+{
+public:
+	char _0x0000[0x70];
+	Vector4 m_ProjectileSpawnOffset; //0x0070
+	Vector4 m_TargetPositionOverride; //0x0080
+	void* m_WeaponMesh; //0x0090
+	WeaponFiring* m_WeaponFiring; //0x0098
+	char* m_pDamageGiverName; //0x00A0
+	void* m_AIData; //0x00A8
+	void* m_CustomWeaponType; //0x00B0
+	float m_ImpulseStrength; //0x00B8
+	DWORD m_Classification; //0x00BC
+	float m_ReloadTimeMultiplier; //0x00C0
+	float m_DamageMultiplier; //0x00C4
+	float m_ExplosionDamageMultiplier; //0x00C8
+	float m_OverheatDropPerSecondMultiplier; //0x00CC
+	float m_LockTimeMultiplier; //0x00D0
+	float m_LockingAcceptanceAngleMultiplier; //0x00D4
+	DWORD m_WeaponItemHash; //0x00D8
+	bool m_SequentialFiring; //0x00DC
+	char _0x00DD[0x3];
+}; //0x00E0
+
 class WeaponFiring
 {
 public:
+	enum WeaponFiringEvent
+	{
+		WeaponFiringEvent_Push = 0x0,
+		WeaponFiringEvent_Pop = 0x1,
+		WeaponFiringEvent_PrimaryStartedFiringCallback = 0x2,
+		WeaponFiringEvent_PrimaryFireCallback = 0x3,
+		WeaponFiringEvent_PrimaryFireReleaseCallback = 0x4,
+		WeaponFiringEvent_PrimaryFireShotSpawnedCallback = 0x5,
+		WeaponFiringEvent_PrimaryFireAutomaticBeginCallback = 0x6,
+		WeaponFiringEvent_PrimaryFireAutomaticEndCallback = 0x7,
+		WeaponFiringEvent_PrimaryStoppedFiringCallback = 0x8,
+		WeaponFiringEvent_ReloadPrimaryCallback = 0x9,
+		WeaponFiringEvent_ReloadPrimaryEndCallback = 0xa,
+		WeaponFiringEvent_BoltActionCallback = 0xb,
+		WeaponFiringEvent_BoltActionEndCallback = 0xc,
+		WeaponFiringEvent_DetonationSwitchCallback = 0xd,
+		WeaponFiringEvent_HoldAndReleaseReleaseCallback = 0xe,
+		WeaponFiringEvent_UpdateRequired = 0xf,
+	};
+
 	char _0x0000[120];
 	WeaponSway* m_Sway; //0x0078 
 	char _0x0080[168];
 	PrimaryFire* m_pPrimaryFire; //0x0128 
-	char _0x0130[24];
-	__int32 m_WeaponState; //0x0148 
-	__int32 m_LastWeaponState; //0x014C 
-	__int32 m_NextWeaponState; //0x0150 
-	char _0x0154[8];
-	float m_TimeToWait; //0x015C 
-	float m_ReloadTimer; //0x0160 
-	float m_HoldReleaseMinDelay; //0x0164 
-	float m_RecoilTimer; //0x0168 
-	float m_RecoilAngleX; //0x016C 
-	float m_RecoilAngleY; //0x0170 
-	float m_RecoilAngleZ; //0x0174 
-	float m_RecoilFOVAngle; //0x0178 
-	float m_RecoilTimeMultiplier; //0x017C 
-	float m_OverheatDropMultiplier; //0x0180 
-	char _0x0184[40];
-	unsigned char m_IsNotFiring; //0x01AC 
-	unsigned char m_JustShot; //0x01AD 
-	unsigned char m_IsOverheated; //0x01AE 
+	char _0x138[8];
+	WeaponComponentData* m_weaponComponentData; //0x0138
+	char _0x0130[8];
+	int32_t m_WeaponState; //0x0148
+	int32_t m_LastWeaponState; //0x014C
+	int32_t m_NextWeaponState; //0x0150
+	float m_Zero; //0x0154
+	float m_MagazineReloadTime; //0x0158 ???? 10, 15, 20, 25 and so on
+	float m_TimeToWait; //0x015C
+	float m_ReloadTimer; //0x0160
+	float m_HoldReleaseMinDelay; //0x0164
+	float m_RecoilTimer; //0x0168
+	float m_RecoilAngleX; //0x016C
+	float m_RecoilAngleY; //0x0170
+	float m_RecoilAngleZ; //0x0174
+	float m_RecoilFOVAngle; //0x0178
+	float m_RecoilTimeMultiplier; //0x017C
+	float m_OverheatDropMultiplier; //0x0180
+	char pad_0184[28]; //0x0184
+	int32_t m_FirstSlotBullets; //0x01A0
+	int32_t m_SecondSlotBullets; //0x01A4
+	char pad_01A8[4]; //0x01A8
+	bool m_IsNotFiring; //0x01AC
+	bool m_JustShot; //0x01AD
+	bool m_IsCoolingDown; //0x01AE
+	bool m_IsOverheated; //0x01AF
+	float m_Overheat; //0x01B0
+	char pad_01B4[4]; //0x01B4
+	int32_t m_CurrTimeWhenReadyToFire; //0x01B8
+	char pad_01BC[224]; //0x01BC
 
-	static WeaponFiring* GetCurrentFiringWeapon() {
+	WeaponClass GetWeaponClass();
+
+	static WeaponFiring* GetInstance()
+	{
 		return *(WeaponFiring**)OFFSET_FIRING_WEAPON;
 	}
 };//Size=0x01AF

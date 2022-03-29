@@ -6,6 +6,7 @@
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
 #include "Aimbot/aimbot.h"
+#include "Overheat/overheat.h"
 
 namespace big
 {

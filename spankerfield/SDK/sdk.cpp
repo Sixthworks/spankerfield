@@ -87,3 +87,10 @@ bool ClientControllableEntity::IsAlive()
 
 	return (m_pHealthComp->m_Health > 0.0f);
 }
+
+WeaponClass WeaponFiring::GetWeaponClass()
+{
+	auto pData = reinterpret_cast<WeaponEntityData*>(this->m_weaponComponentData);
+	if (IsValidPtr(pData)) return pData->m_WeaponClass;
+	return WeaponClass::None;
+}

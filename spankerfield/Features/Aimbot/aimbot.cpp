@@ -31,7 +31,7 @@ namespace big
 		if (!IsValidPtr(client_weapon))
 			return 0;
 
-		const auto weapon_firing = WeaponFiring::GetCurrentFiringWeapon();
+		const auto weapon_firing = WeaponFiring::GetInstance();
 		if (!IsValidPtr(weapon_firing))
 			return 0;
 

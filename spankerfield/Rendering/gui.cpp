@@ -133,6 +133,13 @@ namespace big
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
+				
+				ImGui::Checkbox(xorstr_("Overheat control"), &g_settings.overheat_control);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Critical overheat value"), &g_settings.overheat_critical, 0, 1.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw ESP"), &g_settings.esp);
 				ImGui::PushItemWidth(300.f);

@@ -18,6 +18,9 @@ namespace big
 		int aim_key{ VK_RBUTTON };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
+		bool overheat_control{ true };
+		float overheat_critical{ 0.50f };
+
 		bool esp{ true };
 		float esp_distance { 10000.f };
 
@@ -77,6 +80,9 @@ namespace big
 			g_settings.max_time_to_target = j["settings"]["max_time_to_target"];
 			g_settings.aim_bone = j["settings"]["aim_bone"];
 
+			g_settings.overheat_control = j["settings"]["overheat_control"];
+			g_settings.overheat_critical = j["settings"]["overheat_critical"];
+
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
 
@@ -134,6 +140,8 @@ namespace big
 						{ "min_time_to_target", g_settings.min_time_to_target },
 						{ "max_time_to_target", g_settings.max_time_to_target },
 						{ "aim_bone", g_settings.aim_bone },
+						{ "overheat_control", g_settings.overheat_control },
+						{ "overheat_critical", g_settings.overheat_critical },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },
