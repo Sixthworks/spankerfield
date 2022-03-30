@@ -43,6 +43,20 @@ namespace big
 		return placeholder;
 	}
 
+	IDXGISwapChain* get_swapchain()
+	{
+		const auto renderer = DxRenderer::GetInstance();
+		if (!renderer) return nullptr;
+
+		const auto screen = renderer->m_pScreen;
+		if (!screen) return nullptr;
+
+		const auto swapchain = screen->m_pSwapChain;
+		if (!swapchain) return nullptr;
+
+		return swapchain;
+	}
+
 	bool punkbuster_check()
 	{
 		static auto screenshot_module = (uintptr_t*)OFFSET_SSMODULE;

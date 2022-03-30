@@ -235,6 +235,7 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Unspot when OBS is active"), &g_settings.obs_check);
 
+				ImGui::Checkbox(xorstr_("Alert of close infantry"), &g_settings.infantry_alert);
 				ImGui::EndTabItem();
 			}
 

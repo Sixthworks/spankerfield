@@ -21,6 +21,8 @@ namespace big
 		bool overheat_control{ true };
 		float overheat_critical{ 0.50f };
 
+		bool infantry_alert{ true };
+
 		bool esp{ true };
 		float esp_distance { 10000.f };
 

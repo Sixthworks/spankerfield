@@ -116,19 +116,19 @@ namespace big
 
 	void hooking::enable()
 	{
-		const auto dx_renderer = DxRenderer::GetInstance();
+		const auto renderer = DxRenderer::GetInstance();
 		const auto border_input_node = BorderInputNode::GetInstance();
 		bool terminate{};
 
-		while (dx_renderer && border_input_node)
+		while (renderer && border_input_node)
 		{
 			if (terminate) break;
 
 			WndProc::oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc::hkWndProc)));
 			LOG(INFO) << xorstr_("Hooked WndProc.");
 
-			MH_CreateHook((*reinterpret_cast<void***>(dx_renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
-			MH_EnableHook((*reinterpret_cast<void***>(dx_renderer->m_pScreen->m_pSwapChain))[8]);
+			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
+			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8]);
 			LOG(INFO) << xorstr_("Hooked Present.");
 
 			MH_CreateHook(&BitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));

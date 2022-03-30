@@ -8,6 +8,7 @@ namespace big
 	float get_distance(const Vector3& point1, const Vector3& point2);
 	std::string format_vehicle(std::string vehicle);
 
+	IDXGISwapChain* get_swapchain();
 	bool punkbuster_check();
 
 	int generate_random_int(int min, int max);

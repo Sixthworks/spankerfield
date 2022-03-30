@@ -7,6 +7,7 @@
 #include "Jet Speed/jetspeed.h"
 #include "Aimbot/aimbot.h"
 #include "Overheat/overheat.h"
+#include "Infantry Alert/infantry_alert.h"
 
 namespace big
 {

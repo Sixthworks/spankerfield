@@ -9,6 +9,7 @@ namespace big
 
 		plugins::draw_fov();
 		plugins::draw_blacklisted();
+		plugins::infantry_alert();
 		plugins::draw_spectators();
 		plugins::draw_esp();
 		plugins::draw_explosives();

@@ -9,6 +9,7 @@
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_internal.h"
 #include "../Utilities/path.h"
+#include "../Utilities/other.h"
 #include "../Features/main.h"
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -16,7 +17,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARA
 namespace big
 {
 	renderer::renderer() :
-		m_dxgi_swapchain(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain)
+		m_dxgi_swapchain(get_swapchain())
 	{
 		void *d3d_device{};
 		if (SUCCEEDED(m_dxgi_swapchain->GetDevice(__uuidof(ID3D11Device), &d3d_device)))
