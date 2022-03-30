@@ -85,6 +85,8 @@ namespace big
 			g_settings.overheat_control = j["settings"]["overheat_control"];
 			g_settings.overheat_critical = j["settings"]["overheat_critical"];
 
+			g_settings.infantry_alert = j["settings"]["infantry_alert"];
+
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
 
@@ -144,6 +146,7 @@ namespace big
 						{ "aim_bone", g_settings.aim_bone },
 						{ "overheat_control", g_settings.overheat_control },
 						{ "overheat_critical", g_settings.overheat_critical },
+						{ "infantry_alert", g_settings.infantry_alert },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },
