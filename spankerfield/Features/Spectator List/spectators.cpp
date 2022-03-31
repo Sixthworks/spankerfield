@@ -43,13 +43,13 @@ namespace plugins
 			}
 		}
 
-		if (g_settings.raw_drawing)
+		if (g_settings.spectator_raw_drawing)
 		{
 			float offset = 0.f;
 			for (const auto& rs : spectators)
 			{
-				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor::White(), 26.f, FL_NONE, xorstr_(u8"%s"), rs.c_str());
-				offset += 20;
+				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor::White(), 26.f, FL_NONE, rs.c_str());
+				offset += 20.f;
 			}
 		}
 		else

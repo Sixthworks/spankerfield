@@ -87,10 +87,10 @@ namespace big
 				return false;
 		}
 
-		cords[0].x = g_globals.g_width;
-		cords[0].y = g_globals.g_height;
-		cords[1].x = 0;
-		cords[1].y = 0;
+		cords[0].x = (float)g_globals.g_width;
+		cords[0].y = (float)g_globals.g_height;
+		cords[1].x = 0.f;
+		cords[1].y = 0.f;
 
 		for (auto& v3 : corners) {
 			if (v3.x < cords[0].x)

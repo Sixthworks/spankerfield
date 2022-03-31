@@ -132,7 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile>common.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -154,6 +154,7 @@
     <ClCompile Include="Features\main.cpp" />
     <ClCompile Include="Features\Minimap\minimap.cpp" />
     <ClCompile Include="Features\Overheat\overheat.cpp" />
+    <ClCompile Include="Features\Radar\radar.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
+    <ClInclude Include="Features\Radar\radar.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\gui.h" />

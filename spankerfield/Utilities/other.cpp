@@ -1,9 +1,23 @@
 #include "other.h"
 #include "../global.h"
-#include <random>
 
 namespace big
 {
+	bool color_wrapper(const char* label, ImColor* color)
+	{
+		float colors[4];
+		colors[0] = color->Value.x;
+		colors[1] = color->Value.y;
+		colors[2] = color->Value.z;
+		colors[3] = color->Value.w;
+
+		bool result = ImGui::ColorEdit4(label, colors);
+		if (result)
+			*color = {colors[0], colors[1], colors[2], colors[3]};
+
+		return result;
+	}
+
 	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle)
 	{
 		return vehicle->m_Data;

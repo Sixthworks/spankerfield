@@ -57,15 +57,6 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		bool valid_aiming = IsValidPtr(local_soldier->m_pWeaponComponent) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming) && local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
-		if (g_settings.radar)
-		{
-			if (valid_aiming)
-			{
-				m_drawing->DrawFillArea(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, ImColor::Black(160));
-			}
-		}
-
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			ClientPlayer* player = player_manager->m_ppPlayers[i];
@@ -75,7 +66,8 @@ namespace plugins
 			if (player == local_player)
 				continue;
 
-			if (player->m_TeamId == local_player->m_TeamId)
+			bool teammate = player->m_TeamId == local_player->m_TeamId;
+			if (teammate && !g_settings.esp_draw_teammates)
 				continue;
 
 			ClientSoldierEntity* soldier = player->GetSoldier();
@@ -124,40 +116,6 @@ namespace plugins
 				}
 			}
 
-			if (g_settings.radar)
-			{
-				if (valid_aiming)
-				{
-					double angle = -(double)local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
-
-					float difference_z = local_pos.z - pos.z;
-					float difference_x = local_pos.x - pos.x;
-					float x = difference_x * (float)cos(angle) - difference_z * (float)sin(angle);
-					float y = difference_x * (float)sin(angle) + difference_z * (float)cos(angle);
-
-					x *= 2;
-					x += g_settings.radar_x + (g_settings.radar_width / 2.f);
-					y *= 2;
-					y += g_settings.radar_y + (g_settings.radar_height / 2.f);
-
-					if (x < g_settings.radar_x) x = g_settings.radar_x;
-					if (y < g_settings.radar_y) y = g_settings.radar_y;
-					if (x > g_settings.radar_x + g_settings.radar_width - 3) x = g_settings.radar_x + g_settings.radar_width - 3;
-					if (y > g_settings.radar_y + g_settings.radar_height - 3) y = g_settings.radar_y + g_settings.radar_height - 3;
-
-					if (distance >= 0.f && distance <= g_settings.radar_distance)
-					{
-						if (IsValidPtr(vehicle)) {
-							std::string str = format_vehicle(vehicle_name);
-
-							m_drawing->AddText(x, y - 3.5f, ImColor(39, 95, 239, 255), 15.f, FL_CENTER_X, xorstr_(u8"%s"), str.c_str());
-						}
-						else
-							m_drawing->DrawFillArea(x, y, 4.5f, 4.5f, ImColor::Orange());
-					}
-				}
-			}
-
 			if (get_box_coords(transform, &box_coords[0]) && distance <= g_settings.esp_distance)
 			{
 				float box_width = box_coords[1].x - box_coords[0].x;
@@ -165,13 +123,13 @@ namespace plugins
 				float health = vehicle ? health_vehicle : health_player;
 				float max_health = vehicle ? max_health_vehicle : max_health_player;
 
-				if (g_settings.draw_box)
+				if (g_settings.esp_draw_box)
 				{
-					ImColor box_color = soldier->m_Occluded ? g_settings.box_color_occluded : g_settings.box_color;
-					m_drawing->DrawEspBox(g_settings.box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
+					ImColor box_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
+					m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
 				}
 
-				if (g_settings.draw_health)
+				if (g_settings.esp_draw_health)
 				{
 					ImColor hb_color(BYTE(255 - max(health - max_health / 2, 0) * (255 / (max_health / 2))), BYTE(255 - max(max_health / 2 - health, 0) * (255 / (max_health / 2))), 0, 255);
 					float hb_width = max(box_width, 5.0f);
@@ -186,30 +144,28 @@ namespace plugins
 
 				if (!IsValidPtr(vehicle))
 				{
-					ImColor text_color = soldier->m_Occluded ? g_settings.text_color_occluded : g_settings.text_color;
+					ImColor text_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.text_color_occluded : g_settings.text_color;
 					float base[2] = { box_coords[1].x + 3.5f, box_coords[0].y - 3.f };
 
-					if (g_settings.draw_name)
+					if (g_settings.esp_draw_name)
 					{
-						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, xorstr_(u8"%s"), nickname);
+						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, nickname);
 						base[1] += 9.f;
 					}
 
-					if (g_settings.draw_distance)
+					if (g_settings.esp_draw_distance)
 					{
-						std::string str(fmt::format(xorstr_("{}{}"), abs(ceil(distance)), xorstr_("m")));
-
-						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, xorstr_(u8"%s"), str.c_str());
+						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str());
 						base[1] += 9.f;
 					}
 				}
 
-				if (g_settings.draw_skeleton)
+				if (g_settings.skeleton)
 				{
 					bool dots = false;
-					if (g_settings.use_dots)
+					if (g_settings.skeleton_use_dots)
 					{
-						if (distance <= g_settings.dots_distance)
+						if (distance <= g_settings.skeleton_dots_distance)
 							dots = true;
 					}
 

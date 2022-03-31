@@ -79,11 +79,11 @@ namespace big
 			return CurPos + Velocity * Time + .5f * Accel * Time * Time;
 		};
 
-		double a = .25f * gravity_vec.Dot(gravity_vec);
-		double b = enemy_velocity.Dot(gravity_vec);
-		double c = relative_pos.Dot(gravity_vec) + enemy_velocity.Dot(enemy_velocity) - (bullet_speed.z * bullet_speed.z);
-		double d = 2.0f * (relative_pos.Dot(enemy_velocity));
-		double e = relative_pos.Dot(relative_pos);
+		float a = .25f * gravity_vec.Dot(gravity_vec);
+		float b = enemy_velocity.Dot(gravity_vec);
+		float c = relative_pos.Dot(gravity_vec) + enemy_velocity.Dot(enemy_velocity) - (bullet_speed.z * bullet_speed.z);
+		float d = 2.0f * (relative_pos.Dot(enemy_velocity));
+		float e = relative_pos.Dot(relative_pos);
 
 		// Calculate time projectile is in air
 		std::vector<double> solutions;
@@ -93,12 +93,12 @@ namespace big
 		float shortest_air_time = 99999.0f;
 		for (int i = 0; i < num_solutions; i++)
 		{
-			float air_time = solutions[i];
+			double air_time = solutions[i];
 			if (air_time < 0)
 				continue;
 
 			if (air_time < shortest_air_time)
-				shortest_air_time = air_time;
+				shortest_air_time = (float)air_time;
 		}
 
 		// Extrapolate position on velocity, and account for bullet drop
@@ -221,7 +221,7 @@ namespace big
 				continue;
 
 			float screen_distance = get_screen_distance(screen_vec, get_screen_size());
-			if (g_settings.fov_method)
+			if (g_settings.aim_fov_method)
 			{
 				if (screen_distance > g_settings.aim_fov)
 					return;
@@ -314,11 +314,11 @@ namespace plugins
 		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, target.m_Player->GetSoldier(), temporary_aim, shoot_space);
 		target.m_WorldPosition = temporary_aim;
 
-		if (g_settings.max_time_to_target <= 0.f) return;
+		if (g_settings.aim_max_time_to_target <= 0.f) return;
 
 		if (target.m_Player != m_PreviousTarget.m_Player)
 		{
-			Vector2 vec_rand = { generate_random_float(g_settings.min_time_to_target, g_settings.max_time_to_target), generate_random_float(g_settings.min_time_to_target, g_settings.max_time_to_target) };
+			Vector2 vec_rand = { generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target), generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target) };
 			m_AimbotSmoother.ResetTimes(vec_rand);
 		}
 	
@@ -359,9 +359,7 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		if (g_settings.fov_method && g_settings.draw_fov)
-		{
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2, g_globals.g_height / 2), g_settings.aim_fov, ImColor::White());
-		}
+		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov, ImColor::White());
 	}
 }

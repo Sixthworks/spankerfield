@@ -61,7 +61,7 @@ void CDrawing::AddLine(const ImVec2& from, const ImVec2& to, const ImColor& colo
 
 void CDrawing::DrawLines(int x0, int y0, int x1, int y1, int r, int g, int b, int a)
 {
-	AddLine(ImVec2(x0, y0), ImVec2(x1, y1), ImColor(r, g, b));
+	AddLine(ImVec2((float)x0, (float)y0), ImVec2((float)x1, (float)y1), ImColor(r, g, b));
 }
 
 void CDrawing::AddText(float x, float y, const ImColor& color, float fontSize, int flags, const char* format, ...)
@@ -210,9 +210,7 @@ void CDrawing::DrawEspBox(int box_type, float x, float y, float w, float h, floa
 
 void CDrawing::DrawDot(int x, int y, const ImColor& color)
 {
-	int Thickness;
-	Thickness = (int)5;
-	int thickness = Thickness - 1;
+	float thickness = 4.f;
 
-	DrawFillArea(x - thickness, y - thickness, Thickness, Thickness, color);
+	DrawFillArea(x - thickness, y - thickness, thickness + 1.f, thickness + 1.f, color);
 }

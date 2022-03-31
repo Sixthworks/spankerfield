@@ -3,6 +3,7 @@
 #include "Blacklist/blacklist.h"
 #include "Spectator List/spectators.h"
 #include "ESP/esp.h"
+#include "Radar/radar.h"
 #include "Explosives/explosives.h"
 #include "Jet Speed/jetspeed.h"
 #include "Aimbot/aimbot.h"

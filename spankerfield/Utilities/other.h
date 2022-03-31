@@ -1,8 +1,11 @@
 #pragma once
 #include "../SDK/sdk.h"
+#include "../ImGui/imgui.h"
 
 namespace big
 {
+	bool color_wrapper(const char* label, ImColor* color);
+
 	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle);
 	TransformAABBStruct get_transform(ClientPlayer* player);
 	float get_distance(const Vector3& point1, const Vector3& point2);

@@ -35,7 +35,7 @@ namespace plugins
 		const auto device = mouse->m_pDevice;
 		if (!device) return;
 
-		if (weapon->m_Overheat >= g_settings.overheat_critical)
+		if (weapon->m_Overheat >= g_settings.overheat_control_critical)
 		{
 			about_to_overheat = true;
 			device->m_Buffer.buttons[0] = false;

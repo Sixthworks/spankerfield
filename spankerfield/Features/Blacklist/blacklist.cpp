@@ -76,7 +76,7 @@ namespace plugins
 		auto it = std::find(blacklisted.begin(), blacklisted.end(), name);
 		if (*it == name)
 		{
-			int index = it - blacklisted.begin();
+			__int64 index = it - blacklisted.begin();
 			blacklisted.erase(blacklisted.begin() + index);
 		}
 
@@ -118,8 +118,8 @@ namespace plugins
 			{
 				if (nickname == bl)
 				{
-					m_drawing->AddText(g_globals.g_width / 2, 95.f + offset, ImColor::Red(), 28.f, FL_CENTER_X, xorstr_(u8"%s"), nickname);
-					offset += 20;
+					m_drawing->AddText(g_globals.g_width / 2.f, 95.f + offset, ImColor::Red(), 28.f, FL_CENTER_X, nickname);
+					offset += 20.f;
 				}
 			}
 		}

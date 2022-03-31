@@ -67,7 +67,7 @@ namespace plugins
 							float box_width = box_coords[1].x - box_coords[0].x;
 							float box_height = box_coords[1].y - box_coords[0].y;
 
-							m_drawing->AddText(box_coords[0].x + (box_width / 2), box_coords[0].y + (box_height / 2), ImColor::Pink(), 0.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("[#]"));
+							m_drawing->AddText(box_coords[0].x + (box_width / 2.f), box_coords[0].y + (box_height / 2.f), g_settings.explosives_color, 0.f, FL_CENTER_X, xorstr_("[#]"));
 						}
 					}
 				} while (explosives.next());

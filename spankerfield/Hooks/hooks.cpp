@@ -35,14 +35,14 @@ namespace big
 
 		HRESULT hkPresent(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags)
 		{
-			const auto pDxRenderer = DxRenderer::GetInstance();
-			const auto pGameRenderer = GameRenderer::GetInstance();
+			const auto renderer = DxRenderer::GetInstance();
+			const auto game_renderer = GameRenderer::GetInstance();
 
-			if (pGameRenderer && pDxRenderer)
+			if (renderer && game_renderer)
 			{
-				g_globals.g_height = pDxRenderer->m_pScreen->m_Height;
-				g_globals.g_width = pDxRenderer->m_pScreen->m_Width;
-				g_globals.g_viewproj = pGameRenderer->m_pRenderView->m_ViewProjection;
+				g_globals.g_height = renderer->m_pScreen->m_Height;
+				g_globals.g_width = renderer->m_pScreen->m_Width;
+				g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
 
 				punkbuster_check();
 

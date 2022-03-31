@@ -39,8 +39,35 @@ namespace plugins
 			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
-			if (player->GetVehicle())
-				continue;
+			const auto vehicle = player->GetVehicle();
+			if (vehicle)
+			{
+				if (g_settings.infantry_alert_light_tech)
+				{
+					const auto data = get_vehicle_data(vehicle);
+					if (IsValidPtrWithVTable(data))
+					{
+						const auto type = data->GetVehicleType();
+						const VehicleData::VehicleType light_types[] = { 
+							VehicleData::VehicleType::HELITRANS, 
+							VehicleData::VehicleType::JEEP, 
+							VehicleData::VehicleType::CAR 
+						};
+
+						bool indeed = false;
+						for (int i = 0; i < sizeof(light_types) / sizeof(*light_types); i++)
+						{
+							if (type == light_types[i])
+								indeed = true;
+						}
+
+						if (!indeed)
+							continue;
+					}
+				}
+				else
+					continue;
+			}
 
 			TransformAABBStruct transform = get_transform(player);
 			TransformAABBStruct local_transform = get_transform(local_player);;
@@ -48,8 +75,12 @@ namespace plugins
 			Vector3 local_pos = (Vector3)local_transform.Transform.m[3];
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 
+			float difference_z = local_pos.z - pos.z;
+			if (difference_z > 75.f)
+				continue;
+
 			float distance = get_distance(pos, local_pos);
-			if (distance > 22.5f)
+			if (distance > g_settings.infantry_alert_distance)
 				continue;
 
 			/*
@@ -66,7 +97,7 @@ namespace plugins
 
 			if (!drawing)
 			{
-				m_drawing->AddText(g_globals.g_width / 2, (g_globals.g_height / 2) + 100.f, ImColor::Yellow(200), 20.f, FL_CENTER_X, xorstr_(u8"%s"), xorstr_("Enemy nearby"));
+				m_drawing->AddText(g_globals.g_width / 2.f, (g_globals.g_height / 2.f) + 100.f, g_settings.infantry_alert_color, 20.f, FL_CENTER_X, xorstr_("Enemy nearby"));
 				drawing = true;
 			}
 		}

@@ -10,50 +10,62 @@ namespace big
 		bool blacklist{ true };
 
 		bool aimbot;
-		bool fov_method{ true };
-		bool draw_fov;
+		bool aim_fov_method{ true };
+		bool aim_draw_fov;
 		float aim_fov{ 90.f };
-		float min_time_to_target{ 1.5f };
-		float max_time_to_target{ 3.0f };
+		float aim_min_time_to_target{ 1.5f };
+		float aim_max_time_to_target{ 3.0f };
 		int aim_key{ VK_RBUTTON };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
 		bool overheat_control{ true };
-		float overheat_critical{ 0.50f };
+		float overheat_control_critical{ 0.50f };
 
 		bool infantry_alert{ true };
+		bool infantry_alert_light_tech{ true };
+		float infantry_alert_distance{ 22.5f };
+		ImColor infantry_alert_color{ 255, 255, 0, 255 };
 
 		bool esp{ true };
+		bool esp_draw_teammates;
 		float esp_distance { 10000.f };
+		ImColor esp_teammate_color{ 63, 147, 216, 255 };
 
-		bool draw_box{ true };
-		int box_style{ 4 };
-		ImColor box_color_occluded{ 24, 162, 162, 255 };
-		ImColor box_color{ 255, 51, 0, 255 };
+		bool esp_draw_box{ true };
+		int esp_box_style{ 4 };
+		ImColor esp_box_color_occluded{ 24, 162, 162, 255 };
+		ImColor esp_box_color{ 255, 51, 0, 255 };
 		
-		bool draw_health{ true };
-		bool draw_name{ true };
-		bool draw_distance{ true };
+		bool esp_draw_health{ true };
+		bool esp_draw_name{ true };
+		bool esp_draw_distance{ true };
 		ImColor text_color_occluded{ 24, 162, 162, 255 };
 		ImColor text_color{ 255, 153, 51, 255 };
 
-		bool draw_skeleton{ true };
-		bool use_dots{ true };
-		float dots_distance{ 22.5f };
+		bool skeleton{ true };
+		bool skeleton_use_dots{ true };
+		float skeleton_dots_distance{ 22.5f };
 		ImColor skeleton_color{ 220, 220, 220, 255 };
 
 		bool radar;
+		bool radar_draw_teammates;
 		float radar_x{ 20.f };
 		float radar_y{ 245.f };
 		float radar_width{ 320.f };
 		float radar_height{ 320.f };
 		float radar_distance{ 1000.f };
+		ImColor radar_teammates_color{ 63, 147, 216, 255 };
+		ImColor radar_enemies_color{ 215, 31, 30, 255 };
+		ImColor radar_teammate_vehicles_color{ 0, 145, 255, 255 };
+		ImColor radar_enemy_vehicles_color{ 255, 100, 0, 255 };
 
 		bool explosives{ true };
+		ImColor explosives_color{ 255, 0, 255, 255 };
+
 		bool jet_speed{ true };
 
 		bool spectator_list{ true };
-		bool raw_drawing;
+		bool spectator_raw_drawing;
 		float spectator_x{ 23.5f };
 		float spectator_y{ 565.f };
 		ImColor spectator_color{ 255, 255, 255, 255 };
@@ -75,31 +87,33 @@ namespace big
 			g_settings.blacklist = j["settings"]["blacklist"];
 
 			g_settings.aimbot = j["settings"]["aimbot"];
-			g_settings.fov_method = j["settings"]["fov_method"];
-			g_settings.draw_fov = j["settings"]["draw_fov"];
+			g_settings.aim_fov_method = j["settings"]["aim_fov_method"];
+			g_settings.aim_draw_fov = j["settings"]["aim_draw_fov"];
 			g_settings.aim_fov = j["settings"]["aim_fov"];
-			g_settings.min_time_to_target = j["settings"]["min_time_to_target"];
-			g_settings.max_time_to_target = j["settings"]["max_time_to_target"];
+			g_settings.aim_min_time_to_target = j["settings"]["aim_min_time_to_target"];
+			g_settings.aim_max_time_to_target = j["settings"]["aim_max_time_to_target"];
 			g_settings.aim_bone = j["settings"]["aim_bone"];
 
 			g_settings.overheat_control = j["settings"]["overheat_control"];
-			g_settings.overheat_critical = j["settings"]["overheat_critical"];
+			g_settings.overheat_control_critical = j["settings"]["overheat_control_critical"];
 
 			g_settings.infantry_alert = j["settings"]["infantry_alert"];
+			g_settings.infantry_alert_light_tech = j["settings"]["infantry_alert_light_tech"];
+			g_settings.infantry_alert_distance = j["settings"]["infantry_alert_distance"];
 
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
 
-			g_settings.draw_box = j["settings"]["draw_box"];
-			g_settings.box_style = j["settings"]["box_style"];
+			g_settings.esp_draw_box = j["settings"]["esp_draw_box"];
+			g_settings.esp_box_style = j["settings"]["esp_box_style"];
 
-			g_settings.draw_health = j["settings"]["draw_health"];
-			g_settings.draw_name = j["settings"]["draw_name"];
-			g_settings.draw_distance = j["settings"]["draw_distance"];
+			g_settings.esp_draw_health = j["settings"]["esp_draw_health"];
+			g_settings.esp_draw_name = j["settings"]["esp_draw_name"];
+			g_settings.esp_draw_distance = j["settings"]["esp_draw_distance"];
 
-			g_settings.draw_skeleton = j["settings"]["draw_skeleton"];
-			g_settings.use_dots = j["settings"]["use_dots"];
-			g_settings.dots_distance = j["settings"]["dots_distance"];
+			g_settings.skeleton = j["settings"]["skeleton"];
+			g_settings.skeleton_use_dots = j["settings"]["skeleton_use_dots"];
+			g_settings.skeleton_dots_distance = j["settings"]["skeleton_dots_distance"];
 
 			g_settings.radar = j["settings"]["radar"];
 			g_settings.radar_x = j["settings"]["radar_x"];
@@ -112,7 +126,7 @@ namespace big
 			g_settings.jet_speed = j["settings"]["jet_speed"];
 
 			g_settings.spectator_list = j["settings"]["spectator_list"];
-			g_settings.raw_drawing = j["settings"]["raw_drawing"];
+			g_settings.spectator_raw_drawing = j["settings"]["spectator_raw_drawing"];
 			g_settings.spectator_x = j["settings"]["spectator_x"];
 			g_settings.spectator_y = j["settings"]["spectator_y"];
 			
@@ -129,24 +143,26 @@ namespace big
 					    { "blacklist", g_settings.blacklist },
 						{ "esp", g_settings.esp },
 						{ "esp_distance", g_settings.esp_distance },
-						{ "draw_box", g_settings.draw_box },
-						{ "box_style", g_settings.box_style },
-						{ "draw_health", g_settings.draw_health },
-						{ "draw_name", g_settings.draw_name },
-						{ "draw_distance", g_settings.draw_distance },
-						{ "draw_skeleton", g_settings.draw_skeleton },
-						{ "use_dots", g_settings.use_dots },
-						{ "dots_distance", g_settings.dots_distance },
+						{ "esp_draw_box", g_settings.esp_draw_box },
+						{ "esp_box_style", g_settings.esp_box_style },
+						{ "esp_draw_health", g_settings.esp_draw_health },
+						{ "esp_draw_name", g_settings.esp_draw_name },
+						{ "esp_draw_distance", g_settings.esp_draw_distance },
+						{ "skeleton", g_settings.skeleton },
+						{ "skeleton_use_dots", g_settings.skeleton_use_dots },
+						{ "skeleton_dots_distance", g_settings.skeleton_dots_distance },
 						{ "aimbot", g_settings.aimbot },
-						{ "fov_method", g_settings.fov_method },
-						{ "draw_fov", g_settings.draw_fov },
+						{ "aim_fov_method", g_settings.aim_fov_method },
+						{ "aim_draw_fov", g_settings.aim_draw_fov },
 						{ "aim_fov", g_settings.aim_fov },
-						{ "min_time_to_target", g_settings.min_time_to_target },
-						{ "max_time_to_target", g_settings.max_time_to_target },
+						{ "aim_min_time_to_target", g_settings.aim_min_time_to_target },
+						{ "aim_max_time_to_target", g_settings.aim_max_time_to_target },
 						{ "aim_bone", g_settings.aim_bone },
 						{ "overheat_control", g_settings.overheat_control },
-						{ "overheat_critical", g_settings.overheat_critical },
+						{ "overheat_control_critical", g_settings.overheat_control_critical },
 						{ "infantry_alert", g_settings.infantry_alert },
+						{ "infantry_alert_light_tech", g_settings.infantry_alert_light_tech },
+						{ "infantry_alert_distance", g_settings.infantry_alert_distance },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },
@@ -156,7 +172,7 @@ namespace big
 						{ "explosives", g_settings.explosives },
 						{ "jet_speed", g_settings.jet_speed },
 						{ "spectator_list", g_settings.spectator_list },
-						{ "raw_drawing", g_settings.raw_drawing },
+						{ "spectator_raw_drawing", g_settings.spectator_raw_drawing },
 						{ "spectator_x", g_settings.spectator_x },
 						{ "spectator_y", g_settings.spectator_y },
 						{ "minimap", g_settings.minimap },

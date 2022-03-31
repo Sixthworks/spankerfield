@@ -153,6 +153,9 @@
     <ClCompile Include="Features\Infantry Alert\infantry_alert.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Radar\radar.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Features\ESP\esp.h">
@@ -357,6 +360,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Radar\radar.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

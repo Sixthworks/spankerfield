@@ -48,6 +48,7 @@
 #include <variant>
 
 #include <regex>
+#include <random>
 
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
