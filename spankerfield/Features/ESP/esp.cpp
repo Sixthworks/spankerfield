@@ -142,6 +142,8 @@ namespace plugins
 					m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_perc_width, hb_height, hb_color);
 				}
 
+				// player->m_AttachedEntryId, 0 if driver. 
+				// Ideally we should draw the driver only instead of saying persona non-grata to everyone in the vehicle.
 				if (!IsValidPtr(vehicle))
 				{
 					ImColor text_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.text_color_occluded : g_settings.text_color;

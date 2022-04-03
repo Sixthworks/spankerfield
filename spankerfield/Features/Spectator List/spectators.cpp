@@ -37,6 +37,13 @@ namespace plugins
 
 			if (player->m_IsSpectator)
 			{
+				// Also make an additional check here if the player is actually spectating YOU.
+				// ClientPlayer::ClientPlayerView* pView = pPlayer->m_PlayerView;
+				// IsValidPtr(pView) && pView->m_Owner == pLocalPlayer)
+				// I don't have this in my SDK, but you can add it if you wish.
+				// https://github.com/headmax/Cplus/blob/master/Projet4/esp.h#L406=
+				// https://github.com/headmax/Cplus/blob/master/Projet4/bfsdk.h#L6576=
+
 				const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
 
 				spectators.push_back(nickname);

@@ -3,27 +3,25 @@
 
 #pragma warning (disable : 4200)
 
-#define OFFSET_DXRENDERER             0x142738080
-#define OFFSET_GAMECONTEXT            0x142670D80
-#define OFFSET_GAMERENDERER           0x142672378
-#define OFFSET_DBRENDERER             0x14063D0C0 
-#define OFFSET_DRAWTEXT               0x14063E2E0
-#define OFFSET_DRAWLINE               0x14063DEB0
-#define OFFSET_DRAWLINERECT           0x14063DF20
-#define OFFSET_DRAWFILLRECT           0x14063E0B0
-#define OFFSET_BORDERINPUTNODE        0x142671FB0
-#define OFFSET_ANGLES				  0x1423B2EC0
-#define OFFSET_FIRING_WEAPON		  0x1423B2EC8
-#define OFFSET_MAIN					  0x142364B78
-#define OFFSET_WORLDRENDERSETTINGS	  0x1426724A0
-#define OFFSET_DXDISPLAYSETTINGS	  0x142364C70
-#define OFFSET_FLAG					  0x142385A98
-#define OFFSET_SSMODULE				  0x14273D6E8
-#define OFFSET_CONSOLECOMMANDS		  0x140663A20
-#define OFFSET_DISPATCHMESSAGE		  0x140626810
-#define OFFSET_PBSSRETURN			  0x140CBCD29
+#define OFFSET_DXRENDERER             0x142738080 // \x48\x8B\x0D\x00\x00\x00\x00\x48\x8B\x01\xFF\x50\x08\x85\xC0\x75\x2D
+#define OFFSET_GAMECONTEXT            0x142670D80 // \x48\x8B\x0D\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x48\x8B\xD8\x48\x89\x44\x24\x00\x4C\x8D\xB6\x00\x00\x00\x00\x49\x8B\x3E\x48\x8B\xAE\x00\x00\x00\x00\x48\x3B\xFD
+#define OFFSET_GAMERENDERER           0x142672378 // \x48\x8B\x0D\x00\x00\x00\x00\x48\x85\xC9\x74\x06\x48\x8B\x01\xFF\x50\x50
+#define OFFSET_DBRENDERER             0x14063D0C0 // 48 8B 0D ? ? ? ? 48 85 C9 75 03 33 C0 C3 E9
+#define OFFSET_DRAWTEXT               0x14063E2E0 // 48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 49 8B F9 41 8B F0
+#define OFFSET_DRAWLINE               0x14063DEB0 // 48 89 5C 24 ? 44 89 4C 24 ? 57
+#define OFFSET_DRAWLINERECT           0x14063DF20 // 48 89 5C 24 ? 48 89 74 24 ? 44 89 4C 24 ? 57 48 83 EC 50
+#define OFFSET_DRAWFILLRECT           0x14063E0B0 // 48 8B C4 48 89 58 08 48 89 70 10 44 89 48 20
+#define OFFSET_BORDERINPUTNODE        0x142671FB0 // \x4C\x8B\x05\x00\x00\x00\x00\x4C\x8B\x74\x24\x00\x48\x8B\x5C\x24\x00\x49\x8B\x50\x40\x48\x85\xD2\x74\x16\x48\x8B\x42\x10
+#define OFFSET_ANGLES				  0x1423B2EC0 // \x48\x89\x05\x00\x00\x00\x00\xEB\x07\x48\x89\x35\x00\x00\x00\x00\x48\x8B\xCB
+#define OFFSET_FIRING_WEAPON		  0x1423B2EC8 // \x48\x89\x3D\x00\x00\x00\x00\xF3\x0F\x10\x35\x00\x00\x00\x00\x48\x8B\x0D\x00\x00\x00\x00\x48\x85\xC9\x0F\x84\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x48\x89\x05\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x85\xC0
+#define OFFSET_MAIN					  0x142364B78 // \x48\x89\x1D\x00\x00\x00\x00\x48\x8B\x77\x70\x48\x85\xF6\x74\x10\x48\x8B\xCE\xE8\x00\x00\x00\x00\x48\x8B\xCE\xE8\x00\x00\x00\x00\x48\x89\x5F\x70
+#define OFFSET_WORLDRENDERSETTINGS	  0x1426724A0 // \x48\x8B\x05\x00\x00\x00\x00\x8B\xDA\xFF\xCA\x89\x54\x24\x24\x48\x85\xC0\x75\x26\x48\x8B\x0D\x00\x00\x00\x00\x48\x8D\x15\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x4C\x8B\x84\x24\x00\x00\x00\x00\x8B\x54\x24\x24\x48\x89\x05\x00\x00\x00\x00\x0F\xB6\x80\x00\x00\x00\x00
+#define OFFSET_DXDISPLAYSETTINGS	  0x142364C70 // \x48\x8B\x05\x00\x00\x00\x00\x48\x85\xC0\x75\x1A\x48\x8B\x0D\x00\x00\x00\x00\x48\x8D\x15\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x48\x89\x05\x00\x00\x00\x00\x48\x89\x05\x00\x00\x00\x00\x33\xDB
+#define OFFSET_FLAG					  0x142385A98 // \x48\x8B\x05\x00\x00\x00\x00\x48\x3B\x05\x00\x00\x00\x00\x74\x10\x48\x8B\xD8\x48\x83\xC0\x48
+#define OFFSET_SSMODULE				  0x14273D6E8 // \x48\x8B\x0D\x00\x00\x00\x00\x48\x85\xC9\x74\x24
+#define OFFSET_CONSOLECOMMANDS		  0x140663A20 // \x40\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x00\x00\x00\x00\x48\x81\xEC\x00\x00\x00\x00\x48\xC7\x45\x00\x00\x00\x00\x00\x48\x89\x9C\x24\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x85\x00\x00\x00\x00\x44\x88\x44\x24\x00\x4C\x8B\xEA\x48\x8B\xF9\x48\x89\x8D\x00\x00\x00\x00\x45\x33\xFF\x44\x89\x7C\x24\x00\x8B\x05\x00\x00\x00\x00\x48\x8D\x1D\x00\x00\x00\x00
 #define OFFSET_FIRSTTYPEINFO		  0x1423E41B8
-#define OFFSET_GETENTITYLIST		  0x1407CD5D0
+#define OFFSET_GETENTITYLIST		  0x1407CD5D0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x74\x0C\x48\x8B\x03\x48\x89\x05\x00\x00\x00\x00\xEB\x3F (not sure)
 
 #define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
 
@@ -1271,7 +1269,6 @@ public:
 class ClientPlayer
 {
 public:
-
 	virtual ~ClientPlayer();
 	virtual void Function1();
 	virtual void Function2();
@@ -1289,7 +1286,7 @@ public:
 	char _0x0950[8];
 	__int64 m_pSelectedActiveUnlocks; //0x0958 
 	char _0x0960[2664];
-	BYTE m_isAIPlayer; //0x13C8 
+	bool m_isAIPlayer; //0x13C8 
 	bool m_IsSpectator; //0x13C9 
 	char _0x13CA[2];
 	uint32_t m_TeamId; //0x13CC 
@@ -1301,7 +1298,7 @@ public:
 	__int32 m_AttachedEntryId; //0x14C8 if == 0 -> driver
 	char _0x14CC[4];
 	ClientSoldierEntity* m_pControlledControllable; //0x14D0 
-	__int32 m_ControlledEntryId; //0x14D8 
+	__int32 m_ControlledEntryId; //0x14D8
 
 	inline ClientSoldierEntity* GetSoldier()
 	{
