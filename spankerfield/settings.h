@@ -82,6 +82,26 @@ namespace big
 		nlohmann::json default_options;
 		nlohmann::json options;
 
+		std::string color_to_string(ImColor color)
+		{
+			float colors[4];
+			colors[0] = color.Value.x;
+			colors[1] = color.Value.y;
+			colors[2] = color.Value.z;
+			colors[3] = color.Value.w;
+
+			std::string format = fmt::format(xorstr_("X({}) Y({}) Z({}) W({})"), colors[0], colors[1], colors[2], colors[3]);
+			return format;
+		}
+
+		ImVec4 string_to_color(std::string color)
+		{
+			float x, y, z, w;
+			sscanf_s(color.c_str(), xorstr_("X(%f) Y(%f) Z(%f) W(%f)"), &x, &y, &z, &w);
+
+			return ImVec4(x, y, z, w);
+		}
+
 		void from_json(const nlohmann::json& j)
 		{
 			g_settings.blacklist = j["settings"]["blacklist"];
@@ -100,20 +120,27 @@ namespace big
 			g_settings.infantry_alert = j["settings"]["infantry_alert"];
 			g_settings.infantry_alert_light_tech = j["settings"]["infantry_alert_light_tech"];
 			g_settings.infantry_alert_distance = j["settings"]["infantry_alert_distance"];
+			g_settings.infantry_alert_color = string_to_color(j["settings"]["infantry_alert_color"]);
 
 			g_settings.esp = j["settings"]["esp"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
+			g_settings.esp_teammate_color = string_to_color(j["settings"]["esp_teammate_color"]);
 
 			g_settings.esp_draw_box = j["settings"]["esp_draw_box"];
 			g_settings.esp_box_style = j["settings"]["esp_box_style"];
+			g_settings.esp_box_color_occluded = string_to_color(j["settings"]["esp_box_color_occluded"]);
+			g_settings.esp_box_color = string_to_color(j["settings"]["esp_box_color"]);
 
 			g_settings.esp_draw_health = j["settings"]["esp_draw_health"];
 			g_settings.esp_draw_name = j["settings"]["esp_draw_name"];
 			g_settings.esp_draw_distance = j["settings"]["esp_draw_distance"];
+			g_settings.text_color_occluded = string_to_color(j["settings"]["text_color_occluded"]);
+			g_settings.text_color = string_to_color(j["settings"]["text_color"]);
 
 			g_settings.skeleton = j["settings"]["skeleton"];
 			g_settings.skeleton_use_dots = j["settings"]["skeleton_use_dots"];
 			g_settings.skeleton_dots_distance = j["settings"]["skeleton_dots_distance"];
+			g_settings.skeleton_color = string_to_color(j["settings"]["skeleton_color"]);
 
 			g_settings.radar = j["settings"]["radar"];
 			g_settings.radar_x = j["settings"]["radar_x"];
@@ -121,15 +148,22 @@ namespace big
 			g_settings.radar_width = j["settings"]["radar_width"];
 			g_settings.radar_height = j["settings"]["radar_height"];
 			g_settings.radar_distance = j["settings"]["radar_distance"];
+			g_settings.radar_teammates_color = string_to_color(j["settings"]["radar_teammates_color"]);
+			g_settings.radar_enemies_color = string_to_color(j["settings"]["radar_enemies_color"]);
+			g_settings.radar_teammate_vehicles_color = string_to_color(j["settings"]["radar_teammate_vehicles_color"]);
+			g_settings.radar_enemy_vehicles_color = string_to_color(j["settings"]["radar_enemy_vehicles_color"]);
 
 			g_settings.explosives = j["settings"]["explosives"];
+			g_settings.explosives_color = string_to_color(j["settings"]["explosives_color"]);
+
 			g_settings.jet_speed = j["settings"]["jet_speed"];
 
 			g_settings.spectator_list = j["settings"]["spectator_list"];
 			g_settings.spectator_raw_drawing = j["settings"]["spectator_raw_drawing"];
 			g_settings.spectator_x = j["settings"]["spectator_x"];
 			g_settings.spectator_y = j["settings"]["spectator_y"];
-			
+			g_settings.spectator_color = string_to_color(j["settings"]["spectator_color"]);
+
 			g_settings.minimap = j["settings"]["minimap"];
 			g_settings.obs_check = j["settings"]["obs_check"];
 		}
@@ -143,14 +177,20 @@ namespace big
 					    { "blacklist", g_settings.blacklist },
 						{ "esp", g_settings.esp },
 						{ "esp_distance", g_settings.esp_distance },
+						{ "esp_teammate_color", color_to_string(g_settings.esp_teammate_color) },
 						{ "esp_draw_box", g_settings.esp_draw_box },
 						{ "esp_box_style", g_settings.esp_box_style },
+						{ "esp_box_color_occluded", color_to_string(g_settings.esp_box_color_occluded) },
+						{ "esp_box_color", color_to_string(g_settings.esp_box_color) },
 						{ "esp_draw_health", g_settings.esp_draw_health },
 						{ "esp_draw_name", g_settings.esp_draw_name },
 						{ "esp_draw_distance", g_settings.esp_draw_distance },
+						{ "text_color_occluded", color_to_string(g_settings.text_color_occluded) },
+						{ "text_color", color_to_string(g_settings.text_color) },
 						{ "skeleton", g_settings.skeleton },
 						{ "skeleton_use_dots", g_settings.skeleton_use_dots },
 						{ "skeleton_dots_distance", g_settings.skeleton_dots_distance },
+			            { "skeleton_color", color_to_string(g_settings.skeleton_color) },
 						{ "aimbot", g_settings.aimbot },
 						{ "aim_fov_method", g_settings.aim_fov_method },
 						{ "aim_draw_fov", g_settings.aim_draw_fov },
@@ -163,18 +203,25 @@ namespace big
 						{ "infantry_alert", g_settings.infantry_alert },
 						{ "infantry_alert_light_tech", g_settings.infantry_alert_light_tech },
 						{ "infantry_alert_distance", g_settings.infantry_alert_distance },
+			            { "infantry_alert_color", color_to_string(g_settings.infantry_alert_color) },
 						{ "radar", g_settings.radar },
 						{ "radar_x", g_settings.radar_x },
 						{ "radar_y", g_settings.radar_y },
 						{ "radar_width", g_settings.radar_width },
 						{ "radar_height", g_settings.radar_height },
 						{ "radar_distance", g_settings.radar_distance },
+						{ "radar_teammates_color", color_to_string(g_settings.radar_teammates_color) },
+						{ "radar_enemies_color", color_to_string(g_settings.radar_enemies_color) },
+						{ "radar_teammate_vehicles_color", color_to_string(g_settings.radar_teammate_vehicles_color) },
+						{ "radar_enemy_vehicles_color", color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ "explosives", g_settings.explosives },
+			            { "explosives_color", color_to_string(g_settings.explosives_color) },
 						{ "jet_speed", g_settings.jet_speed },
 						{ "spectator_list", g_settings.spectator_list },
 						{ "spectator_raw_drawing", g_settings.spectator_raw_drawing },
 						{ "spectator_x", g_settings.spectator_x },
 						{ "spectator_y", g_settings.spectator_y },
+			            { "spectator_color", color_to_string(g_settings.spectator_color) },
 						{ "minimap", g_settings.minimap },
 						{ "obs_check", g_settings.obs_check },
 					},
