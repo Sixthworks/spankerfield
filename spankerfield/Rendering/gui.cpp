@@ -152,6 +152,8 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Distance##ESP"), &g_settings.esp_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
 
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
 				
 				ImGui::Text(xorstr_("Teammates color"));
@@ -214,6 +216,8 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
+
+				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
 
@@ -303,6 +307,10 @@ namespace big
 			{
 				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &g_settings.blacklist);
 
+				ImGui::Text(xorstr_("Text color"));
+
+				color_wrapper(xorstr_("Text##BL"), &g_settings.blacklist_color);
+
 				ImGui::Separator();
 
 				if (ImGui::TreeNode(xorstr_("Blacklisted players")))
@@ -310,7 +318,7 @@ namespace big
 					int i = 0;
 					for (const auto& rs : plugins::blacklisted)
 					{
-						if (ImGui::Selectable(rs.c_str(), false))
+						if (ImGui::Selectable(rs.name.c_str(), false))
 						{
 							plugins::selected = i;
 					    }
@@ -323,7 +331,7 @@ namespace big
 
 				if (ImGui::Button(xorstr_("Delete player from blacklist")))
 				{
-					std::string nickname = plugins::blacklisted.at(plugins::selected);
+					std::string nickname = plugins::blacklisted.at(plugins::selected).name;
 					if (!nickname.empty())
 						plugins::delete_from_blacklist(nickname);
 				}
@@ -336,7 +344,7 @@ namespace big
 				ImGui::PopItemWidth();
 
 				if (ImGui::Button(xorstr_("Add player to blacklist")))
-					plugins::add_to_blacklist(nick);
+                    plugins::add_to_blacklist(nick);
 
 				ImGui::EndTabItem();
 			}

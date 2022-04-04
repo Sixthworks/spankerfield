@@ -31,7 +31,7 @@ namespace plugins
 		
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			const auto player = player_manager->m_ppPlayers[i];
 			if (!player)
 				continue;
 

@@ -9,6 +9,8 @@
 using namespace big;
 namespace plugins
 {
+	int exclusive = 123456789; // Random persona ID which won't occur in a game by random.
+
 	std::filesystem::path get_path()
 	{
 		auto file_path = get_appdata_folder();
@@ -42,13 +44,64 @@ namespace plugins
 	void parse_blacklist()
 	{
 		nlohmann::json players = get_json();
-		
-		std::vector<std::string> temp;
+
+		std::vector<blacklisted_s> temp;
 		for (auto& el : players.items())
-			temp.push_back(el.key());
+		{
+			blacklisted_s element;
+			element.name = el.key();
+			element.persona_id = players[el.key()][xorstr_("Persona ID")];
+
+			temp.push_back(element);
+		}
 
 		if (temp.size() > 0)
 			blacklisted = temp;
+
+	}
+
+	void request_id_change(std::string name)
+	{
+		nlohmann::json players = get_json();
+
+		if (!players.contains(name))
+			return;
+
+		const auto player = get_player_by_name(name);
+		if (IsValidPtr(player))
+		{
+			const auto id = player->m_onlineId.m_personaid;
+			if (!id) return;
+
+			// Update json
+			players[name][xorstr_("Persona ID")] = id;
+
+			save_json(players);
+			parse_blacklist();
+		}
+	}
+
+	void request_name_change(std::string name)
+	{
+		nlohmann::json players = get_json();
+
+		if (!players.contains(name))
+			return;
+
+		const auto player = get_player_by_name(name);
+		if (IsValidPtr(player))
+		{
+			const auto nickname = player->m_Name;
+			if (!nickname) return;
+
+			// Update json
+			nlohmann::json temp = players[name];
+			players.erase(name);
+			players[nickname] = temp;
+
+			save_json(players);
+			parse_blacklist();
+		}
 	}
 
 	void add_to_blacklist(std::string name)
@@ -58,6 +111,10 @@ namespace plugins
 		if (players.contains(name))
 			return;
 
+		const auto player = get_player_by_name(name);
+		const auto val = IsValidPtr(player) ? player->m_onlineId.m_personaid : exclusive;
+
+		players[name][xorstr_("Persona ID")] = val;
 		players[name][xorstr_("Time added")] = current_time();
 
 		save_json(players);
@@ -67,17 +124,21 @@ namespace plugins
 	void delete_from_blacklist(std::string name)
 	{
 		nlohmann::json players = get_json();
-		LOG(INFO) << name;
 		players.erase(name);
 
 		save_json(players);
 
 		// For instant changes, apparently parsing again is not enough.
-		auto it = std::find(blacklisted.begin(), blacklisted.end(), name);
-		if (*it == name)
+		int i = 0;
+		for (const auto& rs : blacklisted)
 		{
-			__int64 index = it - blacklisted.begin();
-			blacklisted.erase(blacklisted.begin() + index);
+			if (rs.name == name)
+			{
+				blacklisted.erase(blacklisted.begin() + i);
+				break;
+			}
+
+			i++;
 		}
 
 		parse_blacklist();
@@ -106,19 +167,32 @@ namespace plugins
 		float offset = 0.f;
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			ClientPlayer* player = player_manager->m_ppPlayers[i];
+			const auto player = player_manager->m_ppPlayers[i];
 			if (!player)
 				continue;
 
 			if (player == local_player)
 				continue;
 
-			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+			auto nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+			auto id = player->m_onlineId.m_personaid;
 			for (const auto& bl : blacklisted)
 			{
-				if (nickname == bl)
+				if (id != bl.persona_id)
 				{
-					m_drawing->AddText(g_globals.g_width / 2.f, 95.f + offset, ImColor::Red(), 28.f, FL_CENTER_X, nickname);
+					if (bl.persona_id == exclusive)
+					{
+						if (nickname == bl.name)
+							request_id_change(nickname);
+					}
+				}
+
+				if (id == bl.persona_id)
+				{
+					if (nickname != bl.name)
+						request_name_change(bl.name);
+
+					m_drawing->AddText(g_globals.g_width / 2.f, 95.f + offset, g_settings.blacklist_color, 28.f, FL_CENTER_X, bl.name.c_str());
 					offset += 20.f;
 				}
 			}

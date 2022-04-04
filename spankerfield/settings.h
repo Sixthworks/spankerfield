@@ -8,6 +8,7 @@ namespace big
 	{
 	public:
 		bool blacklist{ true };
+		ImColor blacklist_color{ 255, 0, 0, 255 };
 
 		bool aimbot;
 		bool aim_fov_method{ true };
@@ -105,6 +106,7 @@ namespace big
 		void from_json(const nlohmann::json& j)
 		{
 			g_settings.blacklist = j["settings"]["blacklist"];
+			g_settings.blacklist_color = string_to_color(j["settings"]["blacklist_color"]);
 
 			g_settings.aimbot = j["settings"]["aimbot"];
 			g_settings.aim_fov_method = j["settings"]["aim_fov_method"];
@@ -175,6 +177,7 @@ namespace big
 					"settings",
 					{
 					    { "blacklist", g_settings.blacklist },
+						{ "blacklist_color", color_to_string(g_settings.blacklist_color) },
 						{ "esp", g_settings.esp },
 						{ "esp_distance", g_settings.esp_distance },
 						{ "esp_teammate_color", color_to_string(g_settings.esp_teammate_color) },

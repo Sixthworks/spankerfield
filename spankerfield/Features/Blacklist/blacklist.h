@@ -3,7 +3,13 @@
 
 namespace plugins
 {
-	inline std::vector<std::string> blacklisted;
+	struct blacklisted_s
+	{
+		std::string name{};
+		uint64_t persona_id{};
+	};
+
+	inline std::vector<blacklisted_s> blacklisted;
 	inline int selected;
 
 	void add_to_blacklist(std::string name);

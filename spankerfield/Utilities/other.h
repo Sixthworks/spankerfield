@@ -4,6 +4,8 @@
 
 namespace big
 {
+	ClientPlayer* get_player_by_name(std::string nick);
+
 	bool color_wrapper(const char* label, ImColor* color);
 
 	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle);
