@@ -360,6 +360,6 @@ namespace plugins
 		if (!local_soldier->IsAlive()) return;
 
 		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov, ImColor::White());
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov, ImColor(255, 255, 255, 255));
 	}
 }

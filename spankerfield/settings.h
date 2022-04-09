@@ -118,6 +118,7 @@ namespace big
 			g_settings.aim_fov = j["settings"]["aim_fov"];
 			g_settings.aim_min_time_to_target = j["settings"]["aim_min_time_to_target"];
 			g_settings.aim_max_time_to_target = j["settings"]["aim_max_time_to_target"];
+			g_settings.aim_key = j["settings"]["aim_key"];
 			g_settings.aim_bone = j["settings"]["aim_bone"];
 
 			g_settings.overheat_control = j["settings"]["overheat_control"];
@@ -215,6 +216,7 @@ namespace big
 						{ "aim_fov", g_settings.aim_fov },
 						{ "aim_min_time_to_target", g_settings.aim_min_time_to_target },
 						{ "aim_max_time_to_target", g_settings.aim_max_time_to_target },
+			            { "aim_key", g_settings.aim_key },
 						{ "aim_bone", g_settings.aim_bone },
 						{ "overheat_control", g_settings.overheat_control },
 						{ "overheat_control_critical", g_settings.overheat_control_critical },

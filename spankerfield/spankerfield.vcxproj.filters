@@ -156,6 +156,12 @@
     <ClCompile Include="Features\Radar\radar.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="ImGui\ImGuiCustom\imgui_custom.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Features\ESP\esp.h">
@@ -363,6 +369,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Radar\radar.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\ImGuiCustom\imgui_custom.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

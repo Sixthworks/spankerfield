@@ -7,6 +7,7 @@
 #include "../ImGui/imgui.h"
 #include "../Features/main.h"
 #include "../Utilities/other.h"
+#include "../ImGui/ImGuiCustom/imgui_custom.h"
 
 namespace big
 {
@@ -97,11 +98,17 @@ namespace big
 					ImGui::Checkbox(xorstr_("Draw FOV"), &g_settings.aim_draw_fov);
 
 					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("FOV (pixels)##Aimbot"), &g_settings.aim_fov, 0.f, 10000.f);
+					ImGui::SliderFloat(xorstr_("FOV (pixels)##Aimbot"), &g_settings.aim_fov, 0.f, (float)g_globals.g_height);
 					ImGui::PopItemWidth();
 
 					ImGui::Separator();
 				}
+
+				ImGui::Text(xorstr_("Aim key"));
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::Hotkey(xorstr_("##"), &g_settings.aim_key, ImVec2());
+				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Aim bone"));
 

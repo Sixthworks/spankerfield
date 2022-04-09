@@ -158,11 +158,13 @@
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\ImGuiCustom\imgui_custom.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
     <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="MinHook\buffer.c" />
     <ClCompile Include="MinHook\hde\hde32.c" />
@@ -198,6 +200,7 @@
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
+    <ClInclude Include="ImGui\ImGuiCustom\imgui_custom.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\gui.h" />

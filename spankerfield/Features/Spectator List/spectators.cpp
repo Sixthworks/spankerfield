@@ -55,7 +55,7 @@ namespace plugins
 			float offset = 0.f;
 			for (const auto& rs : spectators)
 			{
-				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor::White(), 26.f, FL_NONE, rs.c_str());
+				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor(255, 255, 255, 255), 26.f, FL_NONE, rs.c_str());
 				offset += 20.f;
 			}
 		}
