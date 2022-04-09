@@ -4,6 +4,7 @@
 #include "../../SDK/sdk.h"
 #include "../../Utilities/xorstr.h"
 #include "../../Utilities/other.h"
+#include "../../Utilities/thread_pool.h"
 
 using namespace big;
 namespace plugins
@@ -16,11 +17,10 @@ namespace plugins
 		{
 			if (GetTickCount64() - g_globals.g_obscheck > 5000)
 			{
-#ifdef _WIN64
-g_globals.g_obs = is_process_running(L"obs64.exe");
-#else
-g_globals.g_obs = is_process_running(L"obs32.exe");
-#endif
+				g_thread_pool->push([&]
+				{
+                   g_globals.g_obs = is_process_running(L"obs64.exe");
+				});
 
 				g_globals.g_obscheck = GetTickCount64();
 			}

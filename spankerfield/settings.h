@@ -29,8 +29,10 @@ namespace big
 
 		bool esp{ true };
 		bool esp_draw_teammates;
+		bool esp_draw_vehicles{ true };
 		float esp_distance { 10000.f };
 		ImColor esp_teammate_color{ 63, 147, 216, 255 };
+		ImColor esp_additional_tags_color{ 228, 213, 106, 255 };
 
 		bool esp_draw_box{ true };
 		int esp_box_style{ 4 };
@@ -40,6 +42,8 @@ namespace big
 		bool esp_draw_health{ true };
 		bool esp_draw_name{ true };
 		bool esp_draw_distance{ true };
+		bool esp_draw_vehicle_tag{ true };
+		float esp_text_spacing{ 9.25f };
 		ImColor text_color_occluded{ 24, 162, 162, 255 };
 		ImColor text_color{ 255, 153, 51, 255 };
 
@@ -125,8 +129,11 @@ namespace big
 			g_settings.infantry_alert_color = string_to_color(j["settings"]["infantry_alert_color"]);
 
 			g_settings.esp = j["settings"]["esp"];
+			g_settings.esp_draw_teammates = j["settings"]["esp_draw_teammates"];
+			g_settings.esp_draw_vehicles = j["settings"]["esp_draw_vehicles"];
 			g_settings.esp_distance = j["settings"]["esp_distance"];
 			g_settings.esp_teammate_color = string_to_color(j["settings"]["esp_teammate_color"]);
+			g_settings.esp_additional_tags_color = string_to_color(j["settings"]["esp_additional_tags_color"]);
 
 			g_settings.esp_draw_box = j["settings"]["esp_draw_box"];
 			g_settings.esp_box_style = j["settings"]["esp_box_style"];
@@ -136,6 +143,9 @@ namespace big
 			g_settings.esp_draw_health = j["settings"]["esp_draw_health"];
 			g_settings.esp_draw_name = j["settings"]["esp_draw_name"];
 			g_settings.esp_draw_distance = j["settings"]["esp_draw_distance"];
+			g_settings.esp_draw_vehicle_tag = j["settings"]["esp_draw_vehicle_tag"];
+			g_settings.esp_text_spacing = j["settings"]["esp_text_spacing"];
+
 			g_settings.text_color_occluded = string_to_color(j["settings"]["text_color_occluded"]);
 			g_settings.text_color = string_to_color(j["settings"]["text_color"]);
 
@@ -179,8 +189,11 @@ namespace big
 					    { "blacklist", g_settings.blacklist },
 						{ "blacklist_color", color_to_string(g_settings.blacklist_color) },
 						{ "esp", g_settings.esp },
+						{ "esp_draw_teammates", g_settings.esp_draw_teammates },
+						{ "esp_draw_vehicles", g_settings.esp_draw_vehicles },
 						{ "esp_distance", g_settings.esp_distance },
 						{ "esp_teammate_color", color_to_string(g_settings.esp_teammate_color) },
+						{ "esp_additional_tags_color", color_to_string(g_settings.esp_additional_tags_color) },
 						{ "esp_draw_box", g_settings.esp_draw_box },
 						{ "esp_box_style", g_settings.esp_box_style },
 						{ "esp_box_color_occluded", color_to_string(g_settings.esp_box_color_occluded) },
@@ -188,6 +201,8 @@ namespace big
 						{ "esp_draw_health", g_settings.esp_draw_health },
 						{ "esp_draw_name", g_settings.esp_draw_name },
 						{ "esp_draw_distance", g_settings.esp_draw_distance },
+						{ "esp_draw_vehicle_tag", g_settings.esp_draw_vehicle_tag },
+						{ "esp_text_spacing", g_settings.esp_text_spacing },
 						{ "text_color_occluded", color_to_string(g_settings.text_color_occluded) },
 						{ "text_color", color_to_string(g_settings.text_color) },
 						{ "skeleton", g_settings.skeleton },

@@ -5,6 +5,7 @@
 #include "../../global.h"
 #include "../../Utilities/path.h"
 #include "../../Utilities/other.h"
+#include "../../Utilities/thread_pool.h"
 
 using namespace big;
 namespace plugins
@@ -150,7 +151,10 @@ namespace plugins
 
 		if (GetTickCount64() - g_globals.g_blcheck > 5000)
 		{
-			parse_blacklist();
+			g_thread_pool->push([&]
+			{
+				parse_blacklist();
+			});
 
 			g_globals.g_blcheck = GetTickCount64();
 		}

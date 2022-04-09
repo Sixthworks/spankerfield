@@ -70,7 +70,7 @@ namespace plugins
 			if (teammate && !g_settings.esp_draw_teammates)
 				continue;
 
-			ClientSoldierEntity* soldier = player->GetSoldier();
+			const auto soldier = player->GetSoldier();
 			if (!soldier) continue;
 
 			if (!soldier->IsAlive())
@@ -89,7 +89,10 @@ namespace plugins
 			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 
 			ClientVehicleEntity* vehicle = player->GetVehicle();
-			char* vehicle_name = nullptr;
+
+			if (!g_settings.esp_draw_vehicles && vehicle)
+				continue;
+
 			float health_vehicle = 0.f, max_health_vehicle = 0.f;
 
 			if (IsValidPtr(vehicle))
@@ -102,9 +105,6 @@ namespace plugins
 				{
 					if (data->m_MaxHealth)
 						max_health_vehicle = data->m_MaxHealth;
-
-					if (data->m_NameID)
-						vehicle_name = data->m_NameID;
 				}
 			}
 			else
@@ -142,9 +142,16 @@ namespace plugins
 					m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_perc_width, hb_height, hb_color);
 				}
 
-				// player->m_AttachedEntryId, 0 if driver. 
-				// Ideally we should draw the driver only instead of saying persona non-grata to everyone in the vehicle.
-				if (!IsValidPtr(vehicle))
+				// player->m_AttachedEntryId is 0 when the person is driving the vehicle. 
+				bool allow_text = true;
+				if (vehicle)
+				{
+					int entry_id = player->m_AttachedEntryId;
+					if (entry_id != 0)
+						allow_text = false;
+				}
+
+				if (allow_text)
 				{
 					ImColor text_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.text_color_occluded : g_settings.text_color;
 					float base[2] = { box_coords[1].x + 3.5f, box_coords[0].y - 3.f };
@@ -152,13 +159,19 @@ namespace plugins
 					if (g_settings.esp_draw_name)
 					{
 						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, nickname);
-						base[1] += 9.f;
+						base[1] += g_settings.esp_text_spacing;
 					}
 
 					if (g_settings.esp_draw_distance)
 					{
 						m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str());
-						base[1] += 9.f;
+						base[1] += g_settings.esp_text_spacing;
+					}
+
+					if (g_settings.esp_draw_vehicle_tag && vehicle)
+					{
+						m_drawing->AddText(base[0], base[1], g_settings.esp_additional_tags_color, 14.f, FL_NONE, xorstr_("VEHICLE"));
+						base[1] += g_settings.esp_text_spacing;
 					}
 				}
 

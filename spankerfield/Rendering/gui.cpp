@@ -154,11 +154,16 @@ namespace big
 
 				ImGui::Separator();
 
+				ImGui::Checkbox(xorstr_("Draw vehicles##ESP"), &g_settings.esp_draw_vehicles);
 				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
 				
 				ImGui::Text(xorstr_("Teammates color"));
 
 				color_wrapper(xorstr_("Teammate##ESP"), &g_settings.esp_teammate_color);
+
+				ImGui::Text(xorstr_("Additional tags color"));
+
+				color_wrapper(xorstr_("Tags##ESP"), &g_settings.esp_additional_tags_color);
 
 				ImGui::Separator();
 
@@ -174,12 +179,22 @@ namespace big
 
 				ImGui::Separator();
 
+				ImGui::Text(xorstr_("Text spacing"));
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Text spacing##ESP"), &g_settings.esp_text_spacing, 0.f, 50.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Spacing();
+
 				ImGui::Checkbox(xorstr_("Draw health"), &g_settings.esp_draw_health);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
 
 				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);
-				
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw vehicle tag"), &g_settings.esp_draw_vehicle_tag);
+
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw explosives"), &g_settings.explosives);
