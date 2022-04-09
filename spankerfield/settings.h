@@ -67,6 +67,9 @@ namespace big
 		bool explosives{ true };
 		ImColor explosives_color{ 255, 0, 255, 255 };
 
+		bool missiles_own{ true };
+		ImColor missiles_color{ 14, 231, 231, 255 };
+
 		bool jet_speed{ true };
 
 		bool spectator_list{ true };
@@ -169,6 +172,9 @@ namespace big
 			g_settings.explosives = j["settings"]["explosives"];
 			g_settings.explosives_color = string_to_color(j["settings"]["explosives_color"]);
 
+			g_settings.missiles_own = j["settings"]["missiles_own"];
+			g_settings.missiles_color = string_to_color(j["settings"]["missiles_color"]);
+
 			g_settings.jet_speed = j["settings"]["jet_speed"];
 
 			g_settings.spectator_list = j["settings"]["spectator_list"];
@@ -236,6 +242,8 @@ namespace big
 						{ "radar_enemy_vehicles_color", color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ "explosives", g_settings.explosives },
 			            { "explosives_color", color_to_string(g_settings.explosives_color) },
+						{ "missiles_own", g_settings.missiles_own },
+						{ "missiles_color", color_to_string(g_settings.missiles_color) },
 						{ "jet_speed", g_settings.jet_speed },
 						{ "spectator_list", g_settings.spectator_list },
 						{ "spectator_raw_drawing", g_settings.spectator_raw_drawing },

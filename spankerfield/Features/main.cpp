@@ -5,16 +5,17 @@ namespace big
 {
 	void features::draw()
 	{
-		static bool draw = !g_globals.g_punkbuster && !g_globals.g_fairfight;
+		bool draw = !g_globals.g_punkbuster && !g_globals.g_fairfight;
 		if (!draw) return;
 
-		plugins::draw_fov();
-		plugins::draw_blacklisted();
-		plugins::infantry_alert();
 		plugins::draw_spectators();
 		plugins::draw_esp();
 		plugins::draw_radar();
 		plugins::draw_explosives();
+		plugins::draw_missiles();
+		plugins::draw_fov();
+		plugins::draw_blacklisted();
+		plugins::infantry_alert();
 	}
 
 	void features::pre_frame(float delta_time)

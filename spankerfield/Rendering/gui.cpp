@@ -205,10 +205,13 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw explosives"), &g_settings.explosives);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw laser guided missiles"), &g_settings.missiles_own);
 
-				ImGui::Text(xorstr_("Explosives color"));
+				ImGui::Text(xorstr_("Colors"));
 
 				color_wrapper(xorstr_("Explosives##BX"), &g_settings.explosives_color);
+				color_wrapper(xorstr_("Missiles##BX"), &g_settings.missiles_color);
 
 				ImGui::Separator();
 

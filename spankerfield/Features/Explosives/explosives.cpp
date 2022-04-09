@@ -2,26 +2,11 @@
 #include "../../settings.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
+#include "../../SDK/class_info.h"
 
 using namespace big;
 namespace plugins
 {
-	struct class_info_s
-	{
-		ClassInfo* MissileEntity = nullptr;
-		ClassInfo* ExplosionEntity = nullptr;
-		ClassInfo* VehicleEntity = nullptr;
-		ClassInfo* WarningComponent = nullptr;
-	}class_info;
-
-	void update_info()
-	{
-		class_info.MissileEntity = FindClassInfo(xorstr_("VeniceClientMissileEntity"));
-		class_info.ExplosionEntity = FindClassInfo(xorstr_("ClientExplosionPackEntity"));
-		class_info.VehicleEntity = FindClassInfo(xorstr_("ClientVehicleEntity"));
-		class_info.WarningComponent = FindClassInfo(xorstr_("ClientWarningSystemComponent"));
-	}
-
 	void draw_explosives()
 	{
 		if (!g_settings.explosives) return;
@@ -74,6 +59,6 @@ namespace plugins
 			}
 		}
 		else
-			update_info();
+			update_class_info();
 	}
 }

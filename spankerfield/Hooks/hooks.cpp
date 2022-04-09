@@ -61,7 +61,7 @@ namespace big
 		void hkPreFrame(float delta_time)
 		{
 			oPreFrameUpdate(delta_time);
-
+			
 			g_features->pre_frame(delta_time);
 		}
 	}

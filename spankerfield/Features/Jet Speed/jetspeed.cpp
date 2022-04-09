@@ -40,34 +40,39 @@ namespace plugins
 
 		if (vehicle_data->IsInJet())
 		{
-			const auto keyboard = border_input_node->m_pKeyboard;
-			if (!keyboard) return;
+			const auto input_cache = border_input_node->m_InputCache;
+			if (!input_cache) return;
 
-			static bool key_press = false;
-			if (keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowUp] || keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_ArrowDown])
+			const auto input = input_cache->m_Event;
+			if (!input) return;
+
+			auto vehicle_velocity = local_soldier->GetVelocity();
+			auto velocity = sqrt(pow(vehicle_velocity->x, 2) + pow(vehicle_velocity->y, 2) + pow(vehicle_velocity->z, 2)) * 3.6f;
+
+			if (velocity < 314.f && velocity > 312.f)
 			{
-				auto vehicle_velocity = local_soldier->GetVelocity();
-				auto velocity = sqrt(pow(vehicle_velocity->x, 2) + pow(vehicle_velocity->y, 2) + pow(vehicle_velocity->z, 2)) * 3.6f;
-
-				if (velocity > 315.0f)
-				{
-					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 1;
-					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
-				}
-				else if (velocity < 310.0f)
-				{
-					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
-					keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 1;
-				}
-
-				key_press = true;
+				input[ConceptMoveForward] = 1.0f;
+				input[ConceptMoveFB] = 1.0f;
+				input[ConceptFreeCameraMoveFB] = 1.0f;
+				input[ConceptFreeCameraTurboSpeed] = 0.0f;
+				input[ConceptSprint] = 0.0f;
 			}
-			else if (key_press)
+			else if (velocity >= 316.f)
 			{
-				keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_S] = 0;
-				keyboard->m_pDevice->m_Buffer[InputDeviceKeys::IDK_LeftShift] = 0;
-				
-				key_press = false;
+				input[ConceptMoveBackward] = 1.0f;
+				input[ConceptMoveFB] = -1.0f;
+				input[ConceptFreeCameraMoveFB] = -1.0f;
+				input[ConceptFreeCameraTurboSpeed] = 0.0f;
+				input[ConceptSprint] = 0.0f;
+				input[ConceptBrake] = 1.0f;
+				input[ConceptCrawl] = 1.0f;
+			}
+			else if (velocity <= 312.f)
+			{
+				input[ConceptMoveFB] = 1.0f;
+				input[ConceptFreeCameraMoveFB] = 1.0f;
+				input[ConceptFreeCameraTurboSpeed] = 1.0f;
+				input[ConceptSprint] = 1.0f;
 			}
 		}
 	}

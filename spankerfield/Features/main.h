@@ -5,6 +5,7 @@
 #include "ESP/esp.h"
 #include "Radar/radar.h"
 #include "Explosives/explosives.h"
+#include "Missiles/missiles.h"
 #include "Jet Speed/jetspeed.h"
 #include "Aimbot/aimbot.h"
 #include "Overheat/overheat.h"

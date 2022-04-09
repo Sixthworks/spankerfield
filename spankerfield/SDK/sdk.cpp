@@ -80,6 +80,19 @@ bool VehicleData::IsInHeli()
 	}
 }
 
+//m_MinTurnAngle > -1 when laser guided
+bool MissileEntityData::IsLaserGuided()
+{
+	if (m_MinTurnAngle > 0.0f) return true;
+	return false;
+}
+
+bool MissileEntityData::IsLockable()
+{
+	if (m_TimeToActivateGuidingSystem > 0.0f) return true;
+	return false;
+}
+
 bool ClientControllableEntity::IsAlive()
 {
 	if (!IsValidPtr(m_pHealthComp))

@@ -1,5 +1,6 @@
 #pragma once
 #include "../common.h"
+#include <atlstr.h>
 
 #pragma warning (disable : 4200)
 
@@ -151,6 +152,8 @@ class AimingSimulationModifier;
 class ZeroingModifier;
 class WeaponSway;
 class GunSwayData;
+class VeniceClientMissileEntity;
+class MissileEntityData;
 
 template<typename T>
 struct WeakToken
@@ -2934,6 +2937,226 @@ public:
 	float m_FirstShotRecoilMultiplier; //0x0444 
 	__int64 m_CamerRecoilData; //0x0448 
 };//Size=0x0450
+
+class LockingControllerData
+{
+public:
+	struct LockingAndHomingData
+	{
+		int m_WarnLock; //0x0000
+		bool m_IsHoming; //0x0004
+		bool m_IsGuided; //0x0005
+		bool m_IsGuidedWhenZoomed; //0x0006
+		bool m_IsGuidedHoming; //0x0007
+		bool m_FireOnlyWhenLockedOn; //0x0008
+		char _0x0009[3];
+	};//Size=0x000C
+
+	char pad[24];
+	float m_LockTime; //0x0018
+	float m_UnLockTime; //0x001C
+	float m_ReleaseTime; //0x0020
+	float m_ReleaseOnNewTargetTime; //0x0024
+	float m_SampleRate; //0x0028
+	float m_HoldStillThreshold; //0x002C
+	float m_CheckVisibilityLength; //0x0030
+	float m_RayLength; //0x0034
+	float m_AcceptanceAngle; //0x0038
+	float m_AngleConstant; //0x003C
+	float m_DistanceConstant; //0x0040
+	float m_Sensitivity; //0x0044
+	float m_MinimumLockTime; //0x0048
+	LockingAndHomingData m_LockingWeaponData; //0x004C
+	bool m_LockOnVisibleTargetsOnly; //0x0058
+	bool m_RequireAmmoToLock; //0x0059
+	bool m_PositionOnly; //0x005A
+	bool m_LockOnWorldSpacePos; //0x005B
+	bool m_LockOnEmptyVehicles; //0x005C
+	bool m_LockOnCharacters; //0x005D
+	bool m_IgnoreHeigthLockDistance; //0x005E
+	bool m_LockInCombatAreaOnly; //0x005F
+};//Size=0x0060
+
+class MeshProjectileEntityData : public ProjectileEntityData
+{
+public:
+
+	Vector3 m_InitialAngularVelocity; //0x00E0
+	void* m_Mesh; //0x00F0
+	void* m_TrailEffect; //0x00F8
+	float m_InstantAttachableTestDistance; //0x0100
+	float m_InstantAttachableVisualConvergenceDelay; //0x0104
+	float m_InstantAttachableVisualConvergenceDuration; //0x0108
+	float m_MaxAttachableInclination; //0x010C
+	float m_UnspawnAfterDetonationDelay; //0x0110
+	bool m_IsAttachable; //0x0114
+	bool m_InstantAttachableTestUnderReticule; //0x0115
+	bool m_ExtraDamping; //0x0116
+	char _0x0117[9];
+};//Size=0x0120
+
+struct MissileUnguidedData
+{
+	Vector2 m_StaticPosition; //0x0000
+	Vector2 m_TargetPositionOffset; //0x0008
+	bool m_UseStaticPosition; //0x0010
+	bool m_UseTargetPosition; //0x0011
+	char _0x0012[2];
+};//Size=0x0014
+
+struct MissileLockableInfoData
+{
+	float m_HeatSignature; //0x0000
+	float m_RadarSignature; //0x0004
+};//Size=0x0008
+
+struct NearTargetDetonationData
+{
+	float m_DetonationRadius; //0x0000
+	float m_MaxDetonationDelay; //0x0004
+	float m_MinDetonationDelay; //0x0008
+	bool m_DetonateNearTarget; //0x000C
+	char _0x000D[3];
+};//Size=0x0010
+
+class ExplosionEntityData// : public SpatialEntityData
+{
+public:
+
+	char pad[96];
+	/*EffectBlueprint**/void* m_DetonationEffect; //0x0060
+	/*EffectBlueprint**/void* m_DetonationEffectForFriendlies; //0x0068
+	/*MaskVolumeEntityData**/void* m_MaskVolume; //0x0070
+	/*DestructionMaskVolumeEntityData**/void* m_DestructionMaskVolume; //0x0078
+	char pad1[0x8C - 0x78];
+	//MaterialDecl m_MaterialPair; //0x0080
+	//MaterialDecl m_SecondaryMaterialPair; //0x0084
+	//DamageIndicationType m_DamageIndicationType; //0x0088
+	float m_EmpTime; //0x008C
+	float m_MaxOcclusionRaycastRadius; //0x0090
+	float m_InnerBlastRadius; //0x0094
+	float m_BlastDamage; //0x0098
+	float m_BlastRadius; //0x009C
+	float m_BlastImpulse; //0x00A0
+	float m_ShockwaveDamage; //0x00A4
+	float m_ShockwaveRadius; //0x00A8
+	float m_ShockwaveImpulse; //0x00AC
+	float m_ShockwaveTime; //0x00B0
+	float m_CameraShockwaveRadius; //0x00B4
+	float m_SpawnDelay; //0x00B8
+	bool m_NoFriendliesEffectOnEnabledFriendlyFire; //0x00BC
+	bool m_UseEntityTransformForDetonationEffect; //0x00BD
+	bool m_SecondaryMaterialsActive; //0x00BE
+	bool m_HasStunEffect; //0x00BF
+	bool m_DisableOcclusion; //0x00C0
+	bool m_DisableStaticEntityOcclusion; //0x00C1
+	bool m_TriggerImpairedHearing; //0x00C2
+	bool m_Enabled; //0x00C3
+	char _0x00C4[12];
+};//Size=0x00D0
+
+class GhostedProjectileEntityData : public MeshProjectileEntityData
+{
+public:
+
+	float m_ProxyConvergenceDelay; //0x0120
+	float m_ProxyConvergenceDuration; //0x0124
+	bool m_ProxyConvergenceInstantOnAttach; //0x0128
+	bool m_ForceProxyConvergence; //0x0129
+	char _0x012A[6];
+};//Size=0x0130
+
+class MissileEntityData : public GhostedProjectileEntityData
+{
+public:
+	enum WarnTarget
+	{
+		wtWarnSoldierAndVehicle = 0x0,
+		wtWarnSoldier = 0x1,
+		wtWarnVehicle = 0x2,
+		wtWarnNone = 0x3,
+	};
+
+	void* m_EngineEffect; //0x0130
+	ExplosionEntityData* m_DudExplosion; //0x0138
+	SoundAsset* m_FlyBySound; //0x0140
+	float m_EngineStrength; //0x0148
+	float m_MaxSpeed; //0x014C
+	float m_EngineTimeToIgnition; //0x0150
+	float m_EngineTimeToLive; //0x0154
+	float m_TimeToActivateGuidingSystem; //0x0158
+	float m_TimeToArm; //0x015C
+	float m_MaxTurnAngle; //0x0160
+	float m_MinTurnAngle; //0x0164
+	float m_TurnAngleMultiplier; //0x0168
+	float m_Drag; //0x016C
+	float m_Gravity; //0x0170
+	float m_FlyBySoundRadius; //0x0174
+	float m_FlyBySoundSpeed; //0x0178
+	float m_ImpactImpulse; //0x017C
+	float m_Damage; //0x0180
+	int m_DefaultTeam; //0x0184
+	WarnTarget m_WarnTarget; // 0x188
+	unsigned char _0x18c[0x4];
+	LockingControllerData* m_LockingController; // 0x190
+	MissileLockableInfoData m_LockableInfo; //0x0198
+	MissileUnguidedData m_UnguidedData; //0x01A0
+	NearTargetDetonationData m_NearTargetDetonation; //0x01B4
+	float m_MaxBankAngle; //0x01C4
+	float m_BankingSpeed; //0x01C8
+	char _0x01CC[4];
+	CString m_Icon; //0x01D0
+	CString m_TargetIcon; //0x01D8
+	CString m_TargetIconEnemy; //0x01E0
+	float m_MinGhostFrequency; //0x01E8
+	bool m_ApplyGravityWhenGuided; //0x01EC
+	bool m_WarnOnPointingMissile; //0x01ED
+	bool m_EnableBanking; //0x01EE
+	char _0x01EF[1];
+
+	bool IsLaserGuided(); //m_MinTurnAngle > 0.0f
+	bool IsLockable(); //m_TimeToActivateGuidingSystem > 0.0f
+};
+
+class VeniceClientMissileEntity //or : inherit from ClientGameComponentEntity..etc
+{
+public:
+	virtual void unkn0();
+	virtual void unkn1();
+	virtual void unkn2();
+	virtual void unkn3();
+	virtual void unkn4();
+	virtual void unkn5();
+	virtual void unkn6();
+	virtual void unkn7();
+	virtual void unkn8();
+	virtual void unkn9();
+	virtual void unkn10();
+	virtual void unkn11();
+	virtual void unkn12();
+	virtual void unkn13();
+	virtual void unkn14();
+	virtual void unkn15();
+	virtual void unkn16();
+	virtual void unkn17();
+	virtual void unkn18();
+	virtual void unkn19();
+	virtual void unkn20();
+	virtual void GetAABB(TransformAABBStruct* mataabb); //22
+	virtual void GetTransform(Matrix* mTransform); //23
+
+	char _0x008[0x28];
+	MissileEntityData* m_pMissileEntityData;//0x030
+	char _0x038[0x238 - 0x038];
+	WeakPtr<ClientPlayer> m_pOwner;//0x238
+	//SoldierWeaponUnlockAsset* m_pUnlockAsset; //0x0240
+	char pad_0240[32]; //0x0240
+	Vector3 N000000A4; //0x0260
+	Vector3 N000000A5; //0x026C
+	Vector3 N000000A6; //0x0278
+	Vector3 N000000A7; //0x0284
+	Vector3 m_Position; //0x0290
+};
 
 class ClientExplosionEntity
 {

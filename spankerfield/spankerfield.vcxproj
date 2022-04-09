@@ -153,6 +153,7 @@
     <ClCompile Include="Features\Jet Speed\jetspeed.cpp" />
     <ClCompile Include="Features\main.cpp" />
     <ClCompile Include="Features\Minimap\minimap.cpp" />
+    <ClCompile Include="Features\Missiles\missiles.cpp" />
     <ClCompile Include="Features\Overheat\overheat.cpp" />
     <ClCompile Include="Features\Radar\radar.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Rendering\draw-list.cpp" />
     <ClCompile Include="Rendering\gui.cpp" />
     <ClCompile Include="Rendering\renderer.cpp" />
+    <ClCompile Include="SDK\class_info.cpp" />
     <ClCompile Include="SDK\sdk.cpp" />
     <ClCompile Include="SDK\type_info.cpp" />
     <ClCompile Include="Utilities\g3log\crashhandler_windows.cpp" />
@@ -198,6 +200,7 @@
     <ClInclude Include="Features\Aimbot\aimbot.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
+    <ClInclude Include="Features\Missiles\missiles.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
     <ClInclude Include="ImGui\ImGuiCustom\imgui_custom.h" />
@@ -205,6 +208,7 @@
     <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\gui.h" />
     <ClInclude Include="Rendering\renderer.h" />
+    <ClInclude Include="SDK\class_info.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="Features\ESP\esp.h" />
     <ClInclude Include="Features\Explosives\explosives.h" />
