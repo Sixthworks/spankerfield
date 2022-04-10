@@ -2,13 +2,13 @@
 If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
 
 ### Images
-![image](https://i.imgur.com/jAtohOv.gif)
+![image](https://i.imgur.com/PscTJ7s.gif)
 
 ![image](https://i.imgur.com/ofC2zpF.png)
 
 ![image](https://i.imgur.com/volKG7y.jpg)
 
-![image](https://i.imgur.com/15nGlN2.png)
+![image](https://i.imgur.com/xjrL0wq.jpg)
 
 ![image](https://i.imgur.com/SXgmNoB.png)
 
