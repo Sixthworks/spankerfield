@@ -7,7 +7,6 @@
 #include "../ImGui/imgui.h"
 #include "../Features/main.h"
 #include "../Utilities/other.h"
-#include "../ImGui/ImGuiCustom/imgui_custom.h"
 
 namespace big
 {
@@ -105,9 +104,8 @@ namespace big
 				}
 
 				ImGui::Text(xorstr_("Aim key"));
-
 				ImGui::PushItemWidth(300.f);
-				ImGui::Hotkey(xorstr_("##"), &g_settings.aim_key, ImVec2());
+				ImGui::SliderInt(xorstr_("Key##Aimbot"), &g_settings.aim_key, 0x01, 0xFE);
 				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Aim bone"));
