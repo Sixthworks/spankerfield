@@ -100,7 +100,7 @@ namespace ImGui
         // Select which buffer we are going to display. When ImGuiInputTextFlags_NoLiveEdit is Set 'buf' might still be the old value. We Set buf to NULL to prevent accidental usage from now on.
         char buf_display[64] = "None";
 
-        ImGui::RenderFrame(frame_bb.Min, frame_bb.Max, GetColorU32(ImGuiCol_Button), true, style.FrameRounding);
+        ImGui::RenderFrame(frame_bb.Min, frame_bb.Max, ImGui::GetColorU32(ImGuiCol_Button), true, style.FrameRounding);
 
         if (*k != 0 && g.ActiveId != id) {
             strcpy_s(buf_display, key_names[*k]);
