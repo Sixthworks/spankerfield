@@ -94,11 +94,6 @@ namespace big
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		auto saved_ctrl = ImGui::GetIO().KeyCtrl;
-		auto saved_alt = ImGui::GetIO().KeyAlt;
-		auto saved_shift = ImGui::GetIO().KeyShift;
-		auto saved_super = ImGui::GetIO().KeySuper;
-
 		g_features->draw();
 		
 		mouse_act();
@@ -106,11 +101,6 @@ namespace big
 		{
 			g_gui.dx_on_tick();
 		}
-		
-		ImGui::GetIO().KeyCtrl = saved_ctrl;
-		ImGui::GetIO().KeyAlt = saved_alt;
-		ImGui::GetIO().KeyShift = saved_shift;
-		ImGui::GetIO().KeySuper = saved_super;
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
