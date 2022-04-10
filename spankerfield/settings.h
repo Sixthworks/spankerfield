@@ -112,79 +112,79 @@ namespace big
 
 		void from_json(const nlohmann::json& j)
 		{
-			g_settings.blacklist = j["settings"]["blacklist"];
-			g_settings.blacklist_color = string_to_color(j["settings"]["blacklist_color"]);
+			g_settings.blacklist = j[xorstr_("settings")][xorstr_("blacklist")];
+			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
 
-			g_settings.aimbot = j["settings"]["aimbot"];
-			g_settings.aim_fov_method = j["settings"]["aim_fov_method"];
-			g_settings.aim_draw_fov = j["settings"]["aim_draw_fov"];
-			g_settings.aim_fov = j["settings"]["aim_fov"];
-			g_settings.aim_min_time_to_target = j["settings"]["aim_min_time_to_target"];
-			g_settings.aim_max_time_to_target = j["settings"]["aim_max_time_to_target"];
-			g_settings.aim_key = j["settings"]["aim_key"];
-			g_settings.aim_bone = j["settings"]["aim_bone"];
+			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
+			g_settings.aim_fov_method = j[xorstr_("settings")][xorstr_("aim_fov_method")];
+			g_settings.aim_draw_fov = j[xorstr_("settings")][xorstr_("aim_draw_fov")];
+			g_settings.aim_fov = j[xorstr_("settings")][xorstr_("aim_fov")];
+			g_settings.aim_min_time_to_target = j[xorstr_("settings")][xorstr_("aim_min_time_to_target")];
+			g_settings.aim_max_time_to_target = j[xorstr_("settings")][xorstr_("aim_max_time_to_target")];
+			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
+			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 
-			g_settings.overheat_control = j["settings"]["overheat_control"];
-			g_settings.overheat_control_critical = j["settings"]["overheat_control_critical"];
+			g_settings.overheat_control = j[xorstr_("settings")][xorstr_("overheat_control")];
+			g_settings.overheat_control_critical = j[xorstr_("settings")][xorstr_("overheat_control_critical")];
 
-			g_settings.infantry_alert = j["settings"]["infantry_alert"];
-			g_settings.infantry_alert_light_tech = j["settings"]["infantry_alert_light_tech"];
-			g_settings.infantry_alert_distance = j["settings"]["infantry_alert_distance"];
-			g_settings.infantry_alert_color = string_to_color(j["settings"]["infantry_alert_color"]);
+			g_settings.infantry_alert = j[xorstr_("settings")][xorstr_("infantry_alert")];
+			g_settings.infantry_alert_light_tech = j[xorstr_("settings")][xorstr_("infantry_alert_light_tech")];
+			g_settings.infantry_alert_distance = j[xorstr_("settings")][xorstr_("infantry_alert_distance")];
+			g_settings.infantry_alert_color = string_to_color(j[xorstr_("settings")][xorstr_("infantry_alert_color")]);
 
-			g_settings.esp = j["settings"]["esp"];
-			g_settings.esp_draw_teammates = j["settings"]["esp_draw_teammates"];
-			g_settings.esp_draw_vehicles = j["settings"]["esp_draw_vehicles"];
-			g_settings.esp_distance = j["settings"]["esp_distance"];
-			g_settings.esp_teammate_color = string_to_color(j["settings"]["esp_teammate_color"]);
-			g_settings.esp_additional_tags_color = string_to_color(j["settings"]["esp_additional_tags_color"]);
+			g_settings.esp = j[xorstr_("settings")][xorstr_("esp")];
+			g_settings.esp_draw_teammates = j[xorstr_("settings")][xorstr_("esp_draw_teammates")];
+			g_settings.esp_draw_vehicles = j[xorstr_("settings")][xorstr_("esp_draw_vehicles")];
+			g_settings.esp_distance = j[xorstr_("settings")][xorstr_("esp_distance")];
+			g_settings.esp_teammate_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_teammate_color")]);
+			g_settings.esp_additional_tags_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_additional_tags_color")]);
 
-			g_settings.esp_draw_box = j["settings"]["esp_draw_box"];
-			g_settings.esp_box_style = j["settings"]["esp_box_style"];
-			g_settings.esp_box_color_occluded = string_to_color(j["settings"]["esp_box_color_occluded"]);
-			g_settings.esp_box_color = string_to_color(j["settings"]["esp_box_color"]);
+			g_settings.esp_draw_box = j[xorstr_("settings")][xorstr_("esp_draw_box")];
+			g_settings.esp_box_style = j[xorstr_("settings")][xorstr_("esp_box_style")];
+			g_settings.esp_box_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color_occluded")]);
+			g_settings.esp_box_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color")]);
 
-			g_settings.esp_draw_health = j["settings"]["esp_draw_health"];
-			g_settings.esp_draw_name = j["settings"]["esp_draw_name"];
-			g_settings.esp_draw_distance = j["settings"]["esp_draw_distance"];
-			g_settings.esp_draw_vehicle_tag = j["settings"]["esp_draw_vehicle_tag"];
-			g_settings.esp_text_spacing = j["settings"]["esp_text_spacing"];
+			g_settings.esp_draw_health = j[xorstr_("settings")][xorstr_("esp_draw_health")];
+			g_settings.esp_draw_name = j[xorstr_("settings")][xorstr_("esp_draw_name")];
+			g_settings.esp_draw_distance = j[xorstr_("settings")][xorstr_("esp_draw_distance")];
+			g_settings.esp_draw_vehicle_tag = j[xorstr_("settings")][xorstr_("esp_draw_vehicle_tag")];
+			g_settings.esp_text_spacing = j[xorstr_("settings")][xorstr_("esp_text_spacing")];
 
 			g_settings.text_color_occluded = string_to_color(j["settings"]["text_color_occluded"]);
 			g_settings.text_color = string_to_color(j["settings"]["text_color"]);
 
-			g_settings.skeleton = j["settings"]["skeleton"];
-			g_settings.skeleton_use_dots = j["settings"]["skeleton_use_dots"];
-			g_settings.skeleton_dots_distance = j["settings"]["skeleton_dots_distance"];
-			g_settings.skeleton_color = string_to_color(j["settings"]["skeleton_color"]);
+			g_settings.skeleton = j[xorstr_("settings")][xorstr_("skeleton")];
+			g_settings.skeleton_use_dots = j[xorstr_("settings")][xorstr_("skeleton_use_dots")];
+			g_settings.skeleton_dots_distance = j[xorstr_("settings")][xorstr_("skeleton_dots_distance")];
+			g_settings.skeleton_color = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color")]);
 
-			g_settings.radar = j["settings"]["radar"];
-			g_settings.radar_x = j["settings"]["radar_x"];
-			g_settings.radar_y = j["settings"]["radar_y"];
-			g_settings.radar_width = j["settings"]["radar_width"];
-			g_settings.radar_height = j["settings"]["radar_height"];
-			g_settings.radar_distance = j["settings"]["radar_distance"];
-			g_settings.radar_teammates_color = string_to_color(j["settings"]["radar_teammates_color"]);
-			g_settings.radar_enemies_color = string_to_color(j["settings"]["radar_enemies_color"]);
-			g_settings.radar_teammate_vehicles_color = string_to_color(j["settings"]["radar_teammate_vehicles_color"]);
-			g_settings.radar_enemy_vehicles_color = string_to_color(j["settings"]["radar_enemy_vehicles_color"]);
+			g_settings.radar = j[xorstr_("settings")][xorstr_("radar")];
+			g_settings.radar_x = j[xorstr_("settings")][xorstr_("radar_x")];
+			g_settings.radar_y = j[xorstr_("settings")][xorstr_("radar_y")];
+			g_settings.radar_width = j[xorstr_("settings")][xorstr_("radar_width")];
+			g_settings.radar_height = j[xorstr_("settings")][xorstr_("radar_height")];
+			g_settings.radar_distance = j[xorstr_("settings")][xorstr_("radar_distance")];
+			g_settings.radar_teammates_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_teammates_color")]);
+			g_settings.radar_enemies_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_enemies_color")]);
+			g_settings.radar_teammate_vehicles_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_teammate_vehicles_color")]);
+			g_settings.radar_enemy_vehicles_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_enemy_vehicles_color")]);
 
-			g_settings.explosives = j["settings"]["explosives"];
-			g_settings.explosives_color = string_to_color(j["settings"]["explosives_color"]);
+			g_settings.explosives = j[xorstr_("settings")][xorstr_("explosives")];
+			g_settings.explosives_color = string_to_color(j[xorstr_("settings")][xorstr_("explosives_color")]);
 
-			g_settings.missiles_own = j["settings"]["missiles_own"];
-			g_settings.missiles_color = string_to_color(j["settings"]["missiles_color"]);
+			g_settings.missiles_own = j[xorstr_("settings")][xorstr_("missiles_own")];
+			g_settings.missiles_color = string_to_color(j[xorstr_("settings")][xorstr_("missiles_color")]);
 
 			g_settings.jet_speed = j["settings"]["jet_speed"];
 
-			g_settings.spectator_list = j["settings"]["spectator_list"];
-			g_settings.spectator_raw_drawing = j["settings"]["spectator_raw_drawing"];
-			g_settings.spectator_x = j["settings"]["spectator_x"];
-			g_settings.spectator_y = j["settings"]["spectator_y"];
-			g_settings.spectator_color = string_to_color(j["settings"]["spectator_color"]);
+			g_settings.spectator_list = j[xorstr_("settings")][xorstr_("spectator_list")];
+			g_settings.spectator_raw_drawing = j[xorstr_("settings")][xorstr_("spectator_raw_drawing")];
+			g_settings.spectator_x = j[xorstr_("settings")][xorstr_("spectator_x")];
+			g_settings.spectator_y = j[xorstr_("settings")][xorstr_("spectator_y")];
+			g_settings.spectator_color = string_to_color(j[xorstr_("settings")][xorstr_("spectator_color")]);
 
-			g_settings.minimap = j["settings"]["minimap"];
-			g_settings.obs_check = j["settings"]["obs_check"];
+			g_settings.minimap = j[xorstr_("settings")][xorstr_("minimap")];
+			g_settings.obs_check = j[xorstr_("settings")][xorstr_("obs_check")];
 		}
 
 		nlohmann::json to_json()
@@ -193,65 +193,65 @@ namespace big
 				{
 					"settings",
 					{
-					    { "blacklist", g_settings.blacklist },
-						{ "blacklist_color", color_to_string(g_settings.blacklist_color) },
-						{ "esp", g_settings.esp },
-						{ "esp_draw_teammates", g_settings.esp_draw_teammates },
-						{ "esp_draw_vehicles", g_settings.esp_draw_vehicles },
-						{ "esp_distance", g_settings.esp_distance },
-						{ "esp_teammate_color", color_to_string(g_settings.esp_teammate_color) },
-						{ "esp_additional_tags_color", color_to_string(g_settings.esp_additional_tags_color) },
-						{ "esp_draw_box", g_settings.esp_draw_box },
-						{ "esp_box_style", g_settings.esp_box_style },
-						{ "esp_box_color_occluded", color_to_string(g_settings.esp_box_color_occluded) },
-						{ "esp_box_color", color_to_string(g_settings.esp_box_color) },
-						{ "esp_draw_health", g_settings.esp_draw_health },
-						{ "esp_draw_name", g_settings.esp_draw_name },
-						{ "esp_draw_distance", g_settings.esp_draw_distance },
-						{ "esp_draw_vehicle_tag", g_settings.esp_draw_vehicle_tag },
-						{ "esp_text_spacing", g_settings.esp_text_spacing },
-						{ "text_color_occluded", color_to_string(g_settings.text_color_occluded) },
-						{ "text_color", color_to_string(g_settings.text_color) },
-						{ "skeleton", g_settings.skeleton },
-						{ "skeleton_use_dots", g_settings.skeleton_use_dots },
-						{ "skeleton_dots_distance", g_settings.skeleton_dots_distance },
-			            { "skeleton_color", color_to_string(g_settings.skeleton_color) },
-						{ "aimbot", g_settings.aimbot },
-						{ "aim_fov_method", g_settings.aim_fov_method },
-						{ "aim_draw_fov", g_settings.aim_draw_fov },
-						{ "aim_fov", g_settings.aim_fov },
-						{ "aim_min_time_to_target", g_settings.aim_min_time_to_target },
-						{ "aim_max_time_to_target", g_settings.aim_max_time_to_target },
-			            { "aim_key", g_settings.aim_key },
-						{ "aim_bone", g_settings.aim_bone },
-						{ "overheat_control", g_settings.overheat_control },
-						{ "overheat_control_critical", g_settings.overheat_control_critical },
-						{ "infantry_alert", g_settings.infantry_alert },
-						{ "infantry_alert_light_tech", g_settings.infantry_alert_light_tech },
-						{ "infantry_alert_distance", g_settings.infantry_alert_distance },
-			            { "infantry_alert_color", color_to_string(g_settings.infantry_alert_color) },
-						{ "radar", g_settings.radar },
-						{ "radar_x", g_settings.radar_x },
-						{ "radar_y", g_settings.radar_y },
-						{ "radar_width", g_settings.radar_width },
-						{ "radar_height", g_settings.radar_height },
-						{ "radar_distance", g_settings.radar_distance },
-						{ "radar_teammates_color", color_to_string(g_settings.radar_teammates_color) },
-						{ "radar_enemies_color", color_to_string(g_settings.radar_enemies_color) },
-						{ "radar_teammate_vehicles_color", color_to_string(g_settings.radar_teammate_vehicles_color) },
-						{ "radar_enemy_vehicles_color", color_to_string(g_settings.radar_enemy_vehicles_color) },
-						{ "explosives", g_settings.explosives },
-			            { "explosives_color", color_to_string(g_settings.explosives_color) },
-						{ "missiles_own", g_settings.missiles_own },
-						{ "missiles_color", color_to_string(g_settings.missiles_color) },
-						{ "jet_speed", g_settings.jet_speed },
-						{ "spectator_list", g_settings.spectator_list },
-						{ "spectator_raw_drawing", g_settings.spectator_raw_drawing },
-						{ "spectator_x", g_settings.spectator_x },
-						{ "spectator_y", g_settings.spectator_y },
-			            { "spectator_color", color_to_string(g_settings.spectator_color) },
-						{ "minimap", g_settings.minimap },
-						{ "obs_check", g_settings.obs_check },
+					    { xorstr_("blacklist"), g_settings.blacklist },
+						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
+						{ xorstr_("esp"), g_settings.esp },
+						{ xorstr_("esp_draw_teammates"), g_settings.esp_draw_teammates },
+						{ xorstr_("esp_draw_vehicles"), g_settings.esp_draw_vehicles },
+						{ xorstr_("esp_distance"), g_settings.esp_distance },
+						{ xorstr_("esp_teammate_color"), color_to_string(g_settings.esp_teammate_color) },
+						{ xorstr_("esp_additional_tags_color"), color_to_string(g_settings.esp_additional_tags_color) },
+						{ xorstr_("esp_draw_box"), g_settings.esp_draw_box },
+						{ xorstr_("esp_box_style"), g_settings.esp_box_style },
+						{ xorstr_("esp_box_color_occluded"), color_to_string(g_settings.esp_box_color_occluded) },
+						{ xorstr_("esp_box_color"), color_to_string(g_settings.esp_box_color) },
+						{ xorstr_("esp_draw_health"), g_settings.esp_draw_health },
+						{ xorstr_("esp_draw_name"), g_settings.esp_draw_name },
+						{ xorstr_("esp_draw_distance"), g_settings.esp_draw_distance },
+						{ xorstr_("esp_draw_vehicle_tag"), g_settings.esp_draw_vehicle_tag },
+						{ xorstr_("esp_text_spacing"), g_settings.esp_text_spacing },
+						{ xorstr_("text_color_occluded"), color_to_string(g_settings.text_color_occluded) },
+						{ xorstr_("text_color"), color_to_string(g_settings.text_color) },
+						{ xorstr_("skeleton"), g_settings.skeleton },
+						{ xorstr_("skeleton_use_dots"), g_settings.skeleton_use_dots },
+						{ xorstr_("skeleton_dots_distance"), g_settings.skeleton_dots_distance },
+			            { xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
+						{ xorstr_("aimbot"), g_settings.aimbot },
+						{ xorstr_("aim_fov_method"), g_settings.aim_fov_method },
+						{ xorstr_("aim_draw_fov"), g_settings.aim_draw_fov },
+						{ xorstr_("aim_fov"), g_settings.aim_fov },
+						{ xorstr_("aim_min_time_to_target"), g_settings.aim_min_time_to_target },
+						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
+			            { xorstr_("aim_key"), g_settings.aim_key },
+						{ xorstr_("aim_bone"), g_settings.aim_bone },
+						{ xorstr_("overheat_control"), g_settings.overheat_control },
+						{ xorstr_("overheat_control_critical"), g_settings.overheat_control_critical },
+						{ xorstr_("infantry_alert"), g_settings.infantry_alert },
+						{ xorstr_("infantry_alert_light_tech"), g_settings.infantry_alert_light_tech },
+						{ xorstr_("infantry_alert_distance"), g_settings.infantry_alert_distance },
+			            { xorstr_("infantry_alert_color"), color_to_string(g_settings.infantry_alert_color) },
+						{ xorstr_("radar"), g_settings.radar },
+						{ xorstr_("radar_x"), g_settings.radar_x },
+						{ xorstr_("radar_y"), g_settings.radar_y },
+						{ xorstr_("radar_width"), g_settings.radar_width },
+						{ xorstr_("radar_height"), g_settings.radar_height },
+						{ xorstr_("radar_distance"), g_settings.radar_distance },
+						{ xorstr_("radar_teammates_color"), color_to_string(g_settings.radar_teammates_color) },
+						{ xorstr_("radar_enemies_color"), color_to_string(g_settings.radar_enemies_color) },
+						{ xorstr_("radar_teammate_vehicles_color"), color_to_string(g_settings.radar_teammate_vehicles_color) },
+						{ xorstr_("radar_enemy_vehicles_color"), color_to_string(g_settings.radar_enemy_vehicles_color) },
+						{ xorstr_("explosives"), g_settings.explosives },
+			            { xorstr_("explosives_color"), color_to_string(g_settings.explosives_color) },
+						{ xorstr_("missiles_own"), g_settings.missiles_own },
+						{ xorstr_("missiles_color"), color_to_string(g_settings.missiles_color) },
+						{ xorstr_("jet_speed"), g_settings.jet_speed },
+						{ xorstr_("spectator_list"), g_settings.spectator_list },
+						{ xorstr_("spectator_raw_drawing"), g_settings.spectator_raw_drawing },
+						{ xorstr_("spectator_x"), g_settings.spectator_x },
+						{ xorstr_("spectator_y"), g_settings.spectator_y },
+			            { xorstr_("spectator_color"), color_to_string(g_settings.spectator_color) },
+						{ xorstr_("minimap"), g_settings.minimap },
+						{ xorstr_("obs_check"), g_settings.obs_check },
 					},
 				},
 
