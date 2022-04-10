@@ -153,9 +153,6 @@
     <ClCompile Include="Features\Radar\radar.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\class_info.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
