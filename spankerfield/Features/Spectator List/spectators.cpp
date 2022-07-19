@@ -64,8 +64,9 @@ namespace plugins
 			ImGuiWindowFlags flags = g_gui.m_opened ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar;
 			if (!set)
 			{
-				ImGui::SetNextWindowSize(ImVec2(250, 125.f));
-				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f));
+				ImGui::SetNextWindowSize(ImVec2(250, 125.f), ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f), ImGuiCond_FirstUseEver);
+				
 				set = true;
 			}
 
