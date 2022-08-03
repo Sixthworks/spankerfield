@@ -322,7 +322,6 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 
-
 				ImGui::EndTabItem();
 			}
 

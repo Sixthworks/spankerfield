@@ -1,8 +1,6 @@
 #include "minimap.h"
 #include "../../settings.h"
 #include "../../global.h"
-#include "../../SDK/sdk.h"
-#include "../../Utilities/xorstr.h"
 #include "../../Utilities/other.h"
 #include "../../Utilities/thread_pool.h"
 
@@ -19,7 +17,7 @@ namespace plugins
 			{
 				g_thread_pool->push([&]
 				{
-                   g_globals.g_obs = is_process_running(L"obs64.exe");
+                   g_globals.g_obs = is_process_running(xorstr_(L"obs64.exe"));
 				});
 
 				g_globals.g_obscheck = GetTickCount64();

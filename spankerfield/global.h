@@ -15,7 +15,7 @@ namespace big
 		bool g_running{ true };
 		int g_width{ 2560 };
 		int g_height{ 1440 };
-
+		
 		bool g_fairfight;
 		bool g_punkbuster;
 		bool g_obs;

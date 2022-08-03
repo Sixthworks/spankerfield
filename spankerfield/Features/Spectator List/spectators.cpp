@@ -66,7 +66,6 @@ namespace plugins
 			{
 				ImGui::SetNextWindowSize(ImVec2(250, 125.f), ImGuiCond_FirstUseEver);
 				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f), ImGuiCond_FirstUseEver);
-				
 				set = true;
 			}
 

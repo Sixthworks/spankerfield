@@ -42,7 +42,13 @@ namespace plugins
 		}
 		else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
 		{
-			border_input_node->m_InputCache->m_Event[ConceptFire] = 1.f;
+			const auto input_cache = border_input_node->m_InputCache;
+			if (!input_cache) return;
+
+			const auto input = input_cache->m_Event;
+			if (!input) return;
+
+			input[ConceptFire] = 1.f;
 		}
 	}
 }

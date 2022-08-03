@@ -141,18 +141,27 @@ namespace big
 
 	bool is_process_running(const wchar_t* process_name)
 	{
-		bool exists = false;
 		PROCESSENTRY32 entry;
 		entry.dwSize = sizeof(PROCESSENTRY32);
 
-		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+		const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
-		if (Process32First(snapshot, &entry))
-			while (Process32Next(snapshot, &entry))
-				if (!_wcsicmp(entry.szExeFile, process_name))
-					exists = true;
+		if (!Process32First(snapshot, &entry))
+		{
+			CloseHandle(snapshot);
+			return false;
+		}
+
+		do
+		{
+			if (!_tcsicmp(entry.szExeFile, process_name))
+			{
+				CloseHandle(snapshot);
+				return true;
+			}
+		} while (Process32Next(snapshot, &entry));
 
 		CloseHandle(snapshot);
-		return exists;
+		return false;
 	}
 }
