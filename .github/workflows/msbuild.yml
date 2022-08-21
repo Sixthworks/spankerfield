@@ -40,4 +40,4 @@ jobs:
       
     - name: Package
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: ls
+      run: ls x64/Release
