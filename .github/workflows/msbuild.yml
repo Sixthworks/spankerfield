@@ -42,4 +42,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: spankerfield.dll
-        path: ${{env.GITHUB_WORKSPACE}}/x64/Release/spankerfield.dll
+        path: ${{env.GITHUB_WORKSPACE}}/x64/Release/*
