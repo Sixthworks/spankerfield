@@ -34,7 +34,7 @@ Conrollable jet speed,
 Auto-spot,
 Spectator list,
 PunkBuster bypass,
-FairFight sbypass,
+FairFight bypass,
 XorString.
 ```
 
