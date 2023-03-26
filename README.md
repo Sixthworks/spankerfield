@@ -52,5 +52,5 @@ Symbols: Unicode.
 
 ### Planning to do
 ```
-Player list with battlelog API.
+Nothing.
 ```
