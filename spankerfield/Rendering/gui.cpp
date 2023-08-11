@@ -105,7 +105,7 @@ namespace big
 
 				ImGui::Text(xorstr_("Aim key"));
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("Key##Aimbot"), &g_settings.aim_key, 0x01, 0xFE);
+				ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
 				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Aim bone"));
