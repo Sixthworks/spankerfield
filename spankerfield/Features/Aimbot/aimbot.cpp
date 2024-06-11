@@ -267,8 +267,6 @@ namespace plugins
 {
 	void aimbot(float delta_time)
 	{
-		if (!g_settings.aimbot) return;
-
 		if (!GetAsyncKeyState(g_settings.aim_key))
 			return;
 
@@ -341,8 +339,6 @@ namespace plugins
 
 	void draw_fov()
 	{
-		if (!g_settings.aimbot) return;
-
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return;
 

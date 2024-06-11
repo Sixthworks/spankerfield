@@ -25,6 +25,7 @@
 #define OFFSET_GETENTITYLIST		  0x1407CD5D0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x74\x0C\x48\x8B\x03\x48\x89\x05\x00\x00\x00\x00\xEB\x3F (not sure)
 
 #define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
+#define OFFSET_TAKESCREENSHOT         0x14015D4F0 // fb::PunkbusterScreenshot::TakeScreenshot()
 
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128

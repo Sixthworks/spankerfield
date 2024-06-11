@@ -97,16 +97,13 @@ namespace big
 		return swapchain;
 	}
 
-	bool punkbuster_check()
+	bool punkbuster_capturing()
 	{
 		static auto screenshot_module = (uintptr_t*)OFFSET_SSMODULE;
 		if (!IsValidPtr(screenshot_module))
 			return true;
 
-		bool status = (*(int*)(*screenshot_module + 0x14) != -1);
-		g_globals.g_punkbuster = status;
-
-		return status;
+		return (*(int*)(*screenshot_module + 0x14) != -1);
 	}
 
 	int generate_random_int(int min, int max)

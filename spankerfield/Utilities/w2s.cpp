@@ -66,7 +66,8 @@ namespace big
 			mat->_13 * vec.x + mat->_23 * vec.y + mat->_33 * vec.z);
 	}
 
-	bool get_box_coords(const TransformAABBStruct& TransAABB, Vector2* cords) {
+	bool get_box_coords(const TransformAABBStruct& TransAABB, Vector2* cords)
+	{
 		Vector3 corners[8];
 		Vector3 pos = (Vector3)TransAABB.Transform.m[3];
 		Vector3 min = Vector3(TransAABB.AABB.m_Min.x, TransAABB.AABB.m_Min.y, TransAABB.AABB.m_Min.z);

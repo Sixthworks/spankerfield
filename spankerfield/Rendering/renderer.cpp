@@ -75,6 +75,7 @@ namespace big
 		{
 			if (!input->m_pMouse->m_pDevice->m_CursorMode)
 			{
+				// Additional fixes for mouse
 				input->m_pMouse->m_pDevice->m_UIOwnsInput, input->m_pMouse->m_pDevice->m_UseRawMouseInput, ImGui::GetIO().MouseDrawCursor = g_gui.m_opened;
 			}
 		}	
@@ -82,16 +83,10 @@ namespace big
 
 	void renderer::on_present()
 	{
-		if (g_gui.m_opened)
-		{
-			ImGui::GetIO().MouseDrawCursor = true;
-			ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-		}
-		else
-		{
-			ImGui::GetIO().MouseDrawCursor = false;
-			ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
-		}
+		// Renewed
+		ImGuiIO& io = ImGui::GetIO();
+		io.MouseDrawCursor = g_gui.m_opened;
+		io.ConfigFlags = g_gui.m_opened ? (io.ConfigFlags & ~ImGuiConfigFlags_NoMouse) : (io.ConfigFlags | ImGuiConfigFlags_NoMouse);
 
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -101,9 +96,7 @@ namespace big
 		
 		mouse_act();
 		if (g_gui.m_opened)
-		{
 			g_gui.dx_on_tick();
-		}
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

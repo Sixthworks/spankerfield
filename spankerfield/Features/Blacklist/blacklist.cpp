@@ -28,7 +28,7 @@ namespace plugins
 		std::ifstream file(file_path);
 
 		if (!file.fail())
-			file >> players;
+			players = nlohmann::json::parse(file);
 
 		return players;
 	}
