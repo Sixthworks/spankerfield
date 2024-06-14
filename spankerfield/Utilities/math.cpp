@@ -8,6 +8,18 @@
 
 namespace big
 {
+	float degrees_to_radians(float degrees)
+	{
+		return degrees * (PI / 180.0f);
+	}
+
+	float get_fov_radius(float fov_degrees, float screen_width, float screen_height)
+	{
+		float aspect_ratio = screen_width / screen_height;
+		float fov_radians = degrees_to_radians(fov_degrees);
+		return tan(fov_radians / 2) * (screen_width / 2) / aspect_ratio;
+	}
+
 	void normalize_angle(Vector2& angle)
 	{
 		if (angle.x <= -PI)
@@ -19,65 +31,6 @@ namespace big
 		if (angle.y > PI_2)
 			angle.y -= PI;
 	}
-
-	void lerp_angle(Vector2& from, Vector2& to, float step)
-	{
-		Vector2 delta = (to - from);
-		normalize_angle(delta);
-		to = (from + step * delta);
-		normalize_angle(to);
-	}
-
-	Vector3 calc_angle(Vector3& from, const Vector3& to)
-	{
-		Vector3 angles = Vector3(0.0f, 0.0f, 0.0f);
-		Vector3 delta = (from - to);
-		float f_hyp = sqrt((delta.x * delta.x) + (delta.y * delta.y));
-
-		angles.x = (atanf(delta.z / f_hyp) * PI_RAD);
-		angles.y = (atanf(delta.y / delta.x) * PI_RAD);
-		angles.z = 0.0f;
-
-		if (delta.x >= 0.0f)
-			angles.y += 180.0f;
-
-		return angles;
-	}
-
-	void angle_vectors(Vector3& angles, Vector3* forward)
-	{
-		float sp, sy, cp, cy;
-
-		sp = sin(DEG2RAD(angles.x));
-		cp = cos(DEG2RAD(angles.x));
-
-		sy = sin(DEG2RAD(angles.y));
-		cy = cos(DEG2RAD(angles.y));
-
-		if (forward)
-		{
-			forward->x = cp * cy;
-			forward->y = cp * sy;
-			forward->z = -sp;
-		}
-	}
-
-	float calc_fov(Vector3& from, Vector3& to)
-	{
-		Vector3 v_src = Vector3();
-		angle_vectors(from, &v_src);
-
-		Vector3 v_dst = Vector3();
-		angle_vectors(to, &v_dst);
-
-		float result = RAD2DEG(acos(v_dst.Dot(v_src) / v_dst.LengthSquared()));
-
-		if (!isfinite(result) || isinf(result) || isnan(result))
-			result = 0.0f;
-
-		return result;
-	}
-
 
 	void cerp_angle(Vector2& from, Vector2& to, float step_x, float step_y)
 	{

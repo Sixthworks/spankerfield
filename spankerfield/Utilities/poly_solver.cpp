@@ -1,161 +1,143 @@
 #include "poly_solver.h"
 
-#define EQN_EPS       1e-9
-#define	IS_ZERO(x)     ((x) > -EQN_EPS && (x) < EQN_EPS)
-#define PI            3.14159265358979323846
-
 namespace big
 {
-	int PolynomialSolver::SolveQuadratic(float a, float b, float c, std::vector<double>& Sol)
-	{
-		double Determinant = b * b - 4 * a * c;
-		if (Determinant > 0)
-		{
-			double X = (-b + std::sqrt(Determinant)) / (2 * a);
-			double X2 = (-b - std::sqrt(Determinant)) / (2 * a);
-			Sol.push_back(X);
-			Sol.push_back(X2);
-			return 2;
-		}
+    int PolynomialSolver::SolveQuadratic(float a, float b, float c, std::vector<double>& Sol)
+    {
+        if (fabs(a) < std::numeric_limits<float>::epsilon())
+        {
+            if (fabs(b) < std::numeric_limits<float>::epsilon())
+            {
+                return 0; // No solutions
+            }
+            Sol.push_back(-c / b);
+            return 1;
+        }
 
-		if (IS_ZERO(Determinant))
-		{
-			double X = (-b + std::sqrt(Determinant)) / (2 * a);
-			Sol.push_back(X);
-			return 2;
-		}
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant > 0)
+        {
+            double sqrt_disc = std::sqrt(discriminant);
+            Sol.push_back((-b + sqrt_disc) / (2 * a));
+            Sol.push_back((-b - sqrt_disc) / (2 * a));
+            return 2;
+        }
+        else if (fabs(discriminant) < std::numeric_limits<float>::epsilon())
+        {
+            Sol.push_back(-b / (2 * a));
+            return 1;
+        }
 
-		// Only 1 real solution
-		double X = -b / (2 * a);
-		Sol.push_back(X);
-		return 1;
-	}
+        return 0; // No real solutions
+    }
 
-	int PolynomialSolver::SolveCubic(float a, float b, float c, float d, std::vector<double>& Sol)
-	{
-		double A = b / a;
-		double B = c / a;
-		double C = d / a;
+    int PolynomialSolver::SolveCubic(float a, float b, float c, float d, std::vector<double>& Sol)
+    {
+        if (fabs(a) < std::numeric_limits<float>::epsilon())
+        {
+            return SolveQuadratic(b, c, d, Sol);
+        }
 
-		double ASq = A * A;
-		double p = 1.0f / 3.0f * (-1.0f / 3.0f * ASq + B);
-		double q = 1.0f / 2.0f * (2.0f / 27.0f * A * ASq - 1.0f / 3.0f * A * B + C);
+        double A = b / a;
+        double B = c / a;
+        double C = d / a;
 
-		double PCube = p * p * p;
-		double D = q * q + PCube;
+        double ASq = A * A;
+        double p = -ASq / 3.0 + B;
+        double q = 2.0 * ASq * A / 27.0 - A * B / 3.0 + C;
 
-		double Sub = 1.0f / 3.0f * A;
+        double cubic_discriminant = q * q / 4.0 + p * p * p / 27.0;
 
-		if (IS_ZERO(D))
-		{
-			if (IS_ZERO(q))
-			{
-				Sol.push_back(0 - Sub);
-				return 1;
-			}
-			else {
-				double u = std::cbrt(-q);
-				Sol.push_back(2.0f * u - Sub);
-				Sol.push_back(-u - Sub);
-				return 2;
-			}
-		}
+        if (cubic_discriminant > 0)
+        {
+            double sqrt_disc = std::sqrt(cubic_discriminant);
+            double u = std::cbrt(-q / 2.0 + sqrt_disc);
+            double v = std::cbrt(-q / 2.0 - sqrt_disc);
+            Sol.push_back(u + v - A / 3.0);
+            return 1;
+        }
+        else if (fabs(cubic_discriminant) < std::numeric_limits<float>::epsilon())
+        {
+            double u = std::cbrt(-q / 2.0);
+            Sol.push_back(2.0 * u - A / 3.0);
+            Sol.push_back(-u - A / 3.0);
+            return 2;
+        }
+        else
+        {
+            double r = std::sqrt(-p * p * p / 27.0);
+            double phi = std::acos(-q / (2.0 * r));
+            double t = 2.0 * std::cbrt(r);
+            Sol.push_back(t * std::cos(phi / 3.0) - A / 3.0);
+            Sol.push_back(t * std::cos((phi + 2.0 * M_PI) / 3.0) - A / 3.0);
+            Sol.push_back(t * std::cos((phi + 4.0 * M_PI) / 3.0) - A / 3.0);
+            return 3;
+        }
+    }
 
-		if (D < 0)
-		{
-			double phi = 1.0f / 3.0f * acos(-q / sqrt(-PCube));
-			double t = 2.0f * sqrt(-p);
+    int PolynomialSolver::SolveQuartic(float a, float b, float c, float d, float e, std::vector<double>& Sol)
+    {
+        if (fabs(a) < std::numeric_limits<float>::epsilon())
+        {
+            return SolveCubic(b, c, d, e, Sol);
+        }
 
-			Sol.push_back((t * cos(phi)) - Sub);
-			Sol.push_back((-t * cos(phi + PI / 3.0f)) - Sub);
-			Sol.push_back((-t * cos(phi - PI / 3.0f)) - Sub);
-			return 3;
-		}
+        double A = b / a;
+        double B = c / a;
+        double C = d / a;
+        double D = e / a;
 
-		double DSqrt = sqrt(D);
-		double u = std::cbrt(DSqrt - q);
-		double v = -std::cbrt(DSqrt + q);
-		Sol.push_back(u + v - Sub);
+        double ASqr = A * A;
+        double p = -3.0 / 8.0 * ASqr + B;
+        double q = ASqr * A / 8.0 - A * B / 2.0 + C;
+        double r = -3.0 / 256.0 * ASqr * ASqr + B * ASqr / 16.0 - A * C / 4.0 + D;
 
-		return 1;
-	}
+        std::vector<double> cubic_solutions;
+        if (fabs(r) < std::numeric_limits<float>::epsilon())
+        {
+            cubic_solutions.clear();
+            int cubic_solution_count = SolveCubic(1, 0, p, q, cubic_solutions);
+            for (int i = 0; i < cubic_solution_count; ++i)
+            {
+                Sol.push_back(cubic_solutions[i] - A / 4.0);
+            }
+            Sol.push_back(-A / 4.0);
+            return cubic_solution_count + 1;
+        }
 
-	int PolynomialSolver::SolveQuartic(float a, float b, float c, float d, float e, std::vector<double>& Sol)
-	{
-		//  A            B           C          D         E
-		//c[4] * x^4 + c[3] * x^3 + c[2] *x^2 + c[1] *x + c[0]
-		double A = b / a;
-		double B = c / a;
-		double C = d / a;
-		double D = e / a;
+        SolveCubic(1, -p / 2.0, -r, r * p / 2.0 - q * q / 8.0, cubic_solutions);
 
-		/* substitute x = y - A/4 to eliminate cubic term:
-		x^4 + px^2 + qx + r = 0 */
-		double ASqr = A * A;
-		double p = -3.0f / 8.0f * ASqr + B;
-		double q = 1.0f / 8.0f * ASqr * A - 1.0f / 2.0f * A * B + C;
-		double r = -3.0f / 256.0f * ASqr * ASqr + 1.0f / 16.0f * ASqr * B - 1.0f / 4.0f * A * C + D;
-		double sub = 1.0f / 4.0f * A;
+        double z = cubic_solutions[0];
+        double u = z * z - r;
+        double v = 2.0 * z - p;
 
-		if (IS_ZERO(r))
-		{
-			/* no absolute term: y(y^3 + py + q) = 0 */
-			std::vector<double> QSol;
-			int SolCount = SolveCubic(1, 0, p, q, QSol);
-			for (int i = 0; i < SolCount; i++)
-			{
-				Sol.push_back(QSol[i] - sub);
-			}
+        if (u > 0)
+        {
+            u = std::sqrt(u);
+        }
+        else
+        {
+            return 0;
+        }
 
-			Sol.push_back(0 - sub);
+        if (v > 0)
+        {
+            v = std::sqrt(v);
+        }
+        else
+        {
+            return 0;
+        }
 
-			return SolCount + 1;
-		}
+        std::vector<double> quadratic_solutions;
+        SolveQuadratic(1, q / 2.0 + v, z - u, quadratic_solutions);
+        SolveQuadratic(1, q / 2.0 - v, z + u, quadratic_solutions);
 
-		double td = 1.0f / 2 * r * p - 1.0f / 8.0f * q * q;
-		double tc = -r;
-		double tb = -1.0f / 2 * p;
-		double ta = 1;
+        for (double sol : quadratic_solutions)
+        {
+            Sol.push_back(sol - A / 4.0);
+        }
 
-		std::vector<double> QSol;
-		SolveCubic(ta, tb, tc, td, QSol);
-
-		double z = QSol[0];
-		double u = z * z - r;
-		double v = 2.0f * z - p;
-
-		if (IS_ZERO(u))
-			u = 0.0f;
-		else if (u > 0.0f)
-			u = sqrt(u);
-		else
-			return 0;
-
-		if (IS_ZERO(v))
-			v = 0.0f;
-		else if (v > 0.0f)
-			v = sqrt(v);
-		else
-			return 0;
-
-		tc = z - u;
-		tb = q < 0 ? -v : v;
-		ta = 1;
-
-		std::vector<double> QSol2;
-		int Sol2Num = SolveQuadratic(ta, tb, tc, QSol2);
-
-		tc = z + u;
-		tb = q < 0 ? v : -v;
-		ta = 1;
-
-		int Sol3Num = SolveQuadratic(ta, tb, tc, QSol2);
-		int TotalSol = Sol2Num + Sol3Num;
-		for (int i = 0; i < TotalSol; i++)
-		{
-			Sol.push_back(QSol2[i] - sub);
-		}
-
-		return TotalSol;
-	}
+        return static_cast<int>(quadratic_solutions.size());
+    }
 }

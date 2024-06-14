@@ -61,7 +61,7 @@ namespace big
 				g_globals.g_height = renderer->m_pScreen->m_Height;
 				g_globals.g_width = renderer->m_pScreen->m_Width;
 				g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
-		        
+
 				// AA flag check + Hooked PB Take Screenshot Function + Hooked BitBlt
 		        // I hope it's enough for people not to get detected...
 				bool draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;

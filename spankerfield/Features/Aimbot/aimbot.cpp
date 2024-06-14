@@ -73,43 +73,41 @@ namespace big
 
 	float AimbotPredictor::DoPrediction(const Vector3& shoot_space, Vector3& aim_point, const Vector3& my_velocity, const Vector3& enemy_velocity, const Vector3& bullet_speed, const float gravity, const WeaponZeroingEntry& zero_entry)
 	{
-		Vector3 relative_pos = (aim_point - shoot_space);
-		Vector3 gravity_vec = Vector3(0, fabs(gravity), 0);
-		auto f_approx_pos = [](Vector3& CurPos, const Vector3& Velocity, const Vector3& Accel, const float Time)->Vector3 {
-			return CurPos + Velocity * Time + .5f * Accel * Time * Time;
+		Vector3 relative_pos = aim_point - shoot_space;
+		Vector3 gravity_vec(0, -fabs(gravity), 0);
+
+		auto approximate_position = [](const Vector3& curPos, const Vector3& velocity, const Vector3& accel, float time) -> Vector3 {
+			return curPos + velocity * time + 0.5f * accel * time * time;
 		};
 
-		float a = .25f * gravity_vec.Dot(gravity_vec);
+		float a = 0.25f * gravity_vec.LengthSquared();
 		float b = enemy_velocity.Dot(gravity_vec);
-		float c = relative_pos.Dot(gravity_vec) + enemy_velocity.Dot(enemy_velocity) - (bullet_speed.z * bullet_speed.z);
-		float d = 2.0f * (relative_pos.Dot(enemy_velocity));
-		float e = relative_pos.Dot(relative_pos);
+		float c = relative_pos.Dot(gravity_vec) + enemy_velocity.LengthSquared() - bullet_speed.LengthSquared();
+		float d = 2.0f * relative_pos.Dot(enemy_velocity);
+		float e = relative_pos.LengthSquared();
 
-		// Calculate time projectile is in air
 		std::vector<double> solutions;
 		int num_solutions = m_Solver->SolveQuartic(a, b, c, d, e, solutions);
 
-		// Find smallest non-negative real root
-		float shortest_air_time = 99999.0f;
-		for (int i = 0; i < num_solutions; i++)
-		{
-			double air_time = solutions[i];
-			if (air_time < 0)
-				continue;
-
-			if (air_time < shortest_air_time)
-				shortest_air_time = (float)air_time;
+		float shortest_air_time = FLT_MAX;
+		for (double air_time : solutions) {
+			if (air_time >= 0 && air_time < shortest_air_time) {
+				shortest_air_time = static_cast<float>(air_time);
+			}
 		}
 
-		// Extrapolate position on velocity, and account for bullet drop
-		aim_point = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
+		if (shortest_air_time == FLT_MAX) {
+			return 0.0f; // No valid solution found
+		}
 
-		if (zero_entry.m_ZeroDistance == -1.0f)
+		aim_point = approximate_position(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
+
+		if (zero_entry.m_ZeroDistance == -1.0f) {
 			return 0.0f;
+		}
 
-		// This is still an approximation, fix later
-		float zero_air_time = zero_entry.m_ZeroDistance / fabs(bullet_speed.z);
-		float zero_drop = (.5f * fabs(gravity) * zero_air_time * zero_air_time);
+		float zero_air_time = zero_entry.m_ZeroDistance / bullet_speed.Length();
+		float zero_drop = 0.5f * fabs(gravity) * zero_air_time * zero_air_time;
 		float theta = atan2(zero_drop, zero_entry.m_ZeroDistance);
 
 		return theta;
@@ -189,6 +187,8 @@ namespace big
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return;
 
+		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
+
 		for (const auto player : m_PlayerList)
 		{
 			if (!IsValidPtr(player))
@@ -220,11 +220,11 @@ namespace big
 			if (screen_vec.x > screen_size.x || screen_vec.y > screen_size.y)
 				continue;
 
-			float screen_distance = get_screen_distance(screen_vec, get_screen_size());
+			float screen_distance = get_screen_distance(screen_vec, screen_size);
 			if (g_settings.aim_fov_method)
 			{
-				if (screen_distance > g_settings.aim_fov)
-					return;
+				if (screen_distance > fov_radius)
+					continue;
 			}
 
 			if (screen_distance < closest_distance)
@@ -254,12 +254,12 @@ namespace big
 		return m_ClosestPlayer;
 	}
 
-	float BotPlayerManager::get_screen_distance(Vector3& EnemyScreen, Vector2 ScreenSize)
+	float BotPlayerManager::get_screen_distance(Vector3& enemy_screen, Vector2 screen_size)
 	{
-		ScreenSize /= 2;
-		Vector2 DistanceFromCenter = Vector2(EnemyScreen.x, EnemyScreen.y) - ScreenSize;
+		Vector2 screen_center = screen_size / 2.0f;
+		Vector2 distance_from_center = Vector2(enemy_screen.x, enemy_screen.y) - screen_center;
 
-		return DistanceFromCenter.Length();
+		return distance_from_center.Length();
 	}
 }
 
@@ -339,6 +339,8 @@ namespace plugins
 
 	void draw_fov()
 	{
+		if (!g_settings.aim_fov_method || !g_settings.aim_draw_fov) return;
+
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return;
 
@@ -355,7 +357,7 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov, ImColor(255, 255, 255, 255));
+		if (g_settings.aim_fov_method && g_settings.aim_draw_fov) // In reality it's bigger, that's why we multiply the radius
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov * 1.35f, ImColor(255, 255, 255, 255));
 	}
 }

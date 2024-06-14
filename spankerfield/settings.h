@@ -16,7 +16,7 @@ namespace big
 		float aim_fov{ 90.f };
 		float aim_min_time_to_target{ 1.5f };
 		float aim_max_time_to_target{ 3.0f };
-		int aim_key{ VK_RBUTTON };
+		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
 		bool no_recoil;
