@@ -147,6 +147,7 @@
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Features\Aimbot\aimbot.cpp" />
     <ClCompile Include="Features\Blacklist\blacklist.cpp" />
+    <ClCompile Include="Features\Crosshair\crosshair.cpp" />
     <ClCompile Include="Features\ESP\esp.cpp" />
     <ClCompile Include="Features\Explosives\explosives.cpp" />
     <ClCompile Include="Features\Infantry Alert\infantry_alert.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Features\Missiles\missiles.cpp" />
     <ClCompile Include="Features\Overheat\overheat.cpp" />
     <ClCompile Include="Features\Radar\radar.cpp" />
+    <ClCompile Include="Features\Risky\risky.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -197,12 +199,15 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="Features\Aimbot\aimbot.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
+    <ClInclude Include="Features\Crosshair\crosshair.h" />
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="Features\Missiles\missiles.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
+    <ClInclude Include="Features\Risky\risky.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\bone_manager.h" />
+    <ClInclude Include="Rendering\font.h" />
     <ClInclude Include="Rendering\gui.h" />
     <ClInclude Include="Rendering\renderer.h" />
     <ClInclude Include="SDK\class_info.h" />
@@ -233,7 +238,6 @@
     <ClInclude Include="MinHook\hde\table64.h" />
     <ClInclude Include="MinHook\trampoline.h" />
     <ClInclude Include="Rendering\draw-list.h" />
-    <ClInclude Include="Rendering\rubik.h" />
     <ClInclude Include="SDK\sdk.h" />
     <ClInclude Include="SDK\type_info.h" />
     <ClInclude Include="Utilities\g3log\filesinkhelper.ipp" />

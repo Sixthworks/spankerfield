@@ -3,11 +3,13 @@
 #include "Blacklist/blacklist.h"
 #include "Spectator List/spectators.h"
 #include "ESP/esp.h"
+#include "Crosshair/crosshair.h"
 #include "Radar/radar.h"
 #include "Explosives/explosives.h"
 #include "Missiles/missiles.h"
 #include "Jet Speed/jetspeed.h"
 #include "Aimbot/aimbot.h"
+#include "Risky/risky.h"
 #include "Overheat/overheat.h"
 #include "Infantry Alert/infantry_alert.h"
 

@@ -118,6 +118,8 @@ namespace plugins
 
 			if (get_box_coords(transform, &box_coords[0]) && distance <= g_settings.esp_distance)
 			{
+				float box_x = box_coords[0].x;
+				float box_y = box_coords[0].y;
 				float box_width = box_coords[1].x - box_coords[0].x;
 				float box_height = box_coords[1].y - box_coords[0].y;
 				float health = vehicle ? health_vehicle : health_player;
@@ -127,6 +129,47 @@ namespace plugins
 				{
 					ImColor box_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
 					m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
+				}
+
+				if (g_settings.esp_draw_line)
+				{
+					ImColor line_color = soldier->m_Occluded ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
+					ImVec2 box_center = ImVec2(box_coords[0].x + box_width / 2.0f, box_coords[0].y + box_height / 2.0f);
+					ImVec2 drawing_from;
+
+					switch (g_settings.esp_draw_line_from) {
+					case 0:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y / 2.0f);
+						break;
+					case 1:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y);
+						break;
+					case 2:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, 0);
+						break;
+					case 3:
+						drawing_from = ImVec2(0, ImGui::GetIO().DisplaySize.y / 2.0f);
+						break;
+					case 4:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y / 2.0f);
+						break;
+					case 5:
+						drawing_from = ImVec2(0, 0);
+						break;
+					case 6:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, 0);
+						break;
+					case 7:
+						drawing_from = ImVec2(0, ImGui::GetIO().DisplaySize.y);
+						break;
+					case 8:
+						drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+						break;
+					default:
+						return; // Invalid position, do nothing
+					}
+
+					m_drawing->AddLine(drawing_from, box_center, line_color, g_settings.esp_line_thickness);
 				}
 
 				if (g_settings.esp_draw_health)

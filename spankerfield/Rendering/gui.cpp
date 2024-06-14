@@ -13,10 +13,6 @@ namespace big
 	void gui::dx_init()
 	{
 		auto& style = ImGui::GetStyle();
-		style.FrameRounding = 4.0f;
-		style.WindowBorderSize = 1.0f;
-		style.PopupBorderSize = 1.0f;
-		style.GrabRounding = 4.0f;
 		style.WindowPadding = { 10.f, 10.f };
 		style.PopupRounding = 0.f;
 		style.FramePadding = { 8.f, 4.f };
@@ -26,58 +22,72 @@ namespace big
 		style.IndentSpacing = 21.f;
 		style.ScrollbarSize = 15.f;
 		style.GrabMinSize = 8.f;
+		style.WindowBorderSize = 1.f;
 		style.ChildBorderSize = 0.f;
+		style.PopupBorderSize = 1.f;
 		style.FrameBorderSize = 0.f;
 		style.TabBorderSize = 0.f;
-		style.WindowRounding = 4.f;
-		style.ChildRounding = 3.f;
-		style.ScrollbarRounding = 4.f;
-		style.TabRounding = 4.f;
+		style.WindowRounding = 0.f;
+		style.ChildRounding = 0.f;
+		style.FrameRounding = 0.f;
+		style.ScrollbarRounding = 0.f;
+		style.GrabRounding = 0.f;
+		style.TabRounding = 0.f;
 		style.WindowTitleAlign = { 0.5f, 0.5f };
 		style.ButtonTextAlign = { 0.5f, 0.5f };
 		style.DisplaySafeAreaPadding = { 3.f, 3.f };
 
-		ImVec4* colors = ImGui::GetStyle().Colors;
-		colors[ImGuiCol_Text] = ImColor(255, 255, 255);
-		colors[ImGuiCol_TextDisabled] = ImColor(42, 42, 42);
-		colors[ImGuiCol_WindowBg] = ImColor(18, 12, 27);
-		colors[ImGuiCol_ChildBg] = ImColor(18, 12, 27);
-		colors[ImGuiCol_PopupBg] = ImColor(18, 12, 27);
-		colors[ImGuiCol_Border] = ImColor(35, 32, 40);
-		colors[ImGuiCol_BorderShadow] = ImColor(35, 32, 40);
-		colors[ImGuiCol_FrameBg] = ImColor(35, 42, 106);
-		colors[ImGuiCol_FrameBgHovered] = ImColor(35, 42, 106);
-		colors[ImGuiCol_FrameBgActive] = ImColor(34, 122, 180);
-		colors[ImGuiCol_TitleBg] = ImColor(39, 51, 125);
-		colors[ImGuiCol_TitleBgActive] = ImColor(39, 51, 125);
-		colors[ImGuiCol_TitleBgCollapsed] = ImColor(39, 51, 125);
-		colors[ImGuiCol_MenuBarBg] = ImColor(39, 51, 125);
-		colors[ImGuiCol_ScrollbarBg] = ImColor(18, 12, 27);
-		colors[ImGuiCol_ScrollbarGrab] = ImColor(18, 12, 27);
-		colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(34, 122, 180);
-		colors[ImGuiCol_ScrollbarGrabActive] = ImColor(34, 122, 180);
-		colors[ImGuiCol_CheckMark] = ImColor(255, 255, 255);
-		colors[ImGuiCol_SliderGrab] = ImColor(33, 107, 167);
-		colors[ImGuiCol_SliderGrabActive] = ImColor(27, 100, 151);
-		colors[ImGuiCol_Button] = ImColor(33, 43, 105);
-		colors[ImGuiCol_ButtonHovered] = ImColor(29, 100, 150);
-		colors[ImGuiCol_ButtonActive] = ImColor(27, 100, 151);
-		colors[ImGuiCol_Header] = ImColor(34, 122, 180);
-		colors[ImGuiCol_HeaderHovered] = ImColor(29, 100, 150);
-		colors[ImGuiCol_HeaderActive] = ImColor(34, 122, 180);
-		colors[ImGuiCol_Separator] = ImColor(46, 46, 46);
-		colors[ImGuiCol_SeparatorHovered] = ImColor(46, 46, 46);
-		colors[ImGuiCol_SeparatorActive] = ImColor(46, 46, 46);
-		colors[ImGuiCol_ResizeGrip] = ImColor(46, 46, 46);
-		colors[ImGuiCol_ResizeGripHovered] = ImColor(29, 100, 150);
-		colors[ImGuiCol_ResizeGripActive] = ImColor(27, 100, 151);
-		colors[ImGuiCol_Tab] = ImColor(33, 43, 105);
-		colors[ImGuiCol_TabHovered] = ImColor(34, 122, 180);
-		colors[ImGuiCol_TabActive] = ImColor(34, 122, 180);
-		colors[ImGuiCol_TabUnfocused] = ImColor(33, 43, 105);
-		colors[ImGuiCol_TabUnfocusedActive] = ImColor(34, 122, 180);
+		auto& colors = style.Colors;
+		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_TextDisabled] = ImVec4(1.00f, 0.90f, 0.19f, 1.00f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+		colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+		colors[ImGuiCol_Border] = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
+		colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.54f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.21f, 0.21f, 0.21f, 0.78f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.28f, 0.27f, 0.27f, 0.54f);
+		colors[ImGuiCol_TitleBg] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+		colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+		colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.39f, 0.38f, 0.38f, 1.00f);
+		colors[ImGuiCol_Button] = ImVec4(0.41f, 0.41f, 0.41f, 0.74f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.41f, 0.41f, 0.41f, 0.78f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.41f, 0.41f, 0.41f, 0.87f);
+		colors[ImGuiCol_Header] = ImVec4(0.37f, 0.37f, 0.37f, 0.31f);
+		colors[ImGuiCol_HeaderHovered] = ImVec4(0.38f, 0.38f, 0.38f, 0.37f);
+		colors[ImGuiCol_HeaderActive] = ImVec4(0.37f, 0.37f, 0.37f, 0.51f);
+		colors[ImGuiCol_Separator] = ImVec4(0.38f, 0.38f, 0.38f, 0.50f);
+		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.46f, 0.46f, 0.46f, 0.50f);
+		colors[ImGuiCol_SeparatorActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.64f);
+		colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+		colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+		colors[ImGuiCol_Tab] = ImVec4(0.21f, 0.21f, 0.21f, 0.86f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.27f, 0.27f, 0.27f, 0.86f);
+		colors[ImGuiCol_TabActive] = ImVec4(0.34f, 0.34f, 0.34f, 0.86f);
+		colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.10f, 0.10f, 0.97f);
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+		colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+		colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+		colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+		colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-		ImGui::SetNextWindowSize(ImVec2(800, 710));
+		ImGui::SetNextWindowSize(ImVec2(850, 750));
 	}
 
 	void gui::dx_on_tick()
@@ -89,7 +99,11 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Weapons")))
 			{
 				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("No recoil"), &g_settings.no_recoil);
+
 				if (g_settings.aim_fov_method)
 				{
 					ImGui::Separator();
@@ -140,13 +154,6 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
 				ImGui::PopItemWidth();
 
-				ImGui::Separator();
-
-				ImGui::Checkbox(xorstr_("Overheat control"), &g_settings.overheat_control);
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Critical overheat value"), &g_settings.overheat_control_critical, 0.f, 1.f);
-				ImGui::PopItemWidth();
-
 				ImGui::EndTabItem();
 			}
 
@@ -184,6 +191,19 @@ namespace big
 
 				ImGui::Separator();
 
+				ImGui::Checkbox(xorstr_("Draw line"), &g_settings.esp_draw_line);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Line point location"), &g_settings.esp_draw_line_from, 0, 8);
+				ImGui::SliderFloat(xorstr_("Line thickness"), &g_settings.esp_line_thickness, 0.1f, 10.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Text(xorstr_("Line color"));
+
+				color_wrapper(xorstr_("Not visible##LC"), &g_settings.esp_line_color);
+				color_wrapper(xorstr_("Visible##LC"), &g_settings.esp_line_color_occluded);
+
+				ImGui::Separator();
+				
 				ImGui::Text(xorstr_("Text spacing"));
 
 				ImGui::PushItemWidth(300.f);
@@ -213,7 +233,21 @@ namespace big
 
 				ImGui::Separator();
 
+				ImGui::Checkbox(xorstr_("Draw crosshair"), &g_settings.draw_crosshair);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw shadow"), &g_settings.crosshair_shadow);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Crosshair size"), &g_settings.crosshair_size, 0.1f, 100.f);
+				ImGui::SliderFloat(xorstr_("Crosshair thickness"), &g_settings.crosshair_thickness, 1.f, 100.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Text(xorstr_("Colors"));
+				color_wrapper(xorstr_("Crosshair##CS"), &g_settings.crosshair_color);
+
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("Draw skeleton"), &g_settings.skeleton);
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.skeleton_use_dots);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.skeleton_dots_distance, 1.f, 5000.f);
@@ -297,8 +331,9 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Infantry alert")))
 			{
-				ImGui::Checkbox(xorstr_("Alert of nearby enemies"), &g_settings.infantry_alert);
-				ImGui::Checkbox(xorstr_("Count infantry vehicles"), &g_settings.infantry_alert_light_tech);
+				ImGui::Checkbox(xorstr_("Nearby enemies"), &g_settings.infantry_alert);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Infantry vehicles"), &g_settings.infantry_alert_light_tech);
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Alert distance"), &g_settings.infantry_alert_distance, 1.f, 500.f);
@@ -314,13 +349,22 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Misc")))
 			{
+				ImGui::Checkbox(xorstr_("Overheat control"), &g_settings.overheat_control);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Critical overheat value"), &g_settings.overheat_control_critical, 0.f, 1.f);
+				ImGui::PopItemWidth();
+				
+				ImGui::Spacing();
+
 				ImGui::Checkbox(xorstr_("Auto-spot"), &g_settings.minimap);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Unspot when using OBS"), &g_settings.obs_check);
 
-				ImGui::Separator();
-
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("No hardcore restrictions"), &g_settings.no_hc_restrictions);
 
 				ImGui::EndTabItem();
 			}

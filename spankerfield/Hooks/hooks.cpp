@@ -25,6 +25,7 @@ namespace big
 			Sleep(15);
 			bool result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
 			g_globals.g_fairfight = false;
+			LOG(INFO) << xorstr_("FairFight initiated a screenshot.");
 			return result;
 		}
 
@@ -41,6 +42,7 @@ namespace big
 				oTakeScreenshot(pThis);
 
 			g_globals.g_punkbuster = false;
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot.");
 		}
 	}
 

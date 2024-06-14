@@ -17,13 +17,12 @@ namespace plugins
 			{
 				g_thread_pool->push([&]
 				{
-                   g_globals.g_obs = is_process_running(xorstr_(L"obs64.exe"));
+				    // There is no way the executable is in any other name, you must be running 64-bit...
+                    g_globals.g_obs = is_process_running(xorstr_(L"obs64.exe"));
 				});
 
 				g_globals.g_obscheck = GetTickCount64();
 			}
-
-			if (g_globals.g_obs) return;
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();

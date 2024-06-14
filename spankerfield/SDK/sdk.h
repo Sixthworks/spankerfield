@@ -23,7 +23,7 @@
 #define OFFSET_CONSOLECOMMANDS		  0x140663A20 // \x40\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x00\x00\x00\x00\x48\x81\xEC\x00\x00\x00\x00\x48\xC7\x45\x00\x00\x00\x00\x00\x48\x89\x9C\x24\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x85\x00\x00\x00\x00\x44\x88\x44\x24\x00\x4C\x8B\xEA\x48\x8B\xF9\x48\x89\x8D\x00\x00\x00\x00\x45\x33\xFF\x44\x89\x7C\x24\x00\x8B\x05\x00\x00\x00\x00\x48\x8D\x1D\x00\x00\x00\x00
 #define OFFSET_FIRSTTYPEINFO		  0x1423E41B8
 #define OFFSET_GETENTITYLIST		  0x1407CD5D0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x74\x0C\x48\x8B\x03\x48\x89\x05\x00\x00\x00\x00\xEB\x3F (not sure)
-
+#define OFFSET_SYNCEDBFSETTINGS		  0x1423717C0
 #define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
 #define OFFSET_TAKESCREENSHOT         0x14015D4F0 // fb::PunkbusterScreenshot::TakeScreenshot()
 
@@ -81,6 +81,7 @@ class GameSettings;
 class ServerSettings;
 class Client;
 class ClientSettings;
+class SyncedBFSettings;
 class FileSystem;
 class GameTimer;
 class GameTimeSettings;
@@ -918,6 +919,45 @@ public:
 	char _0x0000[64];
 
 };//Size=0x0040
+
+
+class SyncedBFSettings
+{
+public:
+	char pad_0x0000[0xC]; //0x0000
+	DWORD N00003016; //0x000C 
+	char* m_Name; //0x0010 
+	__int32 m_Platform; //0x0018 
+	char pad_0x001C[0x4]; //0x001C
+	float m_GameModeCounterModifier; //0x0020 
+	float m_RoundTimeLimit; //0x0024 
+	__int64 m_JesusModeForPlayerTag; //0x0028 char* 0x00 
+	__int32 m_Team1Faction; //0x0030 
+	__int32 m_Team2Faction; //0x0034 
+	__int32 m_Team3Faction; //0x0038 
+	__int32 m_Team4Faction; //0x003C 
+	__int64 m_CommanderSize; //0x0040 alignment to 8 
+	char* m_FieldSpecLevels; //0x0048 char*
+	__int32 m_ServerType; //0x0050 
+	bool m_AllUnlocksUnlocked; //0x0054 
+	bool m_NoMinimap; //0x0055 
+	bool m_NoHud; //0x0056 
+	bool m_NoMinimapSpotting; //0x0057 
+	bool m_No3dSpotting; //0x0058 
+	bool m_NoNameTag; //0x0059 
+	bool m_OnlySquadLeaderSpawn; //0x005A 
+	bool m_TeamSwitchingAllowed; //0x005B 
+	bool m_RevertBackToBF3KillerCamera; //0x005C 
+	bool m_DisableHitIndicators; //0x005D 
+	bool m_DisableVehicleCommanderActions; //0x005E 
+	bool m_CommanderEnabled; //0x005F 
+	bool m_FieldUpgradeSystemActive; //0x0060 
+
+	static SyncedBFSettings* GetInstance()
+	{
+		return *(SyncedBFSettings**)OFFSET_SYNCEDBFSETTINGS;
+	}
+};
 
 class FileSystem
 {

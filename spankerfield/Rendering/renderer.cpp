@@ -1,6 +1,6 @@
 #include "renderer.h"
 #include "gui.h"
-#include "rubik.h"
+#include "font.h"
 #include "../common.h"
 #include "../global.h"
 #include "../SDK/sdk.h"
@@ -47,9 +47,14 @@ namespace big
 		ImFontConfig font_cfg{};
 		font_cfg.FontDataOwnedByAtlas = false;
 		
-		std::strcpy(font_cfg.Name, xorstr_("Rubik"));
+		std::strcpy(font_cfg.Name, xorstr_("Oswald"));
 
-		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 20.f, &font_cfg);
+		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
+			const_cast<std::uint8_t*>(font_main),
+			sizeof(font_main),
+			MAIN_FONT_SIZE, // See font.h to edit
+			&font_cfg);
+
 		io.FontDefault = m_font;
 		
 		m_monospace_font = ImGui::GetIO().Fonts->AddFontDefault();

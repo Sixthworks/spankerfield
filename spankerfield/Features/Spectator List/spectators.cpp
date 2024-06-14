@@ -65,16 +65,14 @@ namespace plugins
 			if (!set)
 			{
 				ImGui::SetNextWindowSize(ImVec2(250, 125.f), ImGuiCond_FirstUseEver);
-				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 260.f, 8.f), ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 258.f, 8.f), ImGuiCond_FirstUseEver);
 				set = true;
 			}
 
 			if (ImGui::Begin(xorstr_("Spectator list"), nullptr, flags))
 			{
 				for (const auto& rs : spectators)
-				{
 					ImGui::Text(rs.c_str());
-				}
 			}
 			ImGui::End();
 		}

@@ -19,6 +19,11 @@ namespace big
 		int aim_key{ VK_RBUTTON };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
+		bool no_recoil;
+
+		bool unlock_all;
+		bool no_hc_restrictions;
+
 		bool overheat_control{ true };
 		float overheat_control_critical{ 0.50f };
 
@@ -30,27 +35,39 @@ namespace big
 		bool esp{ true };
 		bool esp_draw_teammates;
 		bool esp_draw_vehicles{ true };
-		float esp_distance { 10000.f };
+		float esp_distance{ 10000.f };
 		ImColor esp_teammate_color{ 63, 147, 216, 255 };
 		ImColor esp_additional_tags_color{ 228, 213, 106, 255 };
 
 		bool esp_draw_box{ true };
 		int esp_box_style{ 4 };
 		ImColor esp_box_color_occluded{ 24, 162, 162, 255 };
-		ImColor esp_box_color{ 255, 51, 0, 255 };
-		
+		ImColor esp_box_color{ 97, 59, 230, 255 };
+
+		bool esp_draw_line{ true };
+		int esp_draw_line_from{ 1 };
+		float esp_line_thickness{ 1.f };
+		ImColor esp_line_color_occluded{ 24, 162, 162, 120 };
+		ImColor esp_line_color{ 220, 220, 220, 120 };
+
 		bool esp_draw_health{ true };
 		bool esp_draw_name{ true };
 		bool esp_draw_distance{ true };
 		bool esp_draw_vehicle_tag{ true };
 		float esp_text_spacing{ 9.25f };
 		ImColor text_color_occluded{ 24, 162, 162, 255 };
-		ImColor text_color{ 255, 153, 51, 255 };
+		ImColor text_color{ 137, 111, 227, 255 };
 
 		bool skeleton{ true };
 		bool skeleton_use_dots{ true };
 		float skeleton_dots_distance{ 22.5f };
 		ImColor skeleton_color{ 220, 220, 220, 255 };
+
+		bool draw_crosshair{ true };
+		bool crosshair_shadow{ true };
+		float crosshair_size{ 20.f };
+		float crosshair_thickness{ 1.f };
+		ImColor crosshair_color{ 255, 0, 0, 255 };
 
 		bool radar;
 		bool radar_draw_teammates;
@@ -65,7 +82,7 @@ namespace big
 		ImColor radar_enemy_vehicles_color{ 255, 100, 0, 255 };
 
 		bool explosives{ true };
-		ImColor explosives_color{ 255, 0, 255, 255 };
+		ImColor explosives_color{ 255, 77, 77, 255 };
 
 		bool missiles_own{ true };
 		ImColor missiles_color{ 14, 231, 231, 255 };
@@ -124,6 +141,11 @@ namespace big
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 
+			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
+
+			g_settings.unlock_all = j[xorstr_("settings")][xorstr_("unlock_all")];
+			g_settings.no_hc_restrictions = j[xorstr_("settings")][xorstr_("no_hc_restrictions")];
+
 			g_settings.overheat_control = j[xorstr_("settings")][xorstr_("overheat_control")];
 			g_settings.overheat_control_critical = j[xorstr_("settings")][xorstr_("overheat_control_critical")];
 
@@ -144,6 +166,12 @@ namespace big
 			g_settings.esp_box_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color_occluded")]);
 			g_settings.esp_box_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color")]);
 
+			g_settings.esp_draw_line = j[xorstr_("settings")][xorstr_("esp_draw_line")];
+			g_settings.esp_draw_line_from = j[xorstr_("settings")][xorstr_("esp_draw_line_from")];
+			g_settings.esp_line_thickness = j[xorstr_("settings")][xorstr_("esp_line_thickness")];
+			g_settings.esp_line_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_line_color_occluded")]);
+			g_settings.esp_line_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_line_color")]);
+
 			g_settings.esp_draw_health = j[xorstr_("settings")][xorstr_("esp_draw_health")];
 			g_settings.esp_draw_name = j[xorstr_("settings")][xorstr_("esp_draw_name")];
 			g_settings.esp_draw_distance = j[xorstr_("settings")][xorstr_("esp_draw_distance")];
@@ -158,6 +186,12 @@ namespace big
 			g_settings.skeleton_dots_distance = j[xorstr_("settings")][xorstr_("skeleton_dots_distance")];
 			g_settings.skeleton_color = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color")]);
 
+			g_settings.draw_crosshair = j[xorstr_("settings")][xorstr_("draw_crosshair")];
+			g_settings.crosshair_shadow = j[xorstr_("settings")][xorstr_("crosshair_shadow")];
+			g_settings.crosshair_size = j[xorstr_("settings")][xorstr_("crosshair_size")];
+			g_settings.crosshair_thickness = j[xorstr_("settings")][xorstr_("crosshair_thickness")];
+			g_settings.crosshair_color = string_to_color(j[xorstr_("settings")][xorstr_("crosshair_color")]);
+			
 			g_settings.radar = j[xorstr_("settings")][xorstr_("radar")];
 			g_settings.radar_x = j[xorstr_("settings")][xorstr_("radar_x")];
 			g_settings.radar_y = j[xorstr_("settings")][xorstr_("radar_y")];
@@ -205,6 +239,11 @@ namespace big
 						{ xorstr_("esp_box_style"), g_settings.esp_box_style },
 						{ xorstr_("esp_box_color_occluded"), color_to_string(g_settings.esp_box_color_occluded) },
 						{ xorstr_("esp_box_color"), color_to_string(g_settings.esp_box_color) },
+					    { xorstr_("esp_draw_line"), g_settings.esp_draw_line },
+						{ xorstr_("esp_draw_line_from"), g_settings.esp_draw_line_from },
+						{ xorstr_("esp_line_thickness"), g_settings.esp_line_thickness },
+						{ xorstr_("esp_line_color_occluded"), color_to_string(g_settings.esp_line_color_occluded) },
+						{ xorstr_("esp_line_color"), color_to_string(g_settings.esp_line_color) },
 						{ xorstr_("esp_draw_health"), g_settings.esp_draw_health },
 						{ xorstr_("esp_draw_name"), g_settings.esp_draw_name },
 						{ xorstr_("esp_draw_distance"), g_settings.esp_draw_distance },
@@ -216,6 +255,11 @@ namespace big
 						{ xorstr_("skeleton_use_dots"), g_settings.skeleton_use_dots },
 						{ xorstr_("skeleton_dots_distance"), g_settings.skeleton_dots_distance },
 			            { xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
+						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
+						{ xorstr_("crosshair_shadow"), g_settings.crosshair_shadow },
+						{ xorstr_("crosshair_size"), g_settings.crosshair_size },
+						{ xorstr_("crosshair_thickness"), g_settings.crosshair_thickness },
+						{ xorstr_("crosshair_color"), color_to_string(g_settings.crosshair_color) },
 						{ xorstr_("aimbot"), g_settings.aimbot },
 						{ xorstr_("aim_fov_method"), g_settings.aim_fov_method },
 						{ xorstr_("aim_draw_fov"), g_settings.aim_draw_fov },
@@ -224,6 +268,9 @@ namespace big
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
 			            { xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
+						{ xorstr_("no_recoil"), g_settings.no_recoil },
+						{ xorstr_("unlock_all"), g_settings.unlock_all },
+						{ xorstr_("no_hc_restrictions"), g_settings.no_hc_restrictions },
 						{ xorstr_("overheat_control"), g_settings.overheat_control },
 						{ xorstr_("overheat_control_critical"), g_settings.overheat_control_critical },
 						{ xorstr_("infantry_alert"), g_settings.infantry_alert },

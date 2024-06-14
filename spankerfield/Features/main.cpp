@@ -6,6 +6,7 @@ namespace big
 {
 	void features::draw()
 	{
+		plugins::draw_crosshair();
 		plugins::draw_spectators();
 		plugins::draw_esp();
 
@@ -27,6 +28,9 @@ namespace big
 			plugins::aimbot(delta_time);
 		}
 
+		plugins::unlock_all();
+		plugins::no_hc_restrictions();
+		plugins::no_recoil();
 		plugins::overheat_control();
 
 		plugins::spot_minimap();

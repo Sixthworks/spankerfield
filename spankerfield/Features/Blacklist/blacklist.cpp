@@ -10,7 +10,7 @@
 using namespace big;
 namespace plugins
 {
-	int exclusive = 123456789; // Random persona ID which won't occur in a game by random.
+	int exclusive = 193738923; // Random persona ID which won't occur in a game by random chance.
 
 	std::filesystem::path get_path()
 	{
@@ -196,7 +196,7 @@ namespace plugins
 					if (nickname != bl.name)
 						request_name_change(bl.name);
 
-					m_drawing->AddText(g_globals.g_width / 2.f, 95.f + offset, g_settings.blacklist_color, 28.f, FL_CENTER_X, bl.name.c_str());
+					m_drawing->AddText(g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, 26.f, FL_CENTER_X, bl.name.c_str());
 					offset += 20.f;
 				}
 			}
