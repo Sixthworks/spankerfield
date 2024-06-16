@@ -15,17 +15,28 @@ namespace big
 {
 	namespace ScreenshotCleaner
 	{
+		// Mutex
+		std::mutex properLock;
+
 		// FairFight
 		typedef BOOL(WINAPI* tBitBlt)(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
 		tBitBlt oBitBlt = nullptr;
 
-		BOOL hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
+		BOOL WINAPI hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
 		{
-			g_globals.g_fairfight = true;
-			Sleep(15);
-			bool result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
-			g_globals.g_fairfight = false;
 			LOG(INFO) << xorstr_("FairFight initiated a screenshot.");
+			g_globals.g_fairfight = true;
+			g_globals.screenshots_ff++;
+
+			bool result = FALSE;
+			{
+				std::lock_guard<std::mutex> lock(properLock);
+				std::this_thread::sleep_for(std::chrono::milliseconds(15));
+				if (oBitBlt)
+					result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
+			}
+
+			g_globals.g_fairfight = false;
 			return result;
 		}
 
@@ -35,14 +46,18 @@ namespace big
 
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot.");
 			g_globals.g_punkbuster = true;
-			Sleep(15);
-			
-			if (oTakeScreenshot)
-				oTakeScreenshot(pThis);
+			g_globals.screenshots_pb++;
+
+			{
+				std::lock_guard<std::mutex> lock(properLock);
+				std::this_thread::sleep_for(std::chrono::milliseconds(15));
+				if (oTakeScreenshot)
+					oTakeScreenshot(pThis);
+			}
 
 			g_globals.g_punkbuster = false;
-			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot.");
 		}
 	}
 
@@ -64,9 +79,9 @@ namespace big
 
 				// AA flag check + Hooked PB Take Screenshot Function + Hooked BitBlt
 		        // I hope it's enough for people not to get detected...
-				bool draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;
+				g_globals.g_should_draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;
 
-				if (draw)
+				if (g_globals.g_should_draw)
 					g_renderer->on_present();
 			}
 
@@ -148,8 +163,22 @@ namespace big
 			WndProc::oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc::hkWndProc)));
 			LOG(INFO) << xorstr_("Hooked WndProc.");
 
-			MH_CreateHook(&BitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
-			MH_EnableHook(&BitBlt);
+			HMODULE hGdi32 = GetModuleHandleA(xorstr_("Gdi32.dll"));
+			if (!hGdi32)
+			{
+				LOG(INFO) << xorstr_("Failed to get handle for Gdi32.dll.");
+				return;
+			}
+
+			void* pBitBlt = GetProcAddress(hGdi32, xorstr_("BitBlt"));
+			if (!pBitBlt)
+			{
+				LOG(INFO) << xorstr_("Failed to get address of BitBlt.");
+				return;
+			}
+
+			MH_CreateHook(pBitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
+			MH_EnableHook(pBitBlt);
 			LOG(INFO) << xorstr_("Hooked BitBlt.");
 
 			MH_CreateHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT), &ScreenshotCleaner::hkTakeScreenshot, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oTakeScreenshot));

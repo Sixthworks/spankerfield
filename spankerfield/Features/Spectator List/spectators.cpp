@@ -32,9 +32,6 @@ namespace plugins
 			if (!player)
 				continue;
 
-			if (player == local_player)
-				continue;
-
 			if (player->m_IsSpectator)
 			{
 				// Also make an additional check here if the player is actually spectating YOU.
@@ -44,8 +41,7 @@ namespace plugins
 				// https://github.com/headmax/Cplus/blob/master/Projet4/esp.h#L406=
 				// https://github.com/headmax/Cplus/blob/master/Projet4/bfsdk.h#L6576=
 
-				const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
-
+				const char* nickname = IsValidPtr(player->m_Name) ? (player == local_player ? (std::string(xorstr_("(You) ")) + std::string(player->m_Name)).c_str() : player->m_Name) : xorstr_("Unknown");
 				spectators.push_back(nickname);
 			}
 		}

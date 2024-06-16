@@ -106,6 +106,37 @@ namespace big
 		return (*(int*)(*screenshot_module + 0x14) != -1);
 	}
 
+	FiringFunctionData* get_weapon_firing()
+	{
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return nullptr;
+
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return nullptr;
+
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return nullptr;
+
+		const auto local_soldier = local_player->GetSoldier();
+		if (!local_soldier) return nullptr;
+
+		if (local_soldier->IsAlive())
+		{
+			const auto weapon = WeaponFiring::GetInstance();
+			if (!weapon) return nullptr;
+
+			const auto primary_fire = weapon->m_pPrimaryFire;
+			if (!primary_fire) return nullptr;
+
+			const auto firing_data = primary_fire->m_FiringData;
+			if (!firing_data) return nullptr;
+
+			return firing_data;
+		}
+
+		return nullptr;
+	}
+
 	int generate_random_int(int min, int max)
 	{
 		std::random_device dev;

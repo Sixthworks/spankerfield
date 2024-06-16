@@ -23,6 +23,10 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
+		// Vehicle check
+		ClientVehicleEntity* vehicle = local_player->GetVehicle();
+		if (vehicle && !g_settings.crosshair_in_vehicles) return;
+
 		// Positions
 		ImVec2 screen_center = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y / 2.0f);
 		ImVec2 horizontal_start = ImVec2(screen_center.x - g_settings.crosshair_size / 2.0f, screen_center.y);

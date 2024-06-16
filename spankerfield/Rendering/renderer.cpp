@@ -98,7 +98,7 @@ namespace big
 		ImGui::NewFrame();
 
 		g_features->draw();
-		
+
 		mouse_act();
 		if (g_gui.m_opened)
 			g_gui.dx_on_tick();

@@ -12,6 +12,9 @@
 #include "Risky/risky.h"
 #include "Overheat/overheat.h"
 #include "Infantry Alert/infantry_alert.h"
+#include "Screenshots/screenshots.h"
+#include "Health Bar/health_bar.h"
+#include "Anti AFK/anti_afk.h"
 
 namespace big
 {

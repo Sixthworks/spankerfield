@@ -36,7 +36,7 @@ namespace plugins
 		if (!local_vehicle) return;
 
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
-		if (!vehicle_data) return;
+		if (!IsValidPtrWithVTable(vehicle_data)) return;
 
 		if (vehicle_data->IsInJet())
 		{
@@ -47,8 +47,9 @@ namespace plugins
 			if (!input) return;
 
 			Vector3 vehicle_velocity = *local_soldier->GetVelocity();
-			auto velocity = sqrt(pow(vehicle_velocity.x, 2) + pow(vehicle_velocity.y, 2) + pow(vehicle_velocity.z, 2)) * 3.6f;
+			if (vehicle_velocity.x == 0.0f && vehicle_velocity.y == 0.0f && vehicle_velocity.z == 0.0f) return;
 
+			auto velocity = sqrt(pow(vehicle_velocity.x, 2) + pow(vehicle_velocity.y, 2) + pow(vehicle_velocity.z, 2)) * 3.6f;
 			if (velocity < 314.f && velocity > 312.f)
 			{
 				input[ConceptMoveForward] = 1.0f;

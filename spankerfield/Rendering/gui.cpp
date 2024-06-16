@@ -154,6 +154,40 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
 				ImGui::PopItemWidth();
 
+				ImGui::Separator();
+
+				// Not the best way
+				ImGui::Text(xorstr_("Weapon editor"));
+
+				static bool enable_editor = false;
+				ImGui::Checkbox(xorstr_("Enable weapon editor"), &enable_editor);
+
+				if (enable_editor)
+				{
+					const auto data = get_weapon_firing();
+					if (IsValidPtrWithVTable(data))
+					{
+						ImGui::PushItemWidth(300.f);
+						ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 5);
+						ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 5);
+						ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 5);
+						ImGui::PopItemWidth();
+
+						ImGui::Text(xorstr_("Speed"));
+						ImGui::PushItemWidth(300.f);
+						ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.5f, 10.f);
+						ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.5f, 10.f);
+						ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.5f, 10.f);
+						ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.5f, 10.f);
+						ImGui::PopItemWidth();
+
+						ImGui::Text(xorstr_("Other"));
+						ImGui::PushItemWidth(300.f);
+						ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.5f, 10.f);
+						ImGui::PopItemWidth();
+					}
+				}
+
 				ImGui::EndTabItem();
 			}
 
@@ -236,6 +270,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw crosshair"), &g_settings.draw_crosshair);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw shadow"), &g_settings.crosshair_shadow);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw in vehicles"), &g_settings.crosshair_in_vehicles);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Crosshair size"), &g_settings.crosshair_size, 0.1f, 100.f);
 				ImGui::SliderFloat(xorstr_("Crosshair thickness"), &g_settings.crosshair_thickness, 1.f, 100.f);
@@ -264,6 +300,48 @@ namespace big
 
 				color_wrapper(xorstr_("Bones##SKC"), &g_settings.skeleton_color);
 
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Draw personal health bar"), &g_settings.draw_health_bar);
+				ImGui::Checkbox(xorstr_("Player health"), &g_settings.health_bar_soldier);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Vehicle health"), &g_settings.health_bar_vehicle);
+
+				ImGui::Text(xorstr_("Size"));
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Width##HB"), &g_settings.health_bar_width, 1.f, (float)g_globals.g_width);
+				ImGui::SliderFloat(xorstr_("Height##HB"), &g_settings.health_bar_height, 1.f, (float)g_globals.g_height);
+				ImGui::PopItemWidth();
+
+				ImGui::Separator();
+
+				ImGui::Text(xorstr_("Position"));
+
+				ImGui::Checkbox(xorstr_("Use centered X position"), &g_settings.health_bar_use_center_x);
+				if (!g_settings.health_bar_use_center_x)
+				{
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("X##HB"), &g_settings.health_bar_x, 1.f, (float)g_globals.g_width);
+					ImGui::PopItemWidth();
+
+					ImGui::SameLine();
+				}
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Y##HB"), &g_settings.health_bar_y, 1.f, (float)g_globals.g_height);
+				ImGui::PopItemWidth();
+
+				ImGui::Text(xorstr_("Specifics"));
+
+				ImGui::Checkbox(xorstr_("Use health based color"), &g_settings.health_bar_use_default_color);
+				if (!g_settings.health_bar_use_default_color)
+					color_wrapper(xorstr_("Bar##HB"), &g_settings.health_bar_color);
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Spacing between health bars##HB"), &g_settings.health_bar_spacing, 1.f, 100.f);
+				ImGui::PopItemWidth();
+
 				ImGui::EndTabItem();
 			}
 
@@ -274,8 +352,7 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
 
-				ImGui::Separator();
-
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
 
 				ImGui::Separator();
@@ -310,7 +387,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Positioning"));
+				ImGui::Text(xorstr_("Positioning (Raw drawing)"));
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("X##SP"), &g_settings.spectator_x, 0.f, (float)g_globals.g_width);
@@ -341,6 +418,26 @@ namespace big
 
 				ImGui::Separator();
 
+				ImGui::Checkbox(xorstr_("Use default screen position"), &g_settings.infantry_alert_use_default_pos);
+				if (!g_settings.infantry_alert_use_default_pos)
+				{
+					ImGui::Text(xorstr_("Position"));
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("X##IA"), &g_settings.infantry_alert_x, 0.f, (float)g_globals.g_width);
+					ImGui::SameLine();
+					ImGui::SliderFloat(xorstr_("Y##IA"), &g_settings.infantry_alert_y, 0.f, (float)g_globals.g_height);
+					ImGui::PopItemWidth();
+					
+					// If we add this section give it a space
+					ImGui::Spacing();
+				}
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Text size"), &g_settings.infantry_alert_text_size, 1.f, 150.f);
+				ImGui::PopItemWidth();
+
+				ImGui::Separator();
+
 				ImGui::Text(xorstr_("Colors"));
 				color_wrapper(xorstr_("Text##IALRT"), &g_settings.infantry_alert_color);
 
@@ -366,12 +463,22 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No hardcore restrictions"), &g_settings.no_hc_restrictions);
 
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Anti-AFK"), &g_settings.anti_afk);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Timer"), &g_settings.anti_afk_timer, 0, 180000);
+				ImGui::PopItemWidth();
+
 				ImGui::EndTabItem();
 			}
 
 			if (ImGui::BeginTabItem(xorstr_("Blacklist")))
 			{
 				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &g_settings.blacklist);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
+				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Text color"));
 
@@ -417,6 +524,15 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Settings")))
 			{
+				ImGui::Checkbox(xorstr_("Draw PB & FF screenshots amount"), &g_settings.screenshots);
+				ImGui::SameLine();
+				
+				if (ImGui::Button(xorstr_("Reset counters")))
+				{
+					g_globals.screenshots_ff = NULL;
+					g_globals.screenshots_pb = NULL;
+				}
+
 				ImGui::Separator();
 				
 				ImGui::Text(xorstr_("Config"));
@@ -433,6 +549,10 @@ namespace big
 
 				if (ImGui::Button(xorstr_("Unload")))
 					g_globals.g_running = false;
+
+				ImGui::SameLine();
+
+				ImGui::Text(fmt::format(xorstr_("Release rev {}"), xorstr_(__DATE__)).c_str());
 
 				ImGui::EndTabItem();
 			}

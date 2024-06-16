@@ -85,16 +85,13 @@ namespace plugins
 
 			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
 			float distance = get_distance(pos, local_pos);
-			float health_player = 0.f, max_health_player = 0.f;
 			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 
 			ClientVehicleEntity* vehicle = player->GetVehicle();
-
 			if (!g_settings.esp_draw_vehicles && vehicle)
 				continue;
 
-			float health_vehicle = 0.f, max_health_vehicle = 0.f;
-
+			float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
 			if (IsValidPtr(vehicle))
 			{
 				if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)

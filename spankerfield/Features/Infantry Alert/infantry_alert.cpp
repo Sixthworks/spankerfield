@@ -83,21 +83,9 @@ namespace plugins
 			if (distance > g_settings.infantry_alert_distance)
 				continue;
 
-			/*
-			TODO: Aim assist angles are Vec2, figure out a way with Vec3
-			Right now it's just a distance check without FOV :(
-			
-			Vector3 angle = calc_angle(local_pos, pos);
-			Vector3 eye_angles = { aim_assist->m_AimAngles.x, aim_assist->m_AimAngles.y, 0.f };
-
-			float fov = calc_fov(eye_angles, angle);
-			if (fov < 70.0f)
-				continue;
-			*/
-
 			if (!drawing)
 			{
-				m_drawing->AddText(g_globals.g_width / 2.f, (g_globals.g_height / 2.f) + 100.f, g_settings.infantry_alert_color, 20.f, FL_CENTER_X, xorstr_("Enemy nearby"));
+				m_drawing->AddText(g_settings.infantry_alert_use_default_pos ? g_globals.g_width / 2.f : g_settings.infantry_alert_x, g_settings.infantry_alert_use_default_pos ? (g_globals.g_height / 2.f) + 100.f : g_settings.infantry_alert_y, g_settings.infantry_alert_color, g_settings.infantry_alert_text_size, FL_CENTER_X, xorstr_("Enemy nearby"));
 				drawing = true;
 			}
 		}

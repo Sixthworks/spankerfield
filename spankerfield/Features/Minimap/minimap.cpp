@@ -55,7 +55,7 @@ namespace plugins
 				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
 				if (!IsValidPtrWithVTable(map)) continue;
 
-				map->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
@@ -70,7 +70,7 @@ namespace plugins
 				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
 				if (!IsValidPtrWithVTable(map)) continue;
 
-				map->activeSpotType = !g_globals.g_punkbuster && !g_globals.g_fairfight ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}

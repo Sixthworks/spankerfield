@@ -149,7 +149,7 @@ namespace plugins
 	{
 		if (!g_settings.blacklist) return;
 
-		if (GetTickCount64() - g_globals.g_blcheck > 5000)
+		if (GetTickCount64() - g_globals.g_blcheck > 2000)
 		{
 			g_thread_pool->push([&]
 			{
@@ -196,7 +196,7 @@ namespace plugins
 					if (nickname != bl.name)
 						request_name_change(bl.name);
 
-					m_drawing->AddText(g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, 26.f, FL_CENTER_X, bl.name.c_str());
+					m_drawing->AddText(g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, g_settings.blacklist_text_size, FL_CENTER_X, bl.name.c_str());
 					offset += 20.f;
 				}
 			}

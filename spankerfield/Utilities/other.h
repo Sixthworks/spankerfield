@@ -15,6 +15,7 @@ namespace big
 
 	IDXGISwapChain* get_swapchain();
 	bool punkbuster_capturing();
+	FiringFunctionData* get_weapon_firing();
 
 	int generate_random_int(int min, int max);
 	float generate_random_float(float min, float max);

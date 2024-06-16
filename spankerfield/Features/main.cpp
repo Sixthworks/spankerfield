@@ -6,8 +6,10 @@ namespace big
 {
 	void features::draw()
 	{
+		plugins::draw_screenshots();
 		plugins::draw_crosshair();
 		plugins::draw_spectators();
+		plugins::draw_health_bar();
 		plugins::draw_esp();
 
 		if (g_settings.aimbot)
@@ -28,6 +30,7 @@ namespace big
 			plugins::aimbot(delta_time);
 		}
 
+		plugins::anti_afk();
 		plugins::unlock_all();
 		plugins::no_hc_restrictions();
 		plugins::no_recoil();

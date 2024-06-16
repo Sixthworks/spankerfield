@@ -24,9 +24,18 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		const bool valid = IsValidPtr(local_soldier->m_pWeaponComponent) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()) && IsValidPtr(local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming) && local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
-		if (!valid) return;
-		
+		const auto component = local_soldier->m_pWeaponComponent;
+		if (!component) return;
+
+		const auto weapon = component->GetActiveSoldierWeapon();
+		if (!weapon) return;
+
+		const auto aiming = weapon->m_pAuthoritativeAiming;
+		if (!aiming) return;
+
+		const auto yaw = aiming->m_Yaw;
+		if (!yaw) return;
+
 		// Radar itself
 		m_drawing->DrawFillArea(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, ImColor(0, 0, 0, 160));
 		m_drawing->AddCircleFilled(ImVec2(g_settings.radar_x + g_settings.radar_width / 2.0f, g_settings.radar_y + g_settings.radar_height / 2.0f), 3.5f, ImColor(255, 255, 255, 175));
@@ -52,8 +61,7 @@ namespace plugins
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 
 			float distance = get_distance(pos, local_pos);
-
-			double angle = -(double)local_soldier->m_pWeaponComponent->GetActiveSoldierWeapon()->m_pAuthoritativeAiming->m_Yaw;
+			double angle = -(double)yaw;
 
 			float difference_z = local_pos.z - pos.z;
 			float difference_x = local_pos.x - pos.x;

@@ -339,7 +339,7 @@ namespace plugins
 
 	void draw_fov()
 	{
-		if (!g_settings.aim_fov_method || !g_settings.aim_draw_fov) return;
+		if (!g_settings.aim_fov_method) return;
 
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return;

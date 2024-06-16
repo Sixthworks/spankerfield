@@ -146,10 +146,12 @@
     <ClCompile Include="common.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Features\Aimbot\aimbot.cpp" />
+    <ClCompile Include="Features\Anti AFK\anti_afk.cpp" />
     <ClCompile Include="Features\Blacklist\blacklist.cpp" />
     <ClCompile Include="Features\Crosshair\crosshair.cpp" />
     <ClCompile Include="Features\ESP\esp.cpp" />
     <ClCompile Include="Features\Explosives\explosives.cpp" />
+    <ClCompile Include="Features\Health Bar\health_bar.cpp" />
     <ClCompile Include="Features\Infantry Alert\infantry_alert.cpp" />
     <ClCompile Include="Features\Jet Speed\jetspeed.cpp" />
     <ClCompile Include="Features\main.cpp" />
@@ -158,6 +160,7 @@
     <ClCompile Include="Features\Overheat\overheat.cpp" />
     <ClCompile Include="Features\Radar\radar.cpp" />
     <ClCompile Include="Features\Risky\risky.cpp" />
+    <ClCompile Include="Features\Screenshots\screenshots.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -198,13 +201,16 @@
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="Features\Aimbot\aimbot.h" />
+    <ClInclude Include="Features\Anti AFK\anti_afk.h" />
     <ClInclude Include="Features\Blacklist\blacklist.h" />
     <ClInclude Include="Features\Crosshair\crosshair.h" />
+    <ClInclude Include="Features\Health Bar\health_bar.h" />
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="Features\Missiles\missiles.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
     <ClInclude Include="Features\Risky\risky.h" />
+    <ClInclude Include="Features\Screenshots\screenshots.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\font.h" />
