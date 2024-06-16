@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma comment(lib, "Winmm.lib")
+
 #include <SDKDDKVer.h>
 #include <Windows.h>
 #include <TlHelp32.h>

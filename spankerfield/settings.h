@@ -123,6 +123,9 @@ namespace big
 		float spectator_y{ 565.f };
 		ImColor spectator_color{ 255, 255, 255, 255 };
 
+		bool kill_sound;
+		char kill_sound_path[MAX_PATH];
+
 		bool minimap{ true };
 		bool obs_check{ true };
 		bool screenshots{ true };
@@ -269,6 +272,11 @@ namespace big
 			g_settings.spectator_y = j[xorstr_("settings")][xorstr_("spectator_y")];
 			g_settings.spectator_color = string_to_color(j[xorstr_("settings")][xorstr_("spectator_color")]);
 
+			g_settings.kill_sound = j[xorstr_("settings")][xorstr_("kill_sound")];
+			std::string sound_path_str = j["settings"]["kill_sound_path"].get<std::string>();
+			strncpy_s(g_settings.kill_sound_path, sizeof(g_settings.kill_sound_path), sound_path_str.c_str(), MAX_PATH - 1);
+			g_settings.kill_sound_path[sound_path_str.size()] = '\0';
+
 			g_settings.minimap = j[xorstr_("settings")][xorstr_("minimap")];
 			g_settings.obs_check = j[xorstr_("settings")][xorstr_("obs_check")];
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
@@ -370,6 +378,8 @@ namespace big
 						{ xorstr_("spectator_x"), g_settings.spectator_x },
 						{ xorstr_("spectator_y"), g_settings.spectator_y },
 			            { xorstr_("spectator_color"), color_to_string(g_settings.spectator_color) },
+			            { xorstr_("kill_sound"), g_settings.kill_sound },
+			            { xorstr_("kill_sound_path"), g_settings.kill_sound_path },
 						{ xorstr_("minimap"), g_settings.minimap },
 						{ xorstr_("obs_check"), g_settings.obs_check },
 						{ xorstr_("screenshots"), g_settings.screenshots },

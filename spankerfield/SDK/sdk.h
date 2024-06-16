@@ -27,6 +27,9 @@
 #define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
 #define OFFSET_TAKESCREENSHOT         0x14015D4F0 // fb::PunkbusterScreenshot::TakeScreenshot()
 
+// https://www.unknowncheats.me/forum/battlefield-4/133815-getting-clientplayerscore-k-d-etc-without-calling-game-function.html
+#define OFFSET_SOMESCOREMANAGER       0x1423822D8 // 48 8B 05 ? ? ? ? 4C 8B 60 18 (https://www.unknowncheats.me/forum/1044753-post19.html)
+
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
@@ -156,6 +159,9 @@ class WeaponSway;
 class GunSwayData;
 class VeniceClientMissileEntity;
 class MissileEntityData;
+class ClientPlayerScoreManager;
+class ClientPlayerScore;
+class SomeScoreManagerClass;
 
 template<typename T>
 struct WeakToken
@@ -3225,6 +3231,49 @@ public:
 	virtual void unkn20();
 	virtual void GetAABB(TransformAABBStruct* mataabb); //22
 	virtual void GetTransform(Matrix* mTransform); //23
+};
+
+class ClientPlayerScore
+{
+public:
+	class Score
+	{
+	public:
+		__int32 m_rank;
+		__int32 m_kills;
+		__int32 m_deaths;
+		__int32 m_ScoreMultiplier;
+		__int32 m_score;
+		__int32 m_globalScoreOrginal;
+		__int32 m_globalScoreUpdated;
+		__int32 m_veteran;
+	};
+
+	char _0x00[0x02F8];
+	Score m_playerScore;
+};
+
+class ClientPlayerScoreManager
+{
+public:
+	ClientPlayerScore* getScore(ClientPlayer* player)
+	{
+		typedef ClientPlayerScore* (__thiscall* tgetPlayerScore)(ClientPlayerScoreManager*, ClientPlayer* player);
+		tgetPlayerScore getPlayerScore = (tgetPlayerScore)0x14022C2D0;
+		return getPlayerScore(this, player);
+	}
+};
+
+class SomeScoreManagerClass
+{
+public:
+	char pad[0x18];
+	ClientPlayerScoreManager* m_pScoreManager;
+
+	static SomeScoreManagerClass* GetInstance()
+	{
+		return  *reinterpret_cast<SomeScoreManagerClass**>(OFFSET_SOMESCOREMANAGER);
+	}
 };
 
 template <class T>

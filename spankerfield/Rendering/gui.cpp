@@ -160,7 +160,7 @@ namespace big
 				ImGui::Text(xorstr_("Weapon editor"));
 
 				static bool enable_editor = false;
-				ImGui::Checkbox(xorstr_("Enable weapon editor"), &enable_editor);
+				ImGui::Checkbox(xorstr_("Enable weapon editor (Risk)"), &enable_editor);
 
 				if (enable_editor)
 				{
@@ -459,9 +459,9 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
+				ImGui::Checkbox(xorstr_("Unlock everything (BF4DB risk)"), &g_settings.unlock_all);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("No hardcore restrictions"), &g_settings.no_hc_restrictions);
+				ImGui::Checkbox(xorstr_("No hardcore restrictions (PBSS risk)"), &g_settings.no_hc_restrictions);
 
 				ImGui::Separator();
 
@@ -469,6 +469,14 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Timer"), &g_settings.anti_afk_timer, 0, 180000);
 				ImGui::PopItemWidth();
+
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Kill sound (FFSS risk)"), &g_settings.kill_sound);
+				ImGui::PushItemWidth(400.f);
+				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
+				ImGui::PopItemWidth();
+				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is an audio file..."));
 
 				ImGui::EndTabItem();
 			}

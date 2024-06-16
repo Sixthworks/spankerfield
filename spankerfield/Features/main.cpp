@@ -30,6 +30,7 @@ namespace big
 		plugins::no_hc_restrictions();
 		plugins::no_recoil();
 		plugins::overheat_control();
+		plugins::kill_sound();
 
 		if (g_settings.aimbot)
 		{

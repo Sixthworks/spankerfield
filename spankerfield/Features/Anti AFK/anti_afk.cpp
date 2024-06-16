@@ -31,8 +31,8 @@ namespace plugins
 			if (!input) return;
 
 			// Shouldn't interrupt anything
-			input[ConceptBattledashToggle] = 1.f;
-			input[ConceptBattledashToggle] = 0.f;
+			input[ConceptToggleChat] = 1.f;
+			input[ConceptToggleChat] = 0.f;
 
 			g_globals.g_afkcheck = GetTickCount64();
 		}
