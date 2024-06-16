@@ -19,6 +19,7 @@ namespace big
 
 	int generate_random_int(int min, int max);
 	float generate_random_float(float min, float max);
+	std::string get_random_string(const std::vector<std::string>& strings);
 
 	std::string current_time();
 	bool is_process_running(const wchar_t* process_name);

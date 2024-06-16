@@ -4,6 +4,7 @@
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/other.h"
+#include "../../Rendering/nicknames.h"
 
 using namespace big;
 namespace plugins
@@ -39,6 +40,7 @@ namespace plugins
 		m_drawing->AddLine(ImVec2(pos_1.x, pos_1.y), ImVec2(pos_2.x, pos_2.y), color);
 	}
 
+	std::map<uint64_t, std::string> streamer_personas{};
 	void draw_esp()
 	{
 		if (!g_settings.esp) return;
@@ -84,6 +86,23 @@ namespace plugins
 			Vector2 box_coords[2];
 
 			const char* nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
+			
+			// Streamer mode
+			if (g_settings.streamer_mode)
+			{
+				// Player ID
+				uint64_t persona_id = player->m_onlineId.m_personaid;
+				
+				// Saving the nickname for that player in memory so they are consistent
+				if (persona_id != NULL)
+				{
+					if (streamer_personas.count(persona_id) <= 0)
+						streamer_personas[persona_id] = get_random_string(weird_nicknames);
+				}
+
+				nickname = streamer_personas[persona_id].empty() ? xorstr_("Unknown") : streamer_personas[persona_id].c_str();
+			}
+
 			float distance = get_distance(pos, local_pos);
 			RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
 

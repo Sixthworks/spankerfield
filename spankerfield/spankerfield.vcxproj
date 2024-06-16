@@ -157,6 +157,7 @@
     <ClCompile Include="Features\main.cpp" />
     <ClCompile Include="Features\Minimap\minimap.cpp" />
     <ClCompile Include="Features\Missiles\missiles.cpp" />
+    <ClCompile Include="Features\Name Spoofer\name_spoofer.cpp" />
     <ClCompile Include="Features\Overheat\overheat.cpp" />
     <ClCompile Include="Features\Radar\radar.cpp" />
     <ClCompile Include="Features\Risky\risky.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="Features\Health Bar\health_bar.h" />
     <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="Features\Missiles\missiles.h" />
+    <ClInclude Include="Features\Name Spoofer\name_spoofer.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
     <ClInclude Include="Features\Risky\risky.h" />
@@ -215,6 +217,7 @@
     <ClInclude Include="Rendering\bone_manager.h" />
     <ClInclude Include="Rendering\font.h" />
     <ClInclude Include="Rendering\gui.h" />
+    <ClInclude Include="Rendering\nicknames.h" />
     <ClInclude Include="Rendering\renderer.h" />
     <ClInclude Include="SDK\class_info.h" />
     <ClInclude Include="settings.h" />

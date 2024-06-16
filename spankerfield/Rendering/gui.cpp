@@ -534,7 +534,31 @@ namespace big
 				}
 
 				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Spoof local name"), &g_settings.spoof_name);
+				ImGui::SameLine();
 				
+				if (ImGui::Button(xorstr_("Restore local name")))
+				{
+					*g_settings.spoofed_name = '\0';
+
+					g_settings.spoof_restore = true;
+				}
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::InputText(xorstr_("Nickname"), g_settings.spoofed_name, 16);
+				ImGui::PopItemWidth();
+
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
+
+				ImGui::Spacing();
+				
+				ImGui::Text(xorstr_("This affects ESP and Spectator List only!"));
+				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
+
+				ImGui::Separator();
+
 				ImGui::Text(xorstr_("Config"));
 
 				if (ImGui::Button(xorstr_("Load")))
@@ -552,7 +576,7 @@ namespace big
 
 				ImGui::SameLine();
 
-				ImGui::Text(fmt::format(xorstr_("Release rev {}"), xorstr_(__DATE__)).c_str());
+				ImGui::Text(fmt::format(xorstr_("Release rev: {}"), xorstr_(__DATE__)).c_str());
 
 				ImGui::EndTabItem();
 			}

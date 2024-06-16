@@ -10,7 +10,7 @@ namespace big
 {
 	float degrees_to_radians(float degrees)
 	{
-		return degrees * (PI / 180.0f);
+		return degrees * ((float)(PI) / 180.0f);
 	}
 
 	float get_fov_radius(float fov_degrees, float screen_width, float screen_height)
@@ -22,20 +22,20 @@ namespace big
 
 	void normalize_angle(Vector2& angle)
 	{
-		if (angle.x <= -PI)
-			angle.x += 2 * PI;
-		if (angle.x > PI)
-			angle.x -= 2 * PI;
-		if (angle.y <= -PI_2)
-			angle.y += PI;
-		if (angle.y > PI_2)
-			angle.y -= PI;
+		if (angle.x <= (float)(-PI))
+			angle.x += 2.0f * (float)(PI);
+		if (angle.x > (float)(PI))
+			angle.x -= 2.0f * (float)(PI);
+		if (angle.y <= (float)(-PI_2))
+			angle.y += (float)(PI);
+		if (angle.y > (float)(PI_2))
+			angle.y -= (float)(PI);
 	}
 
 	void cerp_angle(Vector2& from, Vector2& to, float step_x, float step_y)
 	{
-		float CubicStepX = (1 - cos(step_x * PI)) / 2;
-		float CubicStepY = (1 - cos(step_y * PI)) / 2;
+		float CubicStepX = (1 - cos(step_x * (float)(PI))) / 2;
+		float CubicStepY = (1 - cos(step_y * (float)(PI))) / 2;
 
 		Vector2 Delta = (to - from);
 		normalize_angle(Delta);
@@ -69,6 +69,6 @@ namespace big
 		if (!screen)
 			return Vector2(0, 0);
 
-		return Vector2(screen->m_Width, screen->m_Height);
+		return Vector2((float)screen->m_Width, (float)screen->m_Height);
 	}
 }

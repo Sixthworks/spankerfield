@@ -1,6 +1,7 @@
 #pragma once
 #include "../SDK/sdk.h"
 
+// Honestly this is utterly fucking retarded
 std::map<UpdatePoseResultData::BONES, std::string> bone_map
 {
 	{ UpdatePoseResultData::BONES::Reference, xorstr_("Reference") },

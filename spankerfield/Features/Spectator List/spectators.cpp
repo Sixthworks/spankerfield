@@ -26,6 +26,8 @@ namespace plugins
 		std::vector<std::string> spectators{};
 
 		// Filling the vector with spectators
+		int censoreds = 0;
+
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
@@ -41,7 +43,15 @@ namespace plugins
 				// https://github.com/headmax/Cplus/blob/master/Projet4/esp.h#L406=
 				// https://github.com/headmax/Cplus/blob/master/Projet4/bfsdk.h#L6576=
 
-				const char* nickname = IsValidPtr(player->m_Name) ? (player == local_player ? (std::string(xorstr_("(You) ")) + std::string(player->m_Name)).c_str() : player->m_Name) : xorstr_("Unknown");
+				const char* nickname{};
+				if (g_settings.streamer_mode)
+				{
+					nickname = player == local_player ? xorstr_("You") : std::string(xorstr_("Censored ") + std::to_string(censoreds)).c_str();
+					censoreds++;
+				}
+				else
+					nickname = IsValidPtr(player->m_Name) ? (player == local_player ? (std::string(xorstr_("(You) ")) + std::string(player->m_Name)).c_str() : player->m_Name) : xorstr_("Unknown");
+				
 				spectators.push_back(nickname);
 			}
 		}

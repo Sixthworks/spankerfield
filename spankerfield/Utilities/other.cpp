@@ -167,6 +167,19 @@ namespace big
 		return str;
 	};
 
+	std::string get_random_string(const std::vector<std::string>& strings)
+	{
+		if (strings.empty())
+			return "";
+
+		std::random_device rd;
+		std::mt19937 generator(rd());
+		std::uniform_int_distribution<size_t> distribution(0, strings.size() - 1);
+
+		size_t random_index = distribution(generator);
+		return strings[random_index];
+	}
+
 	bool is_process_running(const wchar_t* process_name)
 	{
 		PROCESSENTRY32 entry;

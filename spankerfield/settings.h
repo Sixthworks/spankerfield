@@ -11,6 +11,13 @@ namespace big
 		ImColor blacklist_color{ 255, 0, 0, 255 };
 		float blacklist_text_size{ 26.f };
 
+		bool streamer_mode;
+
+		bool spoof_name;
+		bool spoof_restore;
+		char original_name[16];
+		char spoofed_name[16];
+
 		bool aimbot;
 		bool aim_fov_method{ true };
 		bool aim_draw_fov;
@@ -23,7 +30,7 @@ namespace big
 		bool no_recoil;
 
 		bool anti_afk{ true };
-		int anti_afk_timer{ 90000 };
+		int anti_afk_timer{ 150000 };
 
 		bool unlock_all;
 		bool no_hc_restrictions;
@@ -155,6 +162,8 @@ namespace big
 			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
 			g_settings.blacklist_text_size = j[xorstr_("settings")][xorstr_("blacklist_text_size")];
 
+			g_settings.streamer_mode = j[xorstr_("settings")][xorstr_("streamer_mode")];
+
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
 			g_settings.aim_fov_method = j[xorstr_("settings")][xorstr_("aim_fov_method")];
 			g_settings.aim_draw_fov = j[xorstr_("settings")][xorstr_("aim_draw_fov")];
@@ -274,6 +283,7 @@ namespace big
 					    { xorstr_("blacklist"), g_settings.blacklist },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 					    { xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
+						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
 						{ xorstr_("esp"), g_settings.esp },
 						{ xorstr_("esp_draw_teammates"), g_settings.esp_draw_teammates },
 						{ xorstr_("esp_draw_vehicles"), g_settings.esp_draw_vehicles },

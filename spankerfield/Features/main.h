@@ -15,6 +15,7 @@
 #include "Screenshots/screenshots.h"
 #include "Health Bar/health_bar.h"
 #include "Anti AFK/anti_afk.h"
+#include "Name Spoofer/name_spoofer.h"
 
 namespace big
 {

@@ -24,17 +24,18 @@ namespace big
 
 	void features::pre_frame(float delta_time)
 	{
-		if (g_settings.aimbot)
-		{
-			m_PlayerManager.update_players();
-			plugins::aimbot(delta_time);
-		}
-
+		plugins::spoof_name();
 		plugins::anti_afk();
 		plugins::unlock_all();
 		plugins::no_hc_restrictions();
 		plugins::no_recoil();
 		plugins::overheat_control();
+
+		if (g_settings.aimbot)
+		{
+			m_PlayerManager.update_players();
+			plugins::aimbot(delta_time);
+		}
 
 		plugins::spot_minimap();
 		plugins::set_jet_speed();
