@@ -40,6 +40,21 @@ namespace plugins
 		m_drawing->DrawFillArea(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, ImColor(0, 0, 0, 160));
 		m_drawing->AddCircleFilled(ImVec2(g_settings.radar_x + g_settings.radar_width / 2.0f, g_settings.radar_y + g_settings.radar_height / 2.0f), 3.5f, ImColor(255, 255, 255, 175));
 
+		// Cross
+		m_drawing->AddLine(
+			ImVec2(g_settings.radar_x, g_settings.radar_y + g_settings.radar_height / 2.0f),
+			ImVec2(g_settings.radar_x + g_settings.radar_width, g_settings.radar_y + g_settings.radar_height / 2.0f),
+			ImColor(255, 255, 255, 175),
+			1.0f
+		);
+
+		m_drawing->AddLine(
+			ImVec2(g_settings.radar_x + g_settings.radar_width / 2.0f, g_settings.radar_y),
+			ImVec2(g_settings.radar_x + g_settings.radar_width / 2.0f, g_settings.radar_y + g_settings.radar_height),
+			ImColor(255, 255, 255, 175),
+			1.0f
+		);
+
 		// Dots
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
