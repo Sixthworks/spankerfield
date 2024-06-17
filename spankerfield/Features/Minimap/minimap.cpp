@@ -7,13 +7,14 @@
 using namespace big;
 namespace plugins
 {
+	static ULONGLONG last_check = 0;
 	void spot_minimap()
 	{
 		if (!g_settings.minimap) return;
 
 		if (g_settings.obs_check)
 		{
-			if (GetTickCount64() - g_globals.g_obscheck > 5000)
+			if (GetTickCount64() - last_check > 5000)
 			{
 				g_thread_pool->push([&]
 				{
@@ -21,8 +22,10 @@ namespace plugins
                     g_globals.g_obs = is_process_running(xorstr_(L"obs64.exe"));
 				});
 
-				g_globals.g_obscheck = GetTickCount64();
+				last_check = GetTickCount64();
 			}
+
+			if (g_globals.g_obs) return;
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();

@@ -5,12 +5,13 @@
 using namespace big;
 namespace plugins
 {
+	static ULONGLONG last_check = 0;
 	void anti_afk()
 	{
 		if (!g_settings.anti_afk) return;
 
 		// Most basic Anti-AFK ever
-		if (GetTickCount64() - g_globals.g_afkcheck > g_settings.anti_afk_timer)
+		if (GetTickCount64() - last_check > g_settings.anti_afk_timer)
 		{
 			const auto game_context = ClientGameContext::GetInstance();
 			if (!game_context) return;
@@ -34,7 +35,7 @@ namespace plugins
 			input[ConceptToggleChat] = 1.f;
 			input[ConceptToggleChat] = 0.f;
 
-			g_globals.g_afkcheck = GetTickCount64();
+			last_check = GetTickCount64();
 		}
 	}
 }

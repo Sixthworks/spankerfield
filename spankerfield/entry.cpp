@@ -28,12 +28,15 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 
 			auto logger_instance = std::make_unique<logger>();
+			std::unique_ptr<renderer> renderer_instance;
+			std::unique_ptr<thread_pool> thread_pool_instance;
+
 			try
 			{
-				auto renderer_instance = std::make_unique<renderer>();
+				renderer_instance = std::make_unique<renderer>();
 				LOG(INFO) << xorstr_("Renderer initialized.");
 
-				auto thread_pool_instance = std::make_unique<thread_pool>();
+				thread_pool_instance = std::make_unique<thread_pool>();
 				LOG(INFO) << xorstr_("Thread pool initialized.");
 
 				g_hooking->initialize();
@@ -59,14 +62,14 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 				g_hooking->uninitialize();
 				LOG(INFO) << xorstr_("MinHook uninitialized.");
 
-				Sleep(500);
-
 				renderer_instance.reset();
 				LOG(INFO) << xorstr_("Renderer uninitialized.");
 
 				g_thread_pool->destroy();
 				thread_pool_instance.reset();
 				LOG(INFO) << xorstr_("Thread pool uninitialized.");
+
+				Sleep(500);
 			}
 			catch (std::exception const& ex)
 			{

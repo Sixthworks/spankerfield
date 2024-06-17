@@ -13,8 +13,8 @@ namespace big
 
 		Matrix g_viewproj{};
 		bool g_running{ true };
-		int g_width{ 2560 };
-		int g_height{ 1440 };
+		int g_width{ 1920 };
+		int g_height{ 1080 };
 		
 		bool g_should_draw;
 		bool g_fairfight;
@@ -23,10 +23,6 @@ namespace big
 		int screenshots_pb;
 
 		bool g_obs;
-
-		ULONGLONG g_obscheck{};
-		ULONGLONG g_blcheck{};
-		ULONGLONG g_afkcheck{};
 	};
 
 	inline globals g_globals;

@@ -145,18 +145,19 @@ namespace plugins
 		parse_blacklist();
 	}
 
+	static ULONGLONG last_check = 0;
 	void draw_blacklisted()
 	{
 		if (!g_settings.blacklist) return;
 
-		if (GetTickCount64() - g_globals.g_blcheck > 2000)
+		if (GetTickCount64() - last_check > 2000)
 		{
 			g_thread_pool->push([&]
 			{
 				parse_blacklist();
 			});
 
-			g_globals.g_blcheck = GetTickCount64();
+			last_check = GetTickCount64();
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();
@@ -180,6 +181,7 @@ namespace plugins
 
 			auto nickname = IsValidPtr(player->m_Name) ? player->m_Name : xorstr_("Unknown");
 			auto id = player->m_onlineId.m_personaid;
+
 			for (const auto& bl : blacklisted)
 			{
 				if (id != bl.persona_id)

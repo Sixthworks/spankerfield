@@ -102,9 +102,8 @@ namespace big
 
 		aim_point = approximate_position(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 
-		if (zero_entry.m_ZeroDistance == -1.0f) {
+		if (zero_entry.m_ZeroDistance == -1.0f)
 			return 0.0f;
-		}
 
 		float zero_air_time = zero_entry.m_ZeroDistance / bullet_speed.Length();
 		float zero_drop = 0.5f * fabs(gravity) * zero_air_time * zero_air_time;

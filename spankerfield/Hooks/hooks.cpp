@@ -30,7 +30,6 @@ namespace big
 
 			bool result = FALSE;
 			{
-				std::lock_guard<std::mutex> lock(properLock);
 				std::this_thread::sleep_for(std::chrono::milliseconds(15));
 				if (oBitBlt)
 					result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
@@ -51,7 +50,6 @@ namespace big
 			g_globals.screenshots_pb++;
 
 			{
-				std::lock_guard<std::mutex> lock(properLock);
 				std::this_thread::sleep_for(std::chrono::milliseconds(15));
 				if (oTakeScreenshot)
 					oTakeScreenshot(pThis);
