@@ -21,7 +21,6 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 ImGui–based user interface,
 Unloading at runtime,
 Log console with g3log,
-Sorted features,
 Rendering through ImGui,
 Aimbot,
 Infantry alert,
@@ -33,9 +32,13 @@ Explosives ESP,
 Conrollable jet speed,
 Auto-spot,
 Spectator list,
+Health bar,
+Name spoofer,
+Streamer mode,
+Crosshair,
+Anti-AFK,
 PunkBuster bypass,
-FairFight bypass,
-XorString.
+FairFight bypass
 ```
 
 ### How to compile
