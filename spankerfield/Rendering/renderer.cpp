@@ -47,7 +47,7 @@ namespace big
 		ImFontConfig font_cfg{};
 		font_cfg.FontDataOwnedByAtlas = false;
 		
-		std::strcpy(font_cfg.Name, xorstr_("Oswald"));
+		std::strcpy(font_cfg.Name, xorstr_("Rubik"));
 
 		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
 			const_cast<std::uint8_t*>(font_main),
@@ -81,7 +81,9 @@ namespace big
 			if (!input->m_pMouse->m_pDevice->m_CursorMode)
 			{
 				// Additional fixes for mouse
-				input->m_pMouse->m_pDevice->m_UIOwnsInput, input->m_pMouse->m_pDevice->m_UseRawMouseInput, ImGui::GetIO().MouseDrawCursor = g_gui.m_opened;
+				input->m_pMouse->m_pDevice->m_UIOwnsInput = g_gui.m_opened;
+				input->m_pMouse->m_pDevice->m_UseRawMouseInput = g_gui.m_opened;
+				ImGui::GetIO().MouseDrawCursor = g_gui.m_opened;
 			}
 		}	
 	}

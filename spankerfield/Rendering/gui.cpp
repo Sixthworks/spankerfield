@@ -476,7 +476,7 @@ namespace big
 				ImGui::PushItemWidth(400.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
-				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is an audio file..."));
+				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is a WAVE audio file"));
 
 				ImGui::EndTabItem();
 			}
