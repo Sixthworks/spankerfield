@@ -53,7 +53,10 @@ Preprocessor arguments: _CRT_SECURE_NO_WARNINGS,
 Symbols: Unicode.
 ```
 
-### Planning to do
+### Planning to add
 ```
-Nothing.
+Better aimbot,
+Vehicle aimbot,
+Loadout editor,
+Kill say
 ```
