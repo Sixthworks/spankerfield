@@ -162,6 +162,7 @@ class MissileEntityData;
 class ClientPlayerScoreManager;
 class ClientPlayerScore;
 class SomeScoreManagerClass;
+class ClientChassisComponent;
 
 template<typename T>
 struct WeakToken
@@ -812,6 +813,156 @@ public:
 class Keyboard
 {
 public:
+
+	enum class InputKeys
+	{
+		IDK_None = 0,
+		IDK_Escape = 1,
+		IDK_1 = 2,
+		IDK_2 = 3,
+		IDK_3 = 4,
+		IDK_4 = 5,
+		IDK_5 = 6,
+		IDK_6 = 7,
+		IDK_7 = 8,
+		IDK_8 = 9,
+		IDK_9 = 10,
+		IDK_0 = 11,
+		IDK_Minus = 12,
+		IDK_Equals = 13,
+		IDK_Backspace = 14,
+		IDK_Tab = 15,
+		IDK_Q = 16,
+		IDK_W = 17,
+		IDK_E = 18,
+		IDK_R = 19,
+		IDK_T = 20,
+		IDK_Y = 21,
+		IDK_U = 22,
+		IDK_I = 23,
+		IDK_O = 24,
+		IDK_P = 25,
+		IDK_LeftBracket = 26,
+		IDK_RightBracket = 27,
+		IDK_Enter = 28,
+		IDK_LeftCtrl = 29,
+		IDK_A = 30,
+		IDK_S = 31,
+		IDK_D = 32,
+		IDK_F = 33,
+		IDK_G = 34,
+		IDK_H = 35,
+		IDK_J = 36,
+		IDK_K = 37,
+		IDK_L = 38,
+		IDK_Semicolon = 39,
+		IDK_Apostrophe = 40,
+		IDK_Grave = 41,
+		IDK_LeftShift = 42,
+		IDK_Backslash = 43,
+		IDK_Z = 44,
+		IDK_X = 45,
+		IDK_C = 46,
+		IDK_V = 47,
+		IDK_B = 48,
+		IDK_N = 49,
+		IDK_M = 50,
+		IDK_Comma = 51,
+		IDK_Period = 52,
+		IDK_Slash = 53,
+		IDK_RightShift = 54,
+		IDK_Multiply = 55,
+		IDK_LeftAlt = 56,
+		IDK_Space = 57,
+		IDK_Capital = 58,
+		IDK_F1 = 59,
+		IDK_F2 = 60,
+		IDK_F3 = 61,
+		IDK_F4 = 62,
+		IDK_F5 = 63,
+		IDK_F6 = 64,
+		IDK_F7 = 65,
+		IDK_F8 = 66,
+		IDK_F9 = 67,
+		IDK_F10 = 68,
+		IDK_Numlock = 69,
+		IDK_ScrollLock = 70,
+		IDK_Numpad7 = 71,
+		IDK_Numpad8 = 72,
+		IDK_Numpad9 = 73,
+		IDK_Subtract = 74,
+		IDK_Numpad4 = 75,
+		IDK_Numpad5 = 76,
+		IDK_Numpad6 = 77,
+		IDK_Add = 78,
+		IDK_Numpad1 = 79,
+		IDK_Numpad2 = 80,
+		IDK_Numpad3 = 81,
+		IDK_Numpad0 = 82,
+		IDK_Decimal = 83,
+		IDK_OEM_102 = 86,
+		IDK_F11 = 87,
+		IDK_F12 = 88,
+		IDK_F13 = 100,
+		IDK_F14 = 101,
+		IDK_F15 = 102,
+		IDK_Kana = 112,
+		IDK_PTBRSlash = 115,
+		IDK_Convert = 121,
+		IDK_NoConvert = 123,
+		IDK_Yen = 125,
+		IDK_PTBRNUMPADPOINT = 126,
+		IDK_NumpadEquals = 141,
+		IDK_PrevTrack = 144,
+		IDK_At = 145,
+		IDK_Colon = 146,
+		IDK_Underline = 147,
+		IDK_Kanji = 148,
+		IDK_Stop = 149,
+		IDK_Ax = 150,
+		IDK_Unlabeled = 151,
+		IDK_NextTrack = 153,
+		IDK_NumpadEnter = 156,
+		IDK_RightCtrl = 157,
+		IDK_Mute = 160,
+		IDK_Calculator = 161,
+		IDK_PlayPause = 162,
+		IDK_MediaStop = 164,
+		IDK_VolumeDown = 174,
+		IDK_VolumeUp = 176,
+		IDK_WebHome = 178,
+		IDK_NumpadComma = 179,
+		IDK_Divide = 181,
+		IDK_PrintScreen = 183,
+		IDK_RightAlt = 184,
+		IDK_Home = 199,
+		IDK_ArrowUp = 200,
+		IDK_PageUp = 201,
+		IDK_ArrowLeft = 203,
+		IDK_ArrowRight = 205,
+		IDK_End = 207,
+		IDK_ArrowDown = 208,
+		IDK_PageDown = 209,
+		IDK_Insert = 210,
+		IDK_Delete = 211,
+		IDK_LeftWin = 219,
+		IDK_RightWin = 220,
+		IDK_AppMenu = 221,
+		IDK_Power = 222,
+		IDK_Sleep = 223,
+		IDK_Wake = 227,
+		IDK_WebSearch = 229,
+		IDK_WebFavorites = 230,
+		IDK_WebRefresh = 231,
+		IDK_WebStop = 232,
+		IDK_WebForward = 233,
+		IDK_WebBack = 234,
+		IDK_MyComputer = 235,
+		IDK_Mail = 236,
+		IDK_MediaSelect = 237,
+		IDK_Pause = 197,
+		IDK_Undefined = 255
+	};
 
 	class KeyboardDevice
 	{
@@ -1928,11 +2079,44 @@ public:
 	bool IsAlive();
 };//Size=0x0148
 
+class ClientChassisComponent
+{
+public:
+	char pad_0000[208]; //0x0000
+	Vector4 N000007EB; //0x00D0
+	char pad_00E0[192]; //0x00E0
+	Vector3 m_PrevLinearVelocity; //0x01A0
+	char pad_01AC[4]; //0x01AC
+	Vector3 m_AngularVelocity; //0x01B0
+	char pad_01BC[4]; //0x01BC
+	Vector3 m_LinearVelocity; //0x01C0
+	char _0x01D0[48];
+};//Size=0x0200
+
 class ClientVehicleEntity : public ClientControllableEntity
 {
 public:
+	char _0x0188[320 + 8];
+	/*float m_waterLevel; //0x0240
+	float m_terrainLevel; //0x0244
+	float m_waterLevelUpdateTimer; //0x0248
+	float m_terrainLevelUpdateTime; //0x024C
+	AxisAlignedBox m_childrenAABB; //0x0250
+	char _0x0268[24];*/
+	Vector3 m_VelocityVec; //0x0280 
+	char _0x028C[4];
+	Vector3 m_prevVelocity; //0x0290 
+	float zero2; //0x029C
+	char pad_02A0[316]; //0x02A0
+	float N000003C6; //0x03DC
+	ClientChassisComponent* m_Chassis; //0x03E0
+	char pad_03E8[186]; //0x03E8
 
-};
+	ClientChassisComponent* GetChassisComponent()
+	{
+		return *(ClientChassisComponent**)((uintptr_t)this + 0x03E0);
+	}
+};//Size=0x0480
 
 class ClientSoldierEntity : public ClientControllableEntity
 {

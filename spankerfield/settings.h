@@ -116,6 +116,7 @@ namespace big
 		ImColor missiles_color{ 14, 231, 231, 255 };
 
 		bool jet_speed{ true };
+		bool jet_isActive{ true };
 
 		bool spectator_list{ true };
 		bool spectator_raw_drawing;
