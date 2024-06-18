@@ -13,6 +13,8 @@
 *.tlog
 *.log
 *.ipdb
+*.iobj
+*.recipe
 
 # Precompiled Headers
 *.gch

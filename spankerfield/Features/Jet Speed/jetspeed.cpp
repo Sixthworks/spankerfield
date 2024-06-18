@@ -38,16 +38,6 @@ namespace plugins
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
 		if (!IsValidPtrWithVTable(vehicle_data)) return;
 
-		if (GetAsyncKeyState(VK_XBUTTON2) & 0x0001)		// shit way to toggle on/off with 3rd person view keybind
-		{
-			g_settings.jet_isActive = !g_settings.jet_isActive;
-		}
-
-		if (GetAsyncKeyState(0x30) & 0x0001)
-		{
-			g_settings.jet_isActive = true;		// activate again cause of shit toggle
-		}
-
 		if ((vehicle_data->IsInJet())
 			&& (!border_input_node->m_pKeyboard->m_pDevice->m_Current[BYTE(Keyboard::InputKeys::IDK_Space)])	// disable while braking
 			&& (g_settings.jet_isActive))
