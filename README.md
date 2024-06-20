@@ -2,11 +2,11 @@
 If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
 
 ### Images
-![image](https://i.imgur.com/PscTJ7s.gif)
+![image](https://i.imgur.com/oIAjluQ.gif)
 
 ![image](https://i.imgur.com/ofC2zpF.png)
 
-![image](https://i.imgur.com/volKG7y.jpg)
+![image](https://i.imgur.com/zVPTuvl.png)
 
 ![image](https://i.imgur.com/xjrL0wq.jpg)
 
@@ -21,7 +21,6 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 ImGui–based user interface,
 Unloading at runtime,
 Log console with g3log,
-Sorted features,
 Rendering through ImGui,
 Aimbot,
 Infantry alert,
@@ -33,9 +32,13 @@ Explosives ESP,
 Conrollable jet speed,
 Auto-spot,
 Spectator list,
+Health bar,
+Name spoofer,
+Streamer mode,
+Crosshair,
+Anti-AFK,
 PunkBuster bypass,
-FairFight bypass,
-XorString.
+FairFight bypass
 ```
 
 ### How to compile
@@ -50,7 +53,12 @@ Preprocessor arguments: _CRT_SECURE_NO_WARNINGS,
 Symbols: Unicode.
 ```
 
-### Planning to do
+### Planning to add
 ```
-Nothing.
+Better aimbot,
+Vehicle aimbot,
+Loadout editor,
+Kill say
 ```
+
+I would be happy if anyone works on this cheat!
