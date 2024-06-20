@@ -3,7 +3,6 @@
 #include "Utilities/vtablehook.h"
 #include "Utilities/thread_pool.h"
 #include "Hooks/hooks.h"
-#include "MinHook.h"
 #include "global.h"
 #include "settings.h"
 

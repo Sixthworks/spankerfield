@@ -96,9 +96,8 @@ namespace big
 			}
 		}
 
-		if (shortest_air_time == FLT_MAX) {
+		if (shortest_air_time == FLT_MAX)
 			return 0.0f; // No valid solution found
-		}
 
 		aim_point = approximate_position(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 

@@ -24,18 +24,12 @@
 #define OFFSET_FIRSTTYPEINFO		  0x1423E41B8
 #define OFFSET_GETENTITYLIST		  0x1407CD5D0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x74\x0C\x48\x8B\x03\x48\x89\x05\x00\x00\x00\x00\xEB\x3F (not sure)
 #define OFFSET_SYNCEDBFSETTINGS		  0x1423717C0
-#define OFFSET_WEAPONSHOOTSPACE OFFSET_FIRING_WEAPON + 0x28
+#define OFFSET_WEAPONSHOOTSPACE       OFFSET_FIRING_WEAPON + 0x28
 #define OFFSET_TAKESCREENSHOT         0x14015D4F0 // fb::PunkbusterScreenshot::TakeScreenshot()
-
-// https://www.unknowncheats.me/forum/battlefield-4/133815-getting-clientplayerscore-k-d-etc-without-calling-game-function.html
-#define OFFSET_SOMESCOREMANAGER       0x1423822D8 // 48 8B 05 ? ? ? ? 4C 8B 60 18 (https://www.unknowncheats.me/forum/1044753-post19.html)
+#define OFFSET_SOMESCOREMANAGER       0x1423822D8 // 48 8B 05 ? ? ? ? 4C 8B 60 18 (https://www.unknowncheats.me/forum/battlefield-4/133815-getting-clientplayerscore-k-d-etc-without-calling-game-function.html + https://www.unknowncheats.me/forum/1044753-post19.html)
 
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
-
-#if !(defined _WIN64)
-#error Only for x64 systems.
-#endif
 
 #include "type_info.h"
 
@@ -49,11 +43,11 @@ constexpr bool IsValidPtr(PVOID p)
 #define MIN_VTABLE ((uint64_t)0x140000000)
 #define MAX_VTABLE ((uint64_t)0x14FFFFFFF)
 
-constexpr bool IsValidPtrWithVTable(void* p)
+constexpr bool IsValidPtrWithVTable(PVOID p)
 {
 	if (IsValidPtr(p))
 	{
-		void* vtable = *reinterpret_cast<void**>(p);
+		void* vtable = *reinterpret_cast<PVOID*>(p);
 		if (IsValidPtr(vtable) && reinterpret_cast<uint64_t>(vtable) > MIN_VTABLE && reinterpret_cast<uint64_t>(vtable) < MAX_VTABLE)
 			return true;
 	}

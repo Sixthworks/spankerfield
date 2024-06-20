@@ -111,7 +111,7 @@ namespace big
 					ImGui::Checkbox(xorstr_("Draw FOV"), &g_settings.aim_draw_fov);
 
 					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("FOV (pixels)##Aimbot"), &g_settings.aim_fov, 0.f, (float)g_globals.g_height);
+					ImGui::SliderFloat(xorstr_("FOV##Aimbot"), &g_settings.aim_fov, 0.f, (float)g_globals.g_height);
 					ImGui::PopItemWidth();
 
 					ImGui::Separator();
@@ -160,7 +160,7 @@ namespace big
 				ImGui::Text(xorstr_("Weapon editor"));
 
 				static bool enable_editor = false;
-				ImGui::Checkbox(xorstr_("Enable weapon editor (Risk)"), &enable_editor);
+				ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
 
 				if (enable_editor)
 				{
@@ -302,7 +302,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Checkbox(xorstr_("Draw personal health bar"), &g_settings.draw_health_bar);
+				ImGui::Checkbox(xorstr_("Draw health bar"), &g_settings.draw_health_bar);
 				ImGui::Checkbox(xorstr_("Player health"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Vehicle health"), &g_settings.health_bar_vehicle);
@@ -338,9 +338,13 @@ namespace big
 				if (!g_settings.health_bar_use_default_color)
 					color_wrapper(xorstr_("Bar##HB"), &g_settings.health_bar_color);
 
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Spacing between health bars##HB"), &g_settings.health_bar_spacing, 1.f, 100.f);
-				ImGui::PopItemWidth();
+				// Add spacing UI only if both are activated
+				if (g_settings.health_bar_soldier && g_settings.health_bar_vehicle)
+				{
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("Spacing between health bars##HB"), &g_settings.health_bar_spacing, 1.f, 100.f);
+					ImGui::PopItemWidth();
+				}
 
 				ImGui::EndTabItem();
 			}
@@ -348,12 +352,17 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Radar")))
 			{
 				ImGui::Checkbox(xorstr_("Radar"), &g_settings.radar);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw self##RDR"), &g_settings.radar_draw_you);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
-
+				
+				ImGui::Checkbox(xorstr_("Draw cross##RDR"), &g_settings.radar_cross);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
+				ImGui::Checkbox(xorstr_("Draw outline##RDR"), &g_settings.radar_outline);
 
 				ImGui::Separator();
 
@@ -371,6 +380,8 @@ namespace big
 
 				ImGui::Text(xorstr_("Colors"));
 
+				color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
+				color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
 				color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
 				color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
 				color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
@@ -450,7 +461,7 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Critical overheat value"), &g_settings.overheat_control_critical, 0.f, 1.f);
 				ImGui::PopItemWidth();
-				
+
 				ImGui::Spacing();
 
 				ImGui::Checkbox(xorstr_("Auto-spot"), &g_settings.minimap);
@@ -459,7 +470,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Unlock everything (BF4DB risk)"), &g_settings.unlock_all);
+				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No hardcore restrictions (PBSS risk)"), &g_settings.no_hc_restrictions);
 

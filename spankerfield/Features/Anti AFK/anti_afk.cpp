@@ -32,8 +32,8 @@ namespace plugins
 			if (!input) return;
 
 			// Shouldn't interrupt anything
-			input[ConceptToggleChat] = 1.f;
-			input[ConceptToggleChat] = 0.f;
+			input[ConceptJump] = 1.f;
+			input[ConceptJump] = 0.f;
 
 			last_check = GetTickCount64();
 		}

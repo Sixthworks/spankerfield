@@ -89,5 +89,9 @@ namespace plugins
 
 		settings->m_DisableHitIndicators = false;
 		settings->m_NoMinimap = false;
+		settings->m_NoMinimapSpotting = false;
+		settings->m_No3dSpotting = false;
+		settings->m_NoHud = false;
+		settings->m_NoNameTag = false;
 	}
 }

@@ -15,10 +15,7 @@ namespace big
 {
 	namespace ScreenshotCleaner
 	{
-		// Mutex
-		std::mutex properLock;
-
-		// FairFight
+		// FFSS
 		typedef BOOL(WINAPI* tBitBlt)(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
 		tBitBlt oBitBlt = nullptr;
 

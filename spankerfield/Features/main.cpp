@@ -25,13 +25,13 @@ namespace big
 	void features::pre_frame(float delta_time)
 	{
 		plugins::spoof_name();
-		plugins::anti_afk();
 		plugins::unlock_all();
+		plugins::anti_afk();
 		plugins::no_hc_restrictions();
 		plugins::no_recoil();
 		plugins::overheat_control();
 		plugins::kill_sound();
-
+		
 		if (g_settings.aimbot)
 		{
 			m_PlayerManager.update_players();
