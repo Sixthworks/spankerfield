@@ -40,7 +40,7 @@ namespace plugins
 				continue;
 
 			const auto vehicle = player->GetVehicle();
-			if (vehicle)
+			if (IsValidPtr(vehicle))
 			{
 				if (g_settings.infantry_alert_light_tech)
 				{
@@ -75,12 +75,12 @@ namespace plugins
 			Vector3 local_pos = (Vector3)local_transform.Transform.m[3];
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 
-			float difference_y = local_pos.y - pos.y;
-			if (difference_y > 75.f)
-				continue;
-
 			float distance = get_distance(pos, local_pos);
 			if (distance > g_settings.infantry_alert_distance)
+				continue;
+
+			float difference_y = local_pos.y - pos.y;
+			if (difference_y > 75.f)
 				continue;
 
 			if (!drawing)

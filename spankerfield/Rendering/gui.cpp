@@ -124,6 +124,7 @@ namespace big
 				ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
 				ImGui::PopItemWidth();
 
+				ImGui::Checkbox(xorstr_("Auto bone select"), &g_settings.aim_bone_priority);
 				ImGui::Text(xorstr_("Aim bone"));
 
 				static const char* text = g_settings.aim_bone < bone_map.size() ? bone_map[(UpdatePoseResultData::BONES)g_settings.aim_bone].c_str() : xorstr_("Unknown");
@@ -251,6 +252,9 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw health"), &g_settings.esp_draw_health);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Health location"), &g_settings.esp_health_location, 0, 2);
+				ImGui::PopItemWidth();
 
 				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);
 				ImGui::SameLine();
@@ -304,7 +308,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Checkbox(xorstr_("Draw health bar"), &g_settings.draw_health_bar);
+				ImGui::Checkbox(xorstr_("Draw personal health bar"), &g_settings.draw_health_bar);
 				ImGui::Checkbox(xorstr_("Player health"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Vehicle health"), &g_settings.health_bar_vehicle);

@@ -21,8 +21,9 @@ namespace big
 		bool aimbot;
 		bool aim_must_be_visible{ true };
 		bool aim_fov_method{ true };
+		bool aim_bone_priority{ true };
 		bool aim_draw_fov;
-		float aim_fov{ 90.f };
+		float aim_fov{ 35.f };
 		float aim_min_time_to_target{ 0.4f };
 		float aim_max_time_to_target{ 0.8f };
 		int aim_key{ VK_LMENU };
@@ -67,6 +68,7 @@ namespace big
 		ImColor esp_line_color{ 220, 220, 220, 120 };
 
 		bool esp_draw_health{ true };
+		int esp_health_location{ 0 };
 		bool esp_draw_name{ true };
 		bool esp_draw_distance{ true };
 		bool esp_draw_vehicle_tag{ true };
@@ -175,6 +177,7 @@ namespace big
 
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
 			g_settings.aim_must_be_visible = j[xorstr_("settings")][xorstr_("aim_must_be_visible")];
+			g_settings.aim_bone_priority = j[xorstr_("settings")][xorstr_("aim_bone_priority")];
 			g_settings.aim_fov_method = j[xorstr_("settings")][xorstr_("aim_fov_method")];
 			g_settings.aim_draw_fov = j[xorstr_("settings")][xorstr_("aim_draw_fov")];
 			g_settings.aim_fov = j[xorstr_("settings")][xorstr_("aim_fov")];
@@ -222,6 +225,7 @@ namespace big
 			g_settings.esp_line_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_line_color")]);
 
 			g_settings.esp_draw_health = j[xorstr_("settings")][xorstr_("esp_draw_health")];
+			g_settings.esp_health_location = j[xorstr_("settings")][xorstr_("esp_health_location")];
 			g_settings.esp_draw_name = j[xorstr_("settings")][xorstr_("esp_draw_name")];
 			g_settings.esp_draw_distance = j[xorstr_("settings")][xorstr_("esp_draw_distance")];
 			g_settings.esp_draw_vehicle_tag = j[xorstr_("settings")][xorstr_("esp_draw_vehicle_tag")];
@@ -321,6 +325,7 @@ namespace big
 						{ xorstr_("esp_line_color_occluded"), color_to_string(g_settings.esp_line_color_occluded) },
 						{ xorstr_("esp_line_color"), color_to_string(g_settings.esp_line_color) },
 						{ xorstr_("esp_draw_health"), g_settings.esp_draw_health },
+						{ xorstr_("esp_health_location"), g_settings.esp_health_location },
 						{ xorstr_("esp_draw_name"), g_settings.esp_draw_name },
 						{ xorstr_("esp_draw_distance"), g_settings.esp_draw_distance },
 						{ xorstr_("esp_draw_vehicle_tag"), g_settings.esp_draw_vehicle_tag },
@@ -351,6 +356,7 @@ namespace big
 						{ xorstr_("aimbot"), g_settings.aimbot },
 					    { xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
 						{ xorstr_("aim_fov_method"), g_settings.aim_fov_method },
+						{ xorstr_("aim_bone_priority"), g_settings.aim_bone_priority },
 						{ xorstr_("aim_draw_fov"), g_settings.aim_draw_fov },
 						{ xorstr_("aim_fov"), g_settings.aim_fov },
 						{ xorstr_("aim_min_time_to_target"), g_settings.aim_min_time_to_target },

@@ -177,8 +177,21 @@ namespace plugins
                     float hb_height_offset = 5.0f;
                     float hb_perc_width = hb_width * health_ratio;
 
-                    m_drawing->DrawBoxOutline(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_width, hb_height, ImColor(0, 0, 0, 255));
-                    m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_perc_width, hb_height, hb_color);
+                    switch (g_settings.esp_health_location)
+                    {
+                    case 0: // Bottom
+                        m_drawing->DrawBoxOutline(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_width, hb_height, ImColor(0, 0, 0, 255));
+                        m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[1].y + hb_height_offset, hb_perc_width, hb_height, hb_color);
+                        
+                        break;
+                    case 1: // Top
+                        m_drawing->DrawBoxOutline(box_coords[0].x - hb_width_offset, box_coords[0].y - hb_height_offset, hb_width, hb_height, ImColor(0, 0, 0, 255));
+                        m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[0].y - hb_height_offset, hb_perc_width, hb_height, hb_color);
+                        
+                        break;
+                    default:
+                        break;
+                    }
                 }
 
                 bool allow_text = !IsValidPtr(vehicle) || player->m_AttachedEntryId == 0;
