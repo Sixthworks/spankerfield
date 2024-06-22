@@ -14,7 +14,7 @@ namespace plugins
 
 		if (g_settings.obs_check)
 		{
-			if (GetTickCount64() - last_check > 5000)
+			if (GetTickCount64() - last_check > 2500)
 			{
 				g_thread_pool->push([&]
 				{
@@ -24,8 +24,6 @@ namespace plugins
 
 				last_check = GetTickCount64();
 			}
-
-			if (g_globals.g_obs) return;
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();
@@ -37,8 +35,15 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return;
 
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<> dis(0, 1);
+
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
+			if (g_globals.g_obs && dis(gen) < 0.7)
+				continue;
+
 			const auto player = player_manager->m_ppPlayers[i];
 			if (!player)
 				continue;
