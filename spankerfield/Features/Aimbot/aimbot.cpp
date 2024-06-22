@@ -7,6 +7,9 @@
 #include "../../Utilities/other.h"
 #include "../../Rendering/draw-list.h"
 
+// So we don't get shit ton of warnings through or aimbot code
+#pragma warning( disable : 4244 )
+
 using namespace big;
 
 namespace big
@@ -67,6 +70,7 @@ namespace big
 		float gravity = bullet->m_Gravity;
 		Vector3 my_velocity = *local_entity->GetVelocity();
 		Vector3 enemy_velocity = *enemy->GetVelocity();
+		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
 		return DoPrediction(shoot_space.Translation() + spawn_offset, aim_point, my_velocity, enemy_velocity, initial_speed, gravity, zero_entry);
 	}
@@ -76,39 +80,65 @@ namespace big
 		Vector3 relative_pos = aim_point - shoot_space;
 		Vector3 gravity_vec(0, -fabs(gravity), 0);
 
-		auto approximate_position = [](const Vector3& curPos, const Vector3& velocity, const Vector3& accel, float time) -> Vector3 {
-			return curPos + velocity * time + 0.5f * accel * time * time;
-		};
-
-		float a = 0.25f * gravity_vec.LengthSquared();
-		float b = enemy_velocity.Dot(gravity_vec);
-		float c = relative_pos.Dot(gravity_vec) + enemy_velocity.LengthSquared() - bullet_speed.LengthSquared();
-		float d = 2.0f * relative_pos.Dot(enemy_velocity);
-		float e = relative_pos.LengthSquared();
-
-		std::vector<double> solutions;
-		int num_solutions = m_Solver->SolveQuartic(a, b, c, d, e, solutions);
-
 		float shortest_air_time = FLT_MAX;
-		for (double air_time : solutions) {
-			if (air_time >= 0 && air_time < shortest_air_time) {
-				shortest_air_time = static_cast<float>(air_time);
+
+		if (gravity != 0.0f)
+		{
+			const double a = 0.25 * gravity * gravity;
+			const double b = enemy_velocity.y * gravity;
+			const double c = (relative_pos.y * gravity) + enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
+			const double d = 2.0 * relative_pos.Dot(enemy_velocity);
+			const double e = relative_pos.Dot(relative_pos);
+
+			std::vector<double> solutions;
+			int num_solutions = m_Solver->SolveQuartic(a, b, c, d, e, solutions);
+
+			for (double air_time : solutions)
+			{
+				if (air_time > 0 && air_time < shortest_air_time)
+					shortest_air_time = static_cast<float>(air_time);
+			}
+		}
+		else
+		{
+			const double a = enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
+			const double b = 2.0 * relative_pos.Dot(enemy_velocity);
+			const double c = relative_pos.Dot(relative_pos);
+
+			if (a != 0.0f)
+			{
+				double d = b * b - (4 * a * c);
+				if (d >= 0.0f)
+				{
+					const auto t1 = (-b - sqrt(d)) / (2.0f * a);
+					const auto t2 = (-b + sqrt(d)) / (2.0f * a);
+
+					if (t1 > 0.f && t2 > 0.f)
+						shortest_air_time = std::min<float>(t1, t2);
+					else if (t1 < 0.f && t2 > 0.f)
+						shortest_air_time = t2;
+					else if (t1 > 0.f && t2 < 0.f)
+						shortest_air_time = t1;
+				}
 			}
 		}
 
 		if (shortest_air_time == FLT_MAX)
-			return 0.0f; // No valid solution found
-
-		aim_point = approximate_position(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
-
-		if (zero_entry.m_ZeroDistance == -1.0f)
 			return 0.0f;
 
-		float zero_air_time = zero_entry.m_ZeroDistance / bullet_speed.Length();
-		float zero_drop = 0.5f * fabs(gravity) * zero_air_time * zero_air_time;
-		float theta = atan2(zero_drop, zero_entry.m_ZeroDistance);
+		aim_point = aim_point + (enemy_velocity * shortest_air_time);
+		if (gravity != 0.0f)
+			aim_point.y += 0.5f * gravity * shortest_air_time * shortest_air_time;
 
-		return theta;
+		float zero_angle = 0.0f;
+		if (zero_entry.m_ZeroDistance > 0.0f)
+		{
+			float zero_air_time = zero_entry.m_ZeroDistance / bullet_speed.Length();
+			float zero_drop = 0.5f * fabs(gravity) * zero_air_time * zero_air_time;
+			zero_angle = atan2(zero_drop, zero_entry.m_ZeroDistance);
+		}
+
+		return zero_angle;
 	}
 
 	AimbotSmoother::AimbotSmoother()
@@ -199,8 +229,11 @@ namespace big
 			if (!IsValidPtr(soldier))
 				continue;
 
-			if (soldier->m_Occluded)
-				continue;
+			if (!g_settings.aim_must_be_visible)
+			{
+				if (soldier->m_Occluded)
+					continue;
+		    }
 
 			const auto ragdoll = soldier->m_pRagdollComponent;
 			if (!IsValidPtr(ragdoll))
@@ -314,13 +347,24 @@ namespace plugins
 
 		if (target.m_Player != m_PreviousTarget.m_Player)
 		{
-			Vector2 vec_rand = { generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target), generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target) };
+			Vector2 vec_rand = {
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
+			};
 			m_AimbotSmoother.ResetTimes(vec_rand);
 		}
-	
+
 		m_AimbotSmoother.Update(delta_time);
 
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
+
+		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
+
+		if (vertical_angle < 0) // If target is below
+			zero_theta_offset *= (1 + abs(vertical_angle));
+		else // If target is above or level
+			zero_theta_offset *= (1 - vertical_angle);
+
 		vDir.Normalize();
 
 		Vector2 BotAngles = {
@@ -355,7 +399,10 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		if (g_settings.aim_fov_method && g_settings.aim_draw_fov) // In reality it's bigger, that's why we multiply the radius
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), g_settings.aim_fov * 1.35f, ImColor(255, 255, 255, 255));
+		// FOV
+		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
+
+		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), fov_radius, ImColor(255, 255, 255, 200));
 	}
 }

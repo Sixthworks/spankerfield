@@ -17,7 +17,7 @@ namespace big
 	{
 		float aspect_ratio = screen_width / screen_height;
 		float fov_radians = degrees_to_radians(fov_degrees);
-		return tan(fov_radians / 2) * (screen_width / 2) / aspect_ratio;
+		return (screen_height / 2) * tan(fov_radians / 2);
 	}
 
 	void normalize_angle(Vector2& angle)
@@ -46,17 +46,20 @@ namespace big
 		normalize_angle(to);
 	}
 
-	void get_eye_location(Matrix& matrix)
+	Vector2 clamp_magnitude(const Vector2& v, float maxLength)
 	{
-		const auto game_renderer = GameRenderer::GetInstance();
-		if (!game_renderer)
-			return;
+		float sqrMagnitude = v.x * v.x + v.y * v.y;
+		if (sqrMagnitude > maxLength * maxLength)
+		{
+			float scale = maxLength / sqrt(sqrMagnitude);
+			return Vector2(v.x * scale, v.y * scale);
+		}
+		return v;
+	}
 
-		const auto render_view = game_renderer->m_pRenderView;
-		if (!render_view)
-			return;
-
-		matrix = render_view->m_ViewInverse;
+	float vector_dot(const Vector3& v1, const Vector3& v2)
+	{
+		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 	}
 
 	Vector2 get_screen_size()

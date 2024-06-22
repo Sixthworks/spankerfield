@@ -102,6 +102,8 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
 				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No recoil"), &g_settings.no_recoil);
 
 				if (g_settings.aim_fov_method)
@@ -111,7 +113,7 @@ namespace big
 					ImGui::Checkbox(xorstr_("Draw FOV"), &g_settings.aim_draw_fov);
 
 					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("FOV##Aimbot"), &g_settings.aim_fov, 0.f, (float)g_globals.g_height);
+					ImGui::SliderFloat(xorstr_("FOV##Aimbot"), &g_settings.aim_fov, 0.f, 180.f);
 					ImGui::PopItemWidth();
 
 					ImGui::Separator();

@@ -75,8 +75,8 @@ namespace plugins
 			Vector3 local_pos = (Vector3)local_transform.Transform.m[3];
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 
-			float difference_z = local_pos.z - pos.z;
-			if (difference_z > 75.f)
+			float difference_y = local_pos.y - pos.y;
+			if (difference_y > 75.f)
 				continue;
 
 			float distance = get_distance(pos, local_pos);

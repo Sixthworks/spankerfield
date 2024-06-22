@@ -43,10 +43,10 @@ namespace plugins
         if (!g_settings.esp) return;
 
         const auto game_context = ClientGameContext::GetInstance();
-        if (!IsValidPtr(game_context)) return;
+        if (!game_context) return;
 
         const auto player_manager = game_context->m_pPlayerManager;
-        if (!IsValidPtr(player_manager)) return;
+        if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
         if (!IsValidPtr(local_player)) return;
