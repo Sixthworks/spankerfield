@@ -2,6 +2,9 @@
 
 #pragma comment(lib, "Winmm.lib")
 
+// Made this for myself, disables string encryption so I can upload the .dll on UnknownCheats
+// #define BUILD_FOR_UC
+
 #include <SDKDDKVer.h>
 #include <Windows.h>
 #include <TlHelp32.h>

@@ -2,16 +2,14 @@
 #include "../MinHook.h"
 #include "../Utilities/vtablehook.h"
 #include "../Utilities/other.h"
+#include "../Utilities/thread_pool.h"
 #include "../Rendering/renderer.h"
 #include "../Rendering/gui.h"
 #include "../Features/main.h"
 #include "../settings.h"
 #include "../global.h"
 
-
-#ifdef _WIN64
 #define GWL_WNDPROC GWLP_WNDPROC
-#endif
 
 namespace big
 {

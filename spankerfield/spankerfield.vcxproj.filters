@@ -183,6 +183,9 @@
     <ClCompile Include="Features\Kill Sound\kill_sound.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Refresh Hook\refresh_hook.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Features\ESP\esp.h">
@@ -420,6 +423,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Kill Sound\kill_sound.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Refresh Hook\refresh_hook.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

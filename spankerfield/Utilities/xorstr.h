@@ -30,8 +30,13 @@
 #include <utility>
 #include <type_traits>
 
+#ifdef BUILD_FOR_UC
+#define xorstr(str) (str)
+#define xorstr_(str) (str)
+#else
 #define xorstr(str) ::jm::xor_string([]() { return str; }, std::integral_constant<std::size_t, sizeof(str) / sizeof(*str)>{}, std::make_index_sequence<::jm::detail::_buffer_size<sizeof(str)>()>{})
 #define xorstr_(str) xorstr(str).crypt_get()
+#endif
 
 #ifdef _MSC_VER
 #define XORSTR_FORCEINLINE __forceinline

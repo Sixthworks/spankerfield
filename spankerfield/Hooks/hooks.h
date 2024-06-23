@@ -3,6 +3,15 @@
 
 namespace big
 {
+	// For the refresh hook plugin
+	namespace PreFrame
+	{
+		using PreFrameUpdate_t = void(*)(float dt);
+		extern PreFrameUpdate_t oPreFrameUpdate;
+		void hkPreFrame(float delta_time);
+	}
+
+	// Hooking
 	class hooking
 	{
 	public:
@@ -10,6 +19,8 @@ namespace big
 		void uninitialize();
 		void enable();
 		void disable();
+
+		bool refresh_preframe;
 	};
 
 	inline hooking* g_hooking{};

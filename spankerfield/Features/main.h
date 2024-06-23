@@ -17,6 +17,7 @@
 #include "Anti AFK/anti_afk.h"
 #include "Name Spoofer/name_spoofer.h"
 #include "Kill Sound/kill_sound.h"
+#include "Refresh Hook/refresh_hook.h"
 
 namespace big
 {

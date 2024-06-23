@@ -6,6 +6,9 @@ namespace big
 {
 	void features::draw()
 	{
+		// This has to be done before the visuals run
+		plugins::refresh_preframe_hook();
+		
 		plugins::draw_screenshots();
 		plugins::draw_crosshair();
 		plugins::draw_spectators();

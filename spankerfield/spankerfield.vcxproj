@@ -161,6 +161,7 @@
     <ClCompile Include="Features\Name Spoofer\name_spoofer.cpp" />
     <ClCompile Include="Features\Overheat\overheat.cpp" />
     <ClCompile Include="Features\Radar\radar.cpp" />
+    <ClCompile Include="Features\Refresh Hook\refresh_hook.cpp" />
     <ClCompile Include="Features\Risky\risky.cpp" />
     <ClCompile Include="Features\Screenshots\screenshots.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="Features\Name Spoofer\name_spoofer.h" />
     <ClInclude Include="Features\Overheat\overheat.h" />
     <ClInclude Include="Features\Radar\radar.h" />
+    <ClInclude Include="Features\Refresh Hook\refresh_hook.h" />
     <ClInclude Include="Features\Risky\risky.h" />
     <ClInclude Include="Features\Screenshots\screenshots.h" />
     <ClInclude Include="logger.h" />
