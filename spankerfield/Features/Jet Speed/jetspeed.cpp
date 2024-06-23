@@ -33,7 +33,7 @@ namespace plugins
 		if (!local_soldier->IsAlive()) return;
 
 		const auto local_vehicle = local_player->GetVehicle();
-		if (!local_vehicle) return;
+		if (!IsValidPtrWithVTable(local_vehicle)) return;
 
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
 		if (!IsValidPtrWithVTable(vehicle_data)) return;

@@ -94,13 +94,13 @@ namespace plugins
             float distance = get_distance(pos, local_pos);
 
             ClientVehicleEntity* vehicle = player->GetVehicle();
-            if (!g_settings.esp_draw_vehicles && IsValidPtr(vehicle))
+            if (IsValidPtrWithVTable(vehicle) && !g_settings.esp_draw_vehicles)
                 continue;
 
             float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
-            if (IsValidPtr(vehicle))
+            if (IsValidPtrWithVTable(vehicle))
             {
-                if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
+                if (IsValidPtrWithVTable(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
                     health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
                 const auto data = get_vehicle_data(vehicle);
@@ -118,12 +118,10 @@ namespace plugins
 
             if (get_box_coords(transform, &box_coords[0]) && distance <= g_settings.esp_distance)
             {
-                float box_x = box_coords[0].x;
-                float box_y = box_coords[0].y;
                 float box_width = box_coords[1].x - box_coords[0].x;
                 float box_height = box_coords[1].y - box_coords[0].y;
-                float health = IsValidPtr(vehicle) ? health_vehicle : health_player;
-                float max_health = IsValidPtr(vehicle) ? max_health_vehicle : max_health_player;
+                float health = IsValidPtrWithVTable(vehicle) ? health_vehicle : health_player;
+                float max_health = IsValidPtrWithVTable(vehicle) ? max_health_vehicle : max_health_player;
 
                 if (g_settings.esp_draw_box)
                 {
@@ -173,10 +171,12 @@ namespace plugins
                     float health_ratio = health / max_health;
                     ImColor hb_color(BYTE(255 - max(health_ratio - 0.5f, 0.f) * 510), BYTE(255 - max(0.5f - health_ratio, 0.f) * 510), 0, 255);
                     float hb_width = max(box_width, 5.0f);
+                    float hb_width_vertical = max(box_width / 50.0f, 3.0f);
                     float hb_height = max(box_width / 50.0f, 3.0f);
                     float hb_width_offset = max((hb_width - box_width) / 2, 0.f);
                     float hb_height_offset = 5.0f;
                     float hb_perc_width = hb_width * health_ratio;
+                    float hb_perc_height = box_height * health_ratio;
 
                     switch (g_settings.esp_health_location)
                     {
@@ -189,6 +189,15 @@ namespace plugins
                         m_drawing->DrawBoxOutline(box_coords[0].x - hb_width_offset, box_coords[0].y - hb_height_offset, hb_width, hb_height, ImColor(0, 0, 0, 255));
                         m_drawing->DrawFillArea(box_coords[0].x - hb_width_offset, box_coords[0].y - hb_height_offset, hb_perc_width, hb_height, hb_color);
                         
+                        break;
+                    case 2: // Left
+                        m_drawing->DrawBoxOutline(box_coords[0].x - hb_height_offset - hb_width_vertical, box_coords[0].y, hb_width_vertical, box_height, ImColor(0, 0, 0, 255));
+                        m_drawing->DrawFillArea(box_coords[0].x - hb_height_offset - hb_width_vertical, box_coords[0].y + box_height - hb_perc_height, hb_width_vertical, hb_perc_height, hb_color);
+                        
+                        break;
+                    case 3: // Right
+                        m_drawing->DrawBoxOutline(box_coords[1].x + hb_height_offset, box_coords[0].y, hb_width_vertical, box_height, ImColor(0, 0, 0, 255));
+                        m_drawing->DrawFillArea(box_coords[1].x + hb_height_offset, box_coords[0].y + box_height - hb_perc_height, hb_width_vertical, hb_perc_height, hb_color);
                         break;
                     default:
                         break;
@@ -214,6 +223,10 @@ namespace plugins
 
                     float x = box_coords[1].x + 3.5f;
                     float y = box_coords[0].y - 3.f;
+
+                    // Adjustment to work with the right side health bar properly
+                    if (g_settings.esp_health_location == 3)
+                        x += 9.0f;
 
                     draw_esp_text(x, y, nickname, text_color, g_settings.esp_draw_name);
                     draw_esp_text(x, y, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color, g_settings.esp_draw_distance);

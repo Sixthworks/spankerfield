@@ -19,7 +19,7 @@ namespace plugins
 		if (!local_player) return;
 
 		const auto vehicle = local_player->GetVehicle();
-		if (!vehicle) return;
+		if (!IsValidPtrWithVTable(vehicle)) return;
 
 		const auto weapon = WeaponFiring::GetInstance();
 		if (!weapon) return;

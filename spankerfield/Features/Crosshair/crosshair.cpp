@@ -26,7 +26,7 @@ namespace plugins
 
 		// Vehicle check
 		ClientVehicleEntity* vehicle = local_player->GetVehicle();
-		if (vehicle && !g_settings.crosshair_in_vehicles) return;
+		if (IsValidPtrWithVTable(vehicle) && !g_settings.crosshair_in_vehicles) return;
 
 		// Positions
 		ImVec2 screen_center = ImVec2(g_globals.g_width / 2.0f, g_globals.g_height / 2.0f);

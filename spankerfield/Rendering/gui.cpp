@@ -257,7 +257,7 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("Health location"), &g_settings.esp_health_location, 0, 2);
+				ImGui::SliderInt(xorstr_("Health location"), &g_settings.esp_health_location, 0, 3);
 				ImGui::PopItemWidth();
 
 				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);

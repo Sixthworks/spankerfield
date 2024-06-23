@@ -43,9 +43,9 @@ namespace plugins
 		}
 
 		// Vehicle
-		if (IsValidPtr(vehicle))
+		if (IsValidPtrWithVTable(vehicle))
 		{
-			if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
+			if (IsValidPtrWithVTable(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
 				health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
 			const auto data = get_vehicle_data(vehicle);

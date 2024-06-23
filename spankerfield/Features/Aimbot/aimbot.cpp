@@ -335,7 +335,7 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return;
 
-		if (local_player->GetVehicle()) return;
+		if (IsValidPtrWithVTable(local_player->GetVehicle())) return;
 
 		const auto local_soldier = local_player->GetSoldier();
 		if (!local_soldier) return;
@@ -382,19 +382,17 @@ namespace plugins
 		m_AimbotSmoother.Update(delta_time);
 
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
+		vDir.Normalize();
 
+		// Vertical angle
 		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
 
-		if (vertical_angle < 0) // If target is below
-			zero_theta_offset *= (1 + abs(vertical_angle));
-		else // If target is above or level
-			zero_theta_offset *= (1 - vertical_angle);
-
-		vDir.Normalize();
+		// Adjust the elevation based on distance and vertical angle
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0f)); // 175 works best, tuning is possible
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
-			atan2(vDir.y, vDir.Length())
+			atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z)) - elevation_adjustment
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;
@@ -417,7 +415,7 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return;
 
-		if (local_player->GetVehicle()) return;
+		if (IsValidPtrWithVTable(local_player->GetVehicle())) return;
 
 		const auto local_soldier = local_player->GetSoldier();
 		if (!local_soldier) return;

@@ -55,7 +55,7 @@ namespace plugins
 				continue;
 
 			const auto vehicle = player->GetVehicle();
-			if (IsValidPtr(vehicle))
+			if (IsValidPtrWithVTable(vehicle))
 			{
 				const auto components = vehicle->m_pComponents;
 				if (!components) continue;

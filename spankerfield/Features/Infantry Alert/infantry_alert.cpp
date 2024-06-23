@@ -40,7 +40,7 @@ namespace plugins
 				continue;
 
 			const auto vehicle = player->GetVehicle();
-			if (IsValidPtr(vehicle))
+			if (IsValidPtrWithVTable(vehicle))
 			{
 				if (g_settings.infantry_alert_light_tech)
 				{

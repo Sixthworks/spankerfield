@@ -106,7 +106,7 @@ namespace plugins
 			if (distance >= 0.f && distance <= g_settings.radar_distance)
 			{
 				const auto vehicle = player->GetVehicle();
-				if (IsValidPtr(vehicle))
+				if (IsValidPtrWithVTable(vehicle))
 				{
 					const auto data = get_vehicle_data(vehicle);
 					if (IsValidPtrWithVTable(data))

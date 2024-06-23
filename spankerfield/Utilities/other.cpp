@@ -57,7 +57,7 @@ namespace big
 		if (!soldier) return placeholder;
 
 		const auto vehicle = player->GetVehicle();
-		vehicle ? vehicle->GetAABB(&placeholder) : soldier->GetAABB(&placeholder);
+		IsValidPtrWithVTable(vehicle) ? vehicle->GetAABB(&placeholder) : soldier->GetAABB(&placeholder);
 
 		return placeholder;
 	}

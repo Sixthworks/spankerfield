@@ -19,8 +19,6 @@ namespace big
 		void uninitialize();
 		void enable();
 		void disable();
-
-		bool refresh_preframe;
 	};
 
 	inline hooking* g_hooking{};

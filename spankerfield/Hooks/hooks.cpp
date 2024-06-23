@@ -196,7 +196,7 @@ namespace big
 			LOG(INFO) << xorstr_("Hooked Present.");
 
 			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(hook_vtable_func(reinterpret_cast<PDWORD64*>(border_input_node->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
-			LOG(INFO) << xorstr_("Hooked PreFrame.");
+			LOG(INFO) << xorstr_("Hooked PreFrameUpdate.");
 
 			terminate = true;
 		}
@@ -204,8 +204,14 @@ namespace big
 
 	void hooking::disable()
 	{
-		SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc::oWndProc));
-		LOG(INFO) << xorstr_("Disabled WndProc.");
+		if (PreFrame::oPreFrameUpdate)
+		{
+			hook_vtable_func(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+			LOG(INFO) << xorstr_("Restored PreFrameUpdate.");
+		}
+
+		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
+		LOG(INFO) << xorstr_("Disabled Present.");
 
 		MH_DisableHook(&BitBlt);
 		LOG(INFO) << xorstr_("Disabled BitBlt.");
@@ -213,10 +219,10 @@ namespace big
 		MH_DisableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
 		LOG(INFO) << xorstr_("Disabled PBSS.");
 
-		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
-		LOG(INFO) << xorstr_("Disabled Present.");
-
-		hook_vtable_func(reinterpret_cast<PDWORD64*>(BorderInputNode::GetInstance()->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
-		LOG(INFO) << xorstr_("Disabled PreFrame.");
+		if (WndProc::oWndProc)
+		{
+			SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc::oWndProc));
+			LOG(INFO) << xorstr_("Disabled WndProc.");
+		}
 	}
 }
