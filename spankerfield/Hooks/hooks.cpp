@@ -2,10 +2,12 @@
 #include "../MinHook.h"
 #include "../Utilities/vtablehook.h"
 #include "../Utilities/other.h"
-#include "../Features/main.h"
 #include "../Rendering/renderer.h"
 #include "../Rendering/gui.h"
+#include "../Features/main.h"
+#include "../settings.h"
 #include "../global.h"
+
 
 #ifdef _WIN64
 #define GWL_WNDPROC GWLP_WNDPROC
@@ -66,18 +68,21 @@ namespace big
 			const auto renderer = DxRenderer::GetInstance();
 			const auto game_renderer = GameRenderer::GetInstance();
 
-			if (renderer && game_renderer)
+			if (IsValidPtr(renderer) && IsValidPtr(game_renderer))
 			{
-				g_globals.g_height = renderer->m_pScreen->m_Height;
-				g_globals.g_width = renderer->m_pScreen->m_Width;
-				g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
+				const auto screen = renderer->m_pScreen;
+				if (IsValidPtr(screen))
+				{
+					g_globals.g_height = renderer->m_pScreen->m_Height;
+					g_globals.g_width = renderer->m_pScreen->m_Width;
+					g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
 
-				// AA flag check + Hooked PB Take Screenshot Function + Hooked BitBlt
-		        // I hope it's enough for people not to get detected...
-				g_globals.g_should_draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;
+					// AA flag check + Hooked PB Take Screenshot Function + Hooked BitBlt
+					g_globals.g_should_draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;
 
-				if (g_globals.g_should_draw)
-					g_renderer->on_present();
+					if (g_globals.g_should_draw)
+						g_renderer->on_present();
+				}
 			}
 
 			return oPresent(pThis, SyncInterval, Flags);
@@ -107,7 +112,8 @@ namespace big
 			{
 				g_renderer->wndproc(hwnd, msg, wparam, lparam);
 
-				switch (msg) {
+				switch (msg)
+				{
 				case WM_SIZE:
 					if (g_renderer->m_d3d_device != NULL && wparam != SIZE_MINIMIZED)
 					{
@@ -117,11 +123,17 @@ namespace big
 					}
 
 					return false;
+				case WM_SYSCOMMAND:
+					if ((wparam & 0xfff0) == SC_KEYMENU)
+						return false;
+
+					break;
 				}
 
 				if (g_gui.m_opened)
 				{
-					switch (msg) {
+					switch (msg)
+					{
 					case WM_MOUSEMOVE: return false;
 					default:
 						break;
@@ -151,7 +163,8 @@ namespace big
 		const auto border_input_node = BorderInputNode::GetInstance();
 		bool terminate{};
 
-		while (renderer && border_input_node)
+		// We do a while loop and break it, this way we wait both for renderer and border_input_node to initialize
+		while (IsValidPtr(renderer) && IsValidPtr(border_input_node))
 		{
 			if (terminate) break;
 

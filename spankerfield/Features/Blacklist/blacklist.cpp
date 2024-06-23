@@ -22,11 +22,11 @@ namespace plugins
 		auto file_path = get_path();
 		nlohmann::json players;
 
-		try {
+		try
+		{
 			std::ifstream file(file_path);
-			if (file.is_open()) {
+			if (file.is_open()) 
 				players = nlohmann::json::parse(file);
-			}
 		}
 		catch (const std::exception& e)
 		{

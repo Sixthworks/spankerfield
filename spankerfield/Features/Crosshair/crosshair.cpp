@@ -1,5 +1,6 @@
 #include "crosshair.h"
 #include "../../settings.h"
+#include "../../global.h"
 #include "../../Rendering/draw-list.h"
 
 using namespace big;
@@ -28,7 +29,7 @@ namespace plugins
 		if (vehicle && !g_settings.crosshair_in_vehicles) return;
 
 		// Positions
-		ImVec2 screen_center = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y / 2.0f);
+		ImVec2 screen_center = ImVec2(g_globals.g_width / 2.0f, g_globals.g_height / 2.0f);
 		ImVec2 horizontal_start = ImVec2(screen_center.x - g_settings.crosshair_size / 2.0f, screen_center.y);
 		ImVec2 horizontal_end = ImVec2(screen_center.x + g_settings.crosshair_size / 2.0f, screen_center.y);
 		ImVec2 vertical_start = ImVec2(screen_center.x, screen_center.y - g_settings.crosshair_size / 2.0f);

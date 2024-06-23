@@ -241,9 +241,11 @@ namespace big
 
 			// Bone selection
 			Vector3 head_vec;
+			bool got_bone = false;
+
 			if (g_settings.aim_bone_priority)
 			{
-				std::vector<UpdatePoseResultData::BONES> bone_priority =
+				static const UpdatePoseResultData::BONES bone_priority[] =
 				{
 					// From upper body to lower body
 					UpdatePoseResultData::BONES::Head,
@@ -251,7 +253,6 @@ namespace big
 					UpdatePoseResultData::BONES::Hips
 				};
 
-				bool got_bone = false;
 				for (const auto& bone : bone_priority)
 				{
 					if (ragdoll->GetBone(bone, head_vec))
@@ -260,16 +261,12 @@ namespace big
 						break;
 					}
 				}
-
-				// Just in case
-				if (!got_bone)
-					continue;
 			}
 			else
-			{
-				if (!ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec))
-					continue;
-			}
+				got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+
+			if (!got_bone)
+				continue;
 
 			Vector3 screen_vec;
 			if (!world_to_screen(head_vec, screen_vec))

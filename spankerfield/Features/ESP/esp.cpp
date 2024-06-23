@@ -1,5 +1,6 @@
 #include "esp.h"
 #include "../../settings.h"
+#include "../../global.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Utilities/w2s.h"
@@ -49,10 +50,10 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtr(local_player)) return;
+        if (!local_player) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
+        if (!local_soldier || !local_soldier->IsAlive()) return;
 
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
@@ -134,33 +135,33 @@ namespace plugins
                 {
                     ImColor line_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
                     ImVec2 box_center = ImVec2(box_coords[0].x + box_width / 2.0f, box_coords[0].y + box_height / 2.0f);
-                    ImVec2 drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y / 2.0f);
+                    ImVec2 drawing_from = ImVec2((float)g_globals.g_width / 2.0f, (float)g_globals.g_height / 2.0f);
 
                     switch (g_settings.esp_draw_line_from)
                     {
                     case 1:
-                        drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, ImGui::GetIO().DisplaySize.y);
+                        drawing_from = ImVec2((float)g_globals.g_width / 2.0f, (float)g_globals.g_height);
                         break;
                     case 2:
-                        drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x / 2.0f, 0);
+                        drawing_from = ImVec2((float)g_globals.g_width / 2.0f, 0);
                         break;
                     case 3:
-                        drawing_from = ImVec2(0, ImGui::GetIO().DisplaySize.y / 2.0f);
+                        drawing_from = ImVec2(0, (float)g_globals.g_height / 2.0f);
                         break;
                     case 4:
-                        drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y / 2.0f);
+                        drawing_from = ImVec2((float)g_globals.g_width, (float)g_globals.g_height / 2.0f);
                         break;
                     case 5:
                         drawing_from = ImVec2(0, 0);
                         break;
                     case 6:
-                        drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, 0);
+                        drawing_from = ImVec2((float)g_globals.g_width, 0);
                         break;
                     case 7:
-                        drawing_from = ImVec2(0, ImGui::GetIO().DisplaySize.y);
+                        drawing_from = ImVec2(0, (float)g_globals.g_height);
                         break;
                     case 8:
-                        drawing_from = ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+                        drawing_from = ImVec2((float)g_globals.g_width, (float)g_globals.g_height);
                         break;
                     }
 
@@ -198,26 +199,25 @@ namespace plugins
 
                 if (allow_text)
                 {
+                    // Better approach than what spankerfield had before
+                    auto draw_esp_text = [&](float& x, float& y, const char* text, ImColor color, bool condition)
+                    {
+                        if (condition)
+                        {
+                            m_drawing->AddText(x, y, color, 14.f, FL_NONE, text);
+                            y += g_settings.esp_text_spacing;
+                        }
+                    };
+
+                    // Drawing part
                     ImColor text_color = teammate ? g_settings.esp_teammate_color : (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
-                    float base[2] = { box_coords[1].x + 3.5f, box_coords[0].y - 3.f };
 
-                    if (g_settings.esp_draw_name)
-                    {
-                        m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, nickname);
-                        base[1] += g_settings.esp_text_spacing;
-                    }
+                    float x = box_coords[1].x + 3.5f;
+                    float y = box_coords[0].y - 3.f;
 
-                    if (g_settings.esp_draw_distance)
-                    {
-                        m_drawing->AddText(base[0], base[1], text_color, 14.f, FL_NONE, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str());
-                        base[1] += g_settings.esp_text_spacing;
-                    }
-
-                    if (g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle))
-                    {
-                        m_drawing->AddText(base[0], base[1], g_settings.esp_additional_tags_color, 14.f, FL_NONE, xorstr_("VEHICLE"));
-                        base[1] += g_settings.esp_text_spacing;
-                    }
+                    draw_esp_text(x, y, nickname, text_color, g_settings.esp_draw_name);
+                    draw_esp_text(x, y, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color, g_settings.esp_draw_distance);
+                    draw_esp_text(x, y, xorstr_("VEHICLE"), g_settings.esp_additional_tags_color, g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle));
                 }
 
                 if (g_settings.skeleton)

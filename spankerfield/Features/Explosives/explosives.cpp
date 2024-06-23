@@ -7,58 +7,55 @@
 using namespace big;
 namespace plugins
 {
-	void draw_explosives()
-	{
-		if (!g_settings.explosives) return;
+    void draw_explosives()
+    {
+        if (!g_settings.explosives) return;
 
-		const auto game_context = ClientGameContext::GetInstance();
-		if (!game_context) return;
+        const auto game_context = ClientGameContext::GetInstance();
+        if (!game_context) return;
 
-		const auto level = game_context->m_pLevel;
-		if (!level) return;
+        const auto level = game_context->m_pLevel;
+        if (!level) return;
 
-		const auto game_world = level->m_pGameWorld;
-		if (!game_world) return;
+        const auto game_world = level->m_pGameWorld;
+        if (!game_world) return;
 
-		const auto player_manager = game_context->m_pPlayerManager;
-		if (!player_manager) return;
+        const auto player_manager = game_context->m_pPlayerManager;
+        if (!player_manager) return;
 
-		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+        const auto local_player = player_manager->m_pLocalPlayer;
+        if (!local_player) return;
 
-		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+        const auto local_soldier = local_player->GetSoldier();
+        if (!local_soldier || !local_soldier->IsAlive()) return;
 
-		if (!local_soldier->IsAlive()) return;
+        if (!class_info.ExplosionEntity)
+        {
+            update_class_info();
+            return;
+        }
 
-		if (class_info.ExplosionEntity)
-		{
-			EntityIterator<ClientExplosionEntity> explosives(game_world, class_info.ExplosionEntity);
+        EntityIterator<ClientExplosionEntity> explosives(game_world, class_info.ExplosionEntity);
+        if (!explosives.front()) return;
 
-			if (explosives.front())
-			{
-				do
-				{
-					ClientExplosionEntity* explosive = explosives.front()->getObject();
-					if (IsValidPtr(explosive))
-					{
-						TransformAABBStruct transform;
-						ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
-						explosive_controllable->GetAABB(&transform);
+        do
+        {
+            ClientExplosionEntity* explosive = explosives.front()->getObject();
+            if (!IsValidPtr(explosive)) continue;
 
-						Vector2 box_coords[2];
-						if (get_box_coords(transform, &box_coords[0]))
-						{
-							float box_width = box_coords[1].x - box_coords[0].x;
-							float box_height = box_coords[1].y - box_coords[0].y;
+            ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
+            if (!IsValidPtr(explosive_controllable)) continue;
 
-							m_drawing->AddText(box_coords[0].x + (box_width / 2.f), box_coords[0].y + (box_height / 2.f), g_settings.explosives_color, 0.f, FL_CENTER_X, xorstr_("[#]"));
-						}
-					}
-				} while (explosives.next());
-			}
-		}
-		else
-			update_class_info();
-	}
+            TransformAABBStruct transform;
+            explosive_controllable->GetAABB(&transform);
+
+            Vector2 box_coords[2];
+            if (!get_box_coords(transform, &box_coords[0])) continue;
+
+            float box_width = box_coords[1].x - box_coords[0].x;
+            float box_height = box_coords[1].y - box_coords[0].y;
+
+            m_drawing->AddText(box_coords[0].x + (box_width / 2.f), box_coords[0].y + (box_height / 2.f), g_settings.explosives_color, 0.f, FL_CENTER_X, xorstr_("[#]"));
+        } while (explosives.next());
+    }
 }

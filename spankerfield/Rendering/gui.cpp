@@ -124,28 +124,32 @@ namespace big
 				ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
 				ImGui::PopItemWidth();
 
-				ImGui::Checkbox(xorstr_("Auto bone select"), &g_settings.aim_bone_priority);
-				ImGui::Text(xorstr_("Aim bone"));
-
-				static const char* text = g_settings.aim_bone < bone_map.size() ? bone_map[(UpdatePoseResultData::BONES)g_settings.aim_bone].c_str() : xorstr_("Unknown");
-				ImGui::PushItemWidth(300.f);
-				if (ImGui::DragInt(xorstr_("##BS"), &g_settings.aim_bone, 1.0f, 0, (int)(bone_map.size() - 1)))
+				ImGui::Checkbox(xorstr_("Auto bone mode (from upper to lower body)"), &g_settings.aim_bone_priority);
+				
+				if (!g_settings.aim_bone_priority)
 				{
-					if (g_settings.aim_bone >= 0 && g_settings.aim_bone < bone_map.size())
+					ImGui::Text(xorstr_("Aim bone"));
+
+					static const char* text = g_settings.aim_bone < bone_map.size() ? bone_map[(UpdatePoseResultData::BONES)g_settings.aim_bone].c_str() : xorstr_("Unknown");
+					ImGui::PushItemWidth(300.f);
+					if (ImGui::DragInt(xorstr_("##BS"), &g_settings.aim_bone, 1.0f, 0, (int)(bone_map.size() - 1)))
 					{
-						auto it = bone_map.begin();
-						std::advance(it, g_settings.aim_bone);
+						if (g_settings.aim_bone >= 0 && g_settings.aim_bone < bone_map.size())
+						{
+							auto it = bone_map.begin();
+							std::advance(it, g_settings.aim_bone);
 
-						g_settings.aim_bone = it->first;
-						text = it->second.c_str();
+							g_settings.aim_bone = it->first;
+							text = it->second.c_str();
+						}
 					}
-				}
-				ImGui::PopItemWidth();
+					ImGui::PopItemWidth();
 
-				if (text != "")
-				{
-					ImGui::SameLine();
-					ImGui::Text(text);
+					if (text != "")
+					{
+						ImGui::SameLine();
+						ImGui::Text(text);
+					}
 				}
 
 				ImGui::Separator();

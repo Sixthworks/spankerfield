@@ -7,79 +7,71 @@
 using namespace big;
 namespace plugins
 {
-	void draw_missiles()
-	{
-		if (!g_settings.missiles_own) return;
+    void draw_missiles()
+    {
+        if (!g_settings.missiles_own) return;
 
-		const auto game_context = ClientGameContext::GetInstance();
-		if (!game_context) return;
+        const auto game_context = ClientGameContext::GetInstance();
+        if (!game_context) return;
 
-		const auto level = game_context->m_pLevel;
-		if (!level) return;
+        const auto level = game_context->m_pLevel;
+        if (!level) return;
 
-		const auto game_world = level->m_pGameWorld;
-		if (!game_world) return;
+        const auto game_world = level->m_pGameWorld;
+        if (!game_world) return;
 
-		const auto player_manager = game_context->m_pPlayerManager;
-		if (!player_manager) return;
+        const auto player_manager = game_context->m_pPlayerManager;
+        if (!player_manager) return;
 
-		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+        const auto local_player = player_manager->m_pLocalPlayer;
+        if (!local_player) return;
 
-		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+        const auto local_soldier = local_player->GetSoldier();
+        if (!local_soldier || !local_soldier->IsAlive()) return;
 
-		if (!local_soldier->IsAlive()) return;
+        if (!class_info.MissileEntity)
+        {
+            update_class_info();
+            return;
+        }
 
-		if (class_info.MissileEntity)
-		{
-			EntityIterator<VeniceClientMissileEntity> missiles(game_world, class_info.MissileEntity);
-			VeniceClientMissileEntity* local_missile = nullptr;
+        EntityIterator<VeniceClientMissileEntity> missiles(game_world, class_info.MissileEntity);
+        if (!missiles.front()) return;
 
-			if (missiles.front())
-			{
-				do
-				{
-					if (auto* missile = missiles.front()->getObject(); IsValidPtr(missile))
-					{
-						if (missile->m_pOwner.GetData() == local_player)
-						{
-							local_missile = missile;
-							break;
-						}
-					}
+        VeniceClientMissileEntity* local_missile = nullptr;
+        do
+        {
+            auto* missile = missiles.front()->getObject();
+            if (!IsValidPtr(missile)) continue;
 
-				} while (missiles.next());
-			}
+            if (missile->m_pOwner.GetData() == local_player)
+            {
+                local_missile = missile;
+                break;
+            }
+        } while (missiles.next());
 
-			if (!IsValidPtr(local_missile))
-				return;
+        if (!IsValidPtr(local_missile)) return;
 
-			const auto data = local_missile->m_pMissileEntityData;
-			if (!IsValidPtrWithVTable(data))
-				return;
-			
-			if (data->IsLockable())
-				return;
+        const auto data = local_missile->m_pMissileEntityData;
+        if (!IsValidPtrWithVTable(data)) return;
 
-			bool laser_guided = data->IsLaserGuided();
-			if (laser_guided)
-			{
-				TransformAABBStruct transform;
-				ClientControllableEntity* missile_controllable = (ClientControllableEntity*)local_missile;
-				missile_controllable->GetAABB(&transform);
+        if (data->IsLockable()) return;
 
-				Vector2 box_coords[2];
-				if (get_box_coords(transform, &box_coords[0]))
-				{
-					float box_width = box_coords[1].x - box_coords[0].x;
-					float box_height = box_coords[1].y - box_coords[0].y;
+        if (!data->IsLaserGuided()) return;
 
-					m_drawing->DrawEspBox(2, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, g_settings.missiles_color.Value.x, g_settings.missiles_color.Value.y, g_settings.missiles_color.Value.z, g_settings.missiles_color.Value.w);
-				}
-			}
-		}
-		else
-			update_class_info();
-	}
+        ClientControllableEntity* missile_controllable = (ClientControllableEntity*)local_missile;
+        if (!IsValidPtr(missile_controllable)) return;
+
+        TransformAABBStruct transform;
+        missile_controllable->GetAABB(&transform);
+
+        Vector2 box_coords[2];
+        if (!get_box_coords(transform, &box_coords[0])) return;
+
+        float box_width = box_coords[1].x - box_coords[0].x;
+        float box_height = box_coords[1].y - box_coords[0].y;
+
+        m_drawing->DrawEspBox(2, box_coords[0].x, box_coords[0].y, box_width, box_height, g_settings.missiles_color.Value.x, g_settings.missiles_color.Value.y, g_settings.missiles_color.Value.z, g_settings.missiles_color.Value.w);
+    }
 }

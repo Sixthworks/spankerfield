@@ -1,6 +1,6 @@
 #include "spectators.h"
-#include "../../common.h"
 #include "../../settings.h"
+#include "../../global.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Rendering/gui.h"
@@ -71,7 +71,7 @@ namespace plugins
 			if (!set)
 			{
 				ImGui::SetNextWindowSize(ImVec2(250, 125.f), ImGuiCond_FirstUseEver);
-				ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 258.f, 8.f), ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowPos(ImVec2((float)g_globals.g_width - 260.f, 8.f), ImGuiCond_FirstUseEver);
 				set = true;
 			}
 
