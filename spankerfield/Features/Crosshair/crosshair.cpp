@@ -17,10 +17,10 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -38,10 +38,13 @@ namespace plugins
 		// Draw the shadow lines
 		if (g_settings.crosshair_shadow)
 		{
-			ImVec2 horizontal_start_shadow = ImVec2(horizontal_start.x + 1.35f, horizontal_start.y + 1.35f);
-			ImVec2 horizontal_end_shadow = ImVec2(horizontal_end.x + 1.35f, horizontal_end.y + 1.35f);
-			ImVec2 vertical_start_shadow = ImVec2(vertical_start.x + 1.35f, vertical_start.y + 1.35f);
-			ImVec2 vertical_end_shadow = ImVec2(vertical_end.x + 1.35f, vertical_end.y + 1.35f);
+			// Shadow offset, should be made as a setting, but nope
+			float offset = 1.25f;
+
+			ImVec2 horizontal_start_shadow = ImVec2(horizontal_start.x + offset, horizontal_start.y + offset);
+			ImVec2 horizontal_end_shadow = ImVec2(horizontal_end.x + offset, horizontal_end.y + offset);
+			ImVec2 vertical_start_shadow = ImVec2(vertical_start.x + offset, vertical_start.y + offset);
+			ImVec2 vertical_end_shadow = ImVec2(vertical_end.x + offset, vertical_end.y + offset);
 
 			m_drawing->AddLine(horizontal_start_shadow, horizontal_end_shadow, ImColor(0.0f, 0.0f, 0.0f, 0.7f), g_settings.crosshair_thickness);
 			m_drawing->AddLine(vertical_start_shadow, vertical_end_shadow, ImColor(0.0f, 0.0f, 0.0f, 0.7f), g_settings.crosshair_thickness);

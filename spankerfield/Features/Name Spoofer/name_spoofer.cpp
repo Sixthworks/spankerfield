@@ -1,6 +1,5 @@
 #include "name_spoofer.h"
 #include "../../settings.h"
-#include "../../global.h"
 
 using namespace big;
 namespace plugins
@@ -15,7 +14,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		// Backup original name (one-time)
 		if (backup && local_player->m_Name[0] != '\0')
@@ -25,7 +24,7 @@ namespace plugins
 		}
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		// Restore name logic
 		if (g_settings.spoof_restore)

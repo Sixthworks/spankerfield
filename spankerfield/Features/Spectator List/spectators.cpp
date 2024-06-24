@@ -20,7 +20,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		// Vector for storing spectator names
 		std::vector<std::string> spectators{};
@@ -31,7 +31,7 @@ namespace plugins
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!player)
+			if (!IsValidPtrWithVTable(player))
 				continue;
 
 			if (player->m_IsSpectator)

@@ -21,10 +21,10 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 

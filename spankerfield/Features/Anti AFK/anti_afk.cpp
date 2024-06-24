@@ -1,6 +1,5 @@
 #include "anti_afk.h"
 #include "../../settings.h"
-#include "../../global.h"
 
 using namespace big;
 namespace plugins
@@ -20,7 +19,7 @@ namespace plugins
 			if (!player_manager) return;
 
 			const auto local_player = player_manager->m_pLocalPlayer;
-			if (!local_player) return;
+			if (!IsValidPtrWithVTable(local_player)) return;
 
 			const auto border_input_node = BorderInputNode::GetInstance();
 			if (!border_input_node) return;

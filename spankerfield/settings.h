@@ -12,6 +12,7 @@ namespace big
 		float blacklist_text_size{ 26.f };
 
 		bool streamer_mode;
+		bool rainbow_mode;
 
 		bool spoof_name;
 		bool spoof_restore;
@@ -24,6 +25,7 @@ namespace big
 		bool aim_bone_priority{ true };
 		bool aim_draw_fov;
 		float aim_fov{ 35.f };
+		ImColor aim_fov_color{ 255, 255, 255, 200 };
 		float aim_min_time_to_target{ 0.4f };
 		float aim_max_time_to_target{ 0.8f };
 		int aim_key{ VK_LMENU };
@@ -60,6 +62,9 @@ namespace big
 		int esp_box_style{ 4 };
 		ImColor esp_box_color_occluded{ 24, 162, 162, 255 };
 		ImColor esp_box_color{ 97, 59, 230, 255 };
+
+		bool esp_box_fill;
+		ImColor esp_box_fill_color{ 0, 0, 0, 90 };
 
 		bool esp_draw_line{ true };
 		int esp_draw_line_from{ 1 };
@@ -101,7 +106,8 @@ namespace big
 		ImColor health_bar_color{ 138, 107, 255, 255 };
 
 		bool radar;
-		bool radar_draw_teammates{ true };
+		bool radar_circular{ true };
+		bool radar_draw_teammates;
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
 		bool radar_outline{ true };
@@ -109,7 +115,7 @@ namespace big
 		float radar_y{ 245.f };
 		float radar_width{ 320.f };
 		float radar_height{ 320.f };
-		float radar_distance{ 1000.f };
+		float radar_distance{ 400.f };
 		ImColor radar_outline_color{ 255, 255, 255, 255 };
 		ImColor radar_cross_color{ 255, 255, 255, 175 };
 		ImColor radar_teammates_color{ 170, 170, 170, 255 };
@@ -174,6 +180,7 @@ namespace big
 			g_settings.blacklist_text_size = j[xorstr_("settings")][xorstr_("blacklist_text_size")];
 
 			g_settings.streamer_mode = j[xorstr_("settings")][xorstr_("streamer_mode")];
+			g_settings.rainbow_mode = j[xorstr_("settings")][xorstr_("rainbow_mode")];
 
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
 			g_settings.aim_must_be_visible = j[xorstr_("settings")][xorstr_("aim_must_be_visible")];
@@ -181,6 +188,7 @@ namespace big
 			g_settings.aim_fov_method = j[xorstr_("settings")][xorstr_("aim_fov_method")];
 			g_settings.aim_draw_fov = j[xorstr_("settings")][xorstr_("aim_draw_fov")];
 			g_settings.aim_fov = j[xorstr_("settings")][xorstr_("aim_fov")];
+			g_settings.aim_fov_color = string_to_color(j[xorstr_("settings")][xorstr_("aim_fov_color")]);
 			g_settings.aim_min_time_to_target = j[xorstr_("settings")][xorstr_("aim_min_time_to_target")];
 			g_settings.aim_max_time_to_target = j[xorstr_("settings")][xorstr_("aim_max_time_to_target")];
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
@@ -217,6 +225,9 @@ namespace big
 			g_settings.esp_box_style = j[xorstr_("settings")][xorstr_("esp_box_style")];
 			g_settings.esp_box_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color_occluded")]);
 			g_settings.esp_box_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_color")]);
+
+			g_settings.esp_box_fill = j[xorstr_("settings")][xorstr_("esp_box_fill")];
+			g_settings.esp_box_fill_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_fill_color")]);
 
 			g_settings.esp_draw_line = j[xorstr_("settings")][xorstr_("esp_draw_line")];
 			g_settings.esp_draw_line_from = j[xorstr_("settings")][xorstr_("esp_draw_line_from")];
@@ -309,6 +320,7 @@ namespace big
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 					    { xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
 						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
+						{ xorstr_("rainbow_mode"), g_settings.rainbow_mode },
 						{ xorstr_("esp"), g_settings.esp },
 						{ xorstr_("esp_draw_teammates"), g_settings.esp_draw_teammates },
 						{ xorstr_("esp_draw_vehicles"), g_settings.esp_draw_vehicles },
@@ -319,6 +331,8 @@ namespace big
 						{ xorstr_("esp_box_style"), g_settings.esp_box_style },
 						{ xorstr_("esp_box_color_occluded"), color_to_string(g_settings.esp_box_color_occluded) },
 						{ xorstr_("esp_box_color"), color_to_string(g_settings.esp_box_color) },
+						{ xorstr_("esp_box_fill"), g_settings.esp_box_fill },
+						{ xorstr_("esp_box_fill_color"), color_to_string(g_settings.esp_box_fill_color) },
 					    { xorstr_("esp_draw_line"), g_settings.esp_draw_line },
 						{ xorstr_("esp_draw_line_from"), g_settings.esp_draw_line_from },
 						{ xorstr_("esp_line_thickness"), g_settings.esp_line_thickness },
@@ -359,6 +373,7 @@ namespace big
 						{ xorstr_("aim_bone_priority"), g_settings.aim_bone_priority },
 						{ xorstr_("aim_draw_fov"), g_settings.aim_draw_fov },
 						{ xorstr_("aim_fov"), g_settings.aim_fov },
+						{ xorstr_("aim_fov_color"), color_to_string(g_settings.aim_fov_color) },
 						{ xorstr_("aim_min_time_to_target"), g_settings.aim_min_time_to_target },
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
 			            { xorstr_("aim_key"), g_settings.aim_key },

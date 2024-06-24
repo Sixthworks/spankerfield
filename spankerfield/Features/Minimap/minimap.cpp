@@ -33,7 +33,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -45,7 +45,7 @@ namespace plugins
 				continue;
 
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!player)
+			if (!IsValidPtrWithVTable(player))
 				continue;
 
 			if (player == local_player)
@@ -58,27 +58,25 @@ namespace plugins
 			if (IsValidPtrWithVTable(vehicle))
 			{
 				const auto components = vehicle->m_pComponents;
-				if (!components) continue;
+				if (!IsValidPtr(components)) continue;
 
 				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
-				if (!IsValidPtrWithVTable(map)) continue;
-
-				map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				if (IsValidPtrWithVTable(map))
+					map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 			else
 			{
 				const auto soldier = player->GetSoldier();
-				if (!soldier) continue;
+				if (!IsValidPtrWithVTable(soldier)) continue;
 
 				if (!soldier->IsAlive()) continue;
 
 				const auto components = soldier->m_pComponents;
-				if (!components) continue;
+				if (!IsValidPtr(components)) continue;
 
 				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
-				if (!IsValidPtrWithVTable(map)) continue;
-
-				map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
+				if (!IsValidPtrWithVTable(map))
+					map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}
 	}

@@ -116,6 +116,8 @@ namespace big
 					ImGui::SliderFloat(xorstr_("FOV##Aimbot"), &g_settings.aim_fov, 0.f, 180.f);
 					ImGui::PopItemWidth();
 
+					color_wrapper(xorstr_("FOV color##FOV"), &g_settings.aim_fov_color);
+
 					ImGui::Separator();
 				}
 
@@ -169,29 +171,59 @@ namespace big
 				static bool enable_editor = false;
 				ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
 
+				// This is for current weapon only, and made for debugging, you can make all of these as features
 				if (enable_editor)
 				{
-					const auto data = get_weapon_firing();
-					if (IsValidPtrWithVTable(data))
+					const auto weapon_firing = get_weapon_firing();
+					const auto primary_fire = weapon_firing->m_pPrimaryFire;
+					const auto data = primary_fire->m_FiringData;
+
+					if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
 					{
+						ImGui::Text(xorstr_("Bullet count"));
 						ImGui::PushItemWidth(300.f);
-						ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 5);
-						ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 5);
-						ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 5);
+						ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 100);
+						ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
+						ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
+						ImGui::PopItemWidth();
+						
+						ImGui::Text(xorstr_("Overheat"));
+						ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
+						ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
+						
+						static bool is_overheated = false;
+						if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
+							weapon_firing->m_IsOverheated = is_overheated;
+
+						ImGui::Text(xorstr_("Bullet speed"));
+						ImGui::PushItemWidth(300.f);
+						ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.0f, 10000.f);
+						ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.0f, 10000.f);
+						ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
+						ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
 						ImGui::PopItemWidth();
 
-						ImGui::Text(xorstr_("Speed"));
-						ImGui::PushItemWidth(300.f);
-						ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.5f, 10.f);
-						ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.5f, 10.f);
-						ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.5f, 10.f);
-						ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.5f, 10.f);
-						ImGui::PopItemWidth();
+						ImGui::Text(xorstr_("Recoil"));
+
+						ImGui::InputFloat(xorstr_("Recoil time multiplier##WP"), &weapon_firing->m_RecoilTimeMultiplier, 0.0f, 10000.f);
+						ImGui::InputFloat(xorstr_("Recoil angle X##WP"), &weapon_firing->m_RecoilAngleX, 0.0f, 1000.f);
+						ImGui::InputFloat(xorstr_("Recoil angle Y##WP"), &weapon_firing->m_RecoilAngleY, 0.0f, 1000.f);
+						ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
 
 						ImGui::Text(xorstr_("Other"));
-						ImGui::PushItemWidth(300.f);
-						ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.5f, 10.f);
-						ImGui::PopItemWidth();
+						
+						if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
+						{
+							static bool instant_hit = false;
+							if (ImGui::Checkbox(xorstr_("Instant Hit"), &instant_hit))
+								data->m_ShotConfigData.m_ProjectileData->m_InstantHit = instant_hit;
+
+							ImGui::PushItemWidth(300.f);
+							ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.0f, 10.f);
+							ImGui::InputFloat(xorstr_("Time to live##WP"), &data->m_ShotConfigData.m_ProjectileData->m_TimeToLive, 0.0f, 10.f);
+							ImGui::InputFloat(xorstr_("End damage##WP"), &data->m_ShotConfigData.m_ProjectileData->m_EndDamage, 0.0f, 10.f);
+							ImGui::PopItemWidth();
+						}
 					}
 				}
 
@@ -221,11 +253,16 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw box"), &g_settings.esp_draw_box);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Fill box"), &g_settings.esp_box_fill);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
 				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Box color"));
+
+				if (g_settings.esp_box_fill)
+				    color_wrapper(xorstr_("Filler##BX"), &g_settings.esp_box_fill_color);
 
 				color_wrapper(xorstr_("Not visible##BX"), &g_settings.esp_box_color_occluded);
 				color_wrapper(xorstr_("Visible##BX"), &g_settings.esp_box_color);
@@ -363,9 +400,28 @@ namespace big
 			{
 				ImGui::Checkbox(xorstr_("Radar"), &g_settings.radar);
 				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Circular shape"), &g_settings.radar_circular);
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw self##RDR"), &g_settings.radar_draw_you);
+
+				ImGui::PushItemWidth(300.f);
+
+				// We do this so it gets the correct number in the first run
+				static float radar_size = -1.f;
+				if (radar_size < 0)
+					radar_size = g_settings.radar_width; // You can even use height, since they are the same
+
+				if (ImGui::SliderFloat(xorstr_("Radar size##RDR"), &radar_size, 0.f, (float)g_globals.g_height))
+				{
+					g_settings.radar_width = radar_size;
+					g_settings.radar_height = radar_size;
+				}
+				
+				ImGui::PopItemWidth();
+
+				
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
@@ -390,8 +446,12 @@ namespace big
 
 				ImGui::Text(xorstr_("Colors"));
 
-				color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
-				color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
+				if (g_settings.radar_cross)
+				    color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
+
+				if (g_settings.radar_outline)
+				    color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
+
 				color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
 				color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
 				color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
@@ -494,7 +554,7 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Kill sound (FFSS risk)"), &g_settings.kill_sound);
-				ImGui::PushItemWidth(400.f);
+				ImGui::PushItemWidth(500.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
 				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is a WAVE audio file"));
@@ -577,14 +637,18 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::InputText(xorstr_("Nickname"), g_settings.spoofed_name, 16);
 				ImGui::PopItemWidth();
-
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
 
-				ImGui::Spacing();
-				
-				ImGui::Text(xorstr_("This affects ESP and Spectator List only!"));
 				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will use fake nicknames in ESP and censor out nicknames in Spectator List."));
+
+				ImGui::SameLine();
+
+				ImGui::Checkbox(xorstr_("Rainbow mode"), &g_settings.rainbow_mode);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make every Visual color have the Rainbow effect."));
 
 				ImGui::Separator();
 

@@ -7,7 +7,6 @@
 #include "../../Utilities/other.h"
 #include "../../Rendering/draw-list.h"
 
-// So we don't get shit ton of warnings through or aimbot code
 #pragma warning( disable : 4244 )
 
 using namespace big;
@@ -35,15 +34,15 @@ namespace big
 			return 0;
 
 		const auto weapon_firing = WeaponFiring::GetInstance();
-		if (!IsValidPtr(weapon_firing))
+		if (!IsValidPtrWithVTable(weapon_firing))
 			return 0;
 
 		const auto firing = weapon_firing->m_pPrimaryFire;
-		if (!IsValidPtr(firing))
+		if (!IsValidPtrWithVTable(firing))
 			return 0;
 
 		const auto firing_data = firing->m_FiringData;
-		if (!IsValidPtr(firing_data))
+		if (!IsValidPtrWithVTable(firing_data))
 			return 0;
 
 		const auto weapon_modifier = client_weapon->m_pWeaponModifier;
@@ -191,7 +190,7 @@ namespace big
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtr(player))
+			if (!IsValidPtrWithVTable(player))
 				continue;
 
 			m_PlayerList.push_back(player);
@@ -213,20 +212,20 @@ namespace big
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
 
 		for (const auto player : m_PlayerList)
 		{
-			if (!IsValidPtr(player))
+			if (!IsValidPtrWithVTable(player))
 				continue;
 
 			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
 			const auto soldier = player->GetSoldier();
-			if (!IsValidPtr(soldier))
+			if (!IsValidPtrWithVTable(soldier))
 				continue;
 
 			if (!g_settings.aim_must_be_visible)
@@ -333,12 +332,12 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
-		if (IsValidPtrWithVTable(local_player->GetVehicle())) return;
+		if (local_player->GetVehicle()) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -372,7 +371,8 @@ namespace plugins
 
 		if (target.m_Player != m_PreviousTarget.m_Player)
 		{
-			Vector2 vec_rand = {
+			Vector2 vec_rand =
+			{
 				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
 				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
 			};
@@ -413,12 +413,12 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
-		if (IsValidPtrWithVTable(local_player->GetVehicle())) return;
+		if (local_player->GetVehicle()) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -426,6 +426,6 @@ namespace plugins
 		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
 
 		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), fov_radius, ImColor(255, 255, 255, 200));
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), fov_radius, g_settings.aim_fov_color);
 	}
 }

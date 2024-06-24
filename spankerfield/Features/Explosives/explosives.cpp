@@ -14,20 +14,14 @@ namespace plugins
         const auto game_context = ClientGameContext::GetInstance();
         if (!game_context) return;
 
-        const auto level = game_context->m_pLevel;
-        if (!level) return;
-
-        const auto game_world = level->m_pGameWorld;
-        if (!game_world) return;
-
         const auto player_manager = game_context->m_pPlayerManager;
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!local_player) return;
+        if (!IsValidPtrWithVTable(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!local_soldier || !local_soldier->IsAlive()) return;
+        if (!IsValidPtrWithVTable(local_soldier) || !local_soldier->IsAlive()) return;
 
         if (!class_info.ExplosionEntity)
         {
@@ -35,16 +29,22 @@ namespace plugins
             return;
         }
 
+        const auto level = game_context->m_pLevel;
+        if (!level) return;
+
+        const auto game_world = level->m_pGameWorld;
+        if (!game_world) return;
+
         EntityIterator<ClientExplosionEntity> explosives(game_world, class_info.ExplosionEntity);
         if (!explosives.front()) return;
 
         do
         {
             ClientExplosionEntity* explosive = explosives.front()->getObject();
-            if (!IsValidPtr(explosive)) continue;
+            if (!IsValidPtrWithVTable(explosive)) continue;
 
             ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
-            if (!IsValidPtr(explosive_controllable)) continue;
+            if (!IsValidPtrWithVTable(explosive_controllable)) continue;
 
             TransformAABBStruct transform;
             explosive_controllable->GetAABB(&transform);

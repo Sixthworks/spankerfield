@@ -106,7 +106,7 @@ namespace big
 		return (*(int*)(*screenshot_module + 0x14) != -1);
 	}
 
-	FiringFunctionData* get_weapon_firing()
+	WeaponFiring* get_weapon_firing()
 	{
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return nullptr;
@@ -125,13 +125,7 @@ namespace big
 			const auto weapon = WeaponFiring::GetInstance();
 			if (!weapon) return nullptr;
 
-			const auto primary_fire = weapon->m_pPrimaryFire;
-			if (!primary_fire) return nullptr;
-
-			const auto firing_data = primary_fire->m_FiringData;
-			if (!firing_data) return nullptr;
-
-			return firing_data;
+			return weapon;
 		}
 
 		return nullptr;

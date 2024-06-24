@@ -18,7 +18,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		// Rehooking PreFrameUpdate vtable to prevent crashes when leaving the server (credits Menool)
-		if (!IsValidPtr(player_manager->m_pLocalPlayer))
+		if (!IsValidPtrWithVTable(player_manager->m_pLocalPlayer))
 		{
 			if (!refresh)
 			{

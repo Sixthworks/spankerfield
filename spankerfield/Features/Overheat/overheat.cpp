@@ -22,7 +22,7 @@ namespace plugins
 		if (!IsValidPtrWithVTable(vehicle)) return;
 
 		const auto weapon = WeaponFiring::GetInstance();
-		if (!weapon) return;
+		if (!IsValidPtrWithVTable(weapon)) return;
 
 		if (weapon->m_FirstSlotBullets != -1) return;
 

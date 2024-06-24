@@ -9,6 +9,10 @@ namespace big
 		// This has to be done before the visuals run
 		plugins::refresh_preframe_hook();
 		
+		// For fun
+		plugins::rainbow_mode();
+
+		// Rest
 		plugins::draw_screenshots();
 		plugins::draw_crosshair();
 		plugins::draw_spectators();
@@ -34,7 +38,7 @@ namespace big
 		plugins::no_recoil();
 		plugins::overheat_control();
 		plugins::kill_sound();
-		
+
 		if (g_settings.aimbot)
 		{
 			m_PlayerManager.update_players();

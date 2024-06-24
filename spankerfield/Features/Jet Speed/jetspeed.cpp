@@ -25,10 +25,10 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return;
+		if (!IsValidPtrWithVTable(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -47,7 +47,8 @@ namespace plugins
 			if (!input) return;
 
 			Vector3 vehicle_velocity = *local_soldier->GetVelocity();
-			if (vehicle_velocity.x == 0.0f && vehicle_velocity.y == 0.0f && vehicle_velocity.z == 0.0f) return;
+			if (abs(vehicle_velocity.x) < 0.0001f && abs(vehicle_velocity.y) < 0.0001f && abs(vehicle_velocity.z) < 0.0001f)
+			    return;
 
 			auto velocity = sqrt(pow(vehicle_velocity.x, 2) + pow(vehicle_velocity.y, 2) + pow(vehicle_velocity.z, 2)) * 3.6f;
 			if (velocity < 314.f && velocity > 312.f)

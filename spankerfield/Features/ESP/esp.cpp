@@ -50,23 +50,23 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!local_player) return;
+        if (!IsValidPtrWithVTable(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!local_soldier || !local_soldier->IsAlive()) return;
+        if (!IsValidPtrWithVTable(local_soldier)) return;
 
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             const auto player = player_manager->m_ppPlayers[i];
-            if (!IsValidPtr(player) || player == local_player)
+            if (!IsValidPtrWithVTable(player) || player == local_player)
                 continue;
 
-            bool teammate = IsValidPtr(player) && player->m_TeamId == local_player->m_TeamId;
+            bool teammate = IsValidPtrWithVTable(player) && player->m_TeamId == local_player->m_TeamId;
             if (teammate && !g_settings.esp_draw_teammates)
                 continue;
 
             const auto soldier = player->GetSoldier();
-            if (!IsValidPtr(soldier) || !soldier->IsAlive()) continue;
+            if (!IsValidPtrWithVTable(soldier) || !soldier->IsAlive()) continue;
 
             TransformAABBStruct transform = get_transform(player);
             TransformAABBStruct local_transform = get_transform(local_player);
@@ -125,6 +125,9 @@ namespace plugins
 
                 if (g_settings.esp_draw_box)
                 {
+                    if (g_settings.esp_box_fill)
+                        m_drawing->DrawFillArea(box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, g_settings.esp_box_fill_color, 0.0f);
+
                     ImColor box_color = teammate ? g_settings.esp_teammate_color : (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
                     m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
                 }
@@ -204,7 +207,7 @@ namespace plugins
                     }
                 }
 
-                bool allow_text = !IsValidPtr(vehicle) || player->m_AttachedEntryId == 0;
+                bool allow_text = !IsValidPtrWithVTable(vehicle) || player->m_AttachedEntryId == 0;
 
                 if (allow_text)
                 {
@@ -225,7 +228,7 @@ namespace plugins
                     float y = box_coords[0].y - 3.f;
 
                     // Adjustment to work with the right side health bar properly
-                    if (g_settings.esp_health_location == 3)
+                    if (g_settings.esp_draw_health && g_settings.esp_health_location == 3)
                         x += 9.0f;
 
                     draw_esp_text(x, y, nickname, text_color, g_settings.esp_draw_name);
