@@ -16,7 +16,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return;
+		if (!IsValidPtrWithVTable(local_player)) return;
 
 		const auto vehicle = local_player->GetVehicle();
 		if (!IsValidPtrWithVTable(vehicle)) return;

@@ -64,7 +64,7 @@ namespace big
 		ImColor esp_box_color{ 97, 59, 230, 255 };
 
 		bool esp_box_fill;
-		ImColor esp_box_fill_color{ 0, 0, 0, 90 };
+		ImColor esp_box_fill_color{ 0, 0, 0, 70 };
 
 		bool esp_draw_line{ true };
 		int esp_draw_line_from{ 1 };
@@ -116,6 +116,8 @@ namespace big
 		float radar_width{ 320.f };
 		float radar_height{ 320.f };
 		float radar_distance{ 150.f };
+		ImColor radar_background_color{ 0, 0, 0, 160 };
+		ImColor radar_you_color{ 255, 255, 255, 200 };
 		ImColor radar_outline_color{ 255, 255, 255, 255 };
 		ImColor radar_cross_color{ 255, 255, 255, 175 };
 		ImColor radar_teammates_color{ 170, 170, 170, 255 };
@@ -142,7 +144,9 @@ namespace big
 
 		bool minimap{ true };
 		bool obs_check{ true };
+		
 		bool screenshots{ true };
+		ImColor screenshots_color{ 255, 255, 255, 255 };
 	};
 
 	inline settings g_settings;
@@ -279,6 +283,8 @@ namespace big
 			g_settings.radar_width = j[xorstr_("settings")][xorstr_("radar_width")];
 			g_settings.radar_height = j[xorstr_("settings")][xorstr_("radar_height")];
 			g_settings.radar_distance = j[xorstr_("settings")][xorstr_("radar_distance")];
+			g_settings.radar_background_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_background_color")]);
+			g_settings.radar_you_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_you_color")]);
 			g_settings.radar_outline_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_outline_color")]);
 			g_settings.radar_cross_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_cross_color")]);
 			g_settings.radar_teammates_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_teammates_color")]);
@@ -308,6 +314,7 @@ namespace big
 			g_settings.minimap = j[xorstr_("settings")][xorstr_("minimap")];
 			g_settings.obs_check = j[xorstr_("settings")][xorstr_("obs_check")];
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
+			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
 		}
 
 		nlohmann::json to_json()
@@ -403,6 +410,8 @@ namespace big
 						{ xorstr_("radar_width"), g_settings.radar_width },
 						{ xorstr_("radar_height"), g_settings.radar_height },
 						{ xorstr_("radar_distance"), g_settings.radar_distance },
+			            { xorstr_("radar_background_color"), color_to_string(g_settings.radar_background_color) },
+			            { xorstr_("radar_you_color"), color_to_string(g_settings.radar_you_color) },
 					    { xorstr_("radar_outline_color"), color_to_string(g_settings.radar_outline_color) },
 						{ xorstr_("radar_cross_color"), color_to_string(g_settings.radar_cross_color) },
 						{ xorstr_("radar_teammates_color"), color_to_string(g_settings.radar_teammates_color) },
@@ -424,6 +433,7 @@ namespace big
 						{ xorstr_("minimap"), g_settings.minimap },
 						{ xorstr_("obs_check"), g_settings.obs_check },
 						{ xorstr_("screenshots"), g_settings.screenshots },
+						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
 					},
 				},
 

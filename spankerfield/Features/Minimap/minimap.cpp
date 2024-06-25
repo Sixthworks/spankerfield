@@ -75,7 +75,7 @@ namespace plugins
 				if (!IsValidPtr(components)) continue;
 
 				const auto map = components->GetComponentByClassId<ClientSpottingTargetComponent>(378);
-				if (!IsValidPtrWithVTable(map))
+				if (IsValidPtrWithVTable(map))
 					map->activeSpotType = g_globals.g_should_draw ? ClientSpottingTargetComponent::SpotType_Active : ClientSpottingTargetComponent::SpotType_None;
 			}
 		}

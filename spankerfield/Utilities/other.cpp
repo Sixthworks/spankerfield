@@ -12,12 +12,12 @@ namespace big
 		if (!player_manager) return nullptr;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!local_player) return nullptr;
+		if (!IsValidPtrWithVTable(local_player)) return nullptr;
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!player) continue;
+			if (!IsValidPtrWithVTable(player)) continue;
 
 			const auto name = player->m_Name;
 			if (!name) continue;
@@ -46,7 +46,10 @@ namespace big
 
 	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle)
 	{
-		return vehicle->m_Data;
+		const auto data = vehicle->m_Data;
+		if (!IsValidPtrWithVTable(data)) return nullptr;
+
+		return data;
 	}
 
 	TransformAABBStruct get_transform(ClientPlayer* player)

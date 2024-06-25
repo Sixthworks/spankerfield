@@ -159,7 +159,7 @@ namespace big
 				ImGui::Text(xorstr_("Smoothing"));
 
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Minimum time to target (seconds)##Aimbot"), &g_settings.aim_min_time_to_target, 0.f, g_settings.aim_max_time_to_target);
+				ImGui::SliderFloat(xorstr_("Minimum time to target (seconds)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
 				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
 				ImGui::PopItemWidth();
 
@@ -170,6 +170,8 @@ namespace big
 
 				static bool enable_editor = false;
 				ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
 
 				// This is for current weapon only, and made for debugging, you can make all of these as features
 				if (enable_editor)
@@ -415,6 +417,7 @@ namespace big
 
 				if (ImGui::SliderFloat(xorstr_("Radar size##RDR"), &radar_size, 0.f, (float)g_globals.g_height))
 				{
+					// Should've made this one variable, honestly
 					g_settings.radar_width = radar_size;
 					g_settings.radar_height = radar_size;
 				}
@@ -452,6 +455,10 @@ namespace big
 				if (g_settings.radar_outline)
 				    color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
 
+				if (g_settings.radar_draw_you)
+					color_wrapper(xorstr_("Self##RDR"), &g_settings.radar_you_color);
+
+				color_wrapper(xorstr_("Background##RDR"), &g_settings.radar_background_color);
 				color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
 				color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
 				color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
@@ -537,12 +544,16 @@ namespace big
 				ImGui::Checkbox(xorstr_("Auto-spot"), &g_settings.minimap);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Unspot when using OBS"), &g_settings.obs_check);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS is running."));
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No hardcore restrictions (PBSS risk)"), &g_settings.no_hc_restrictions);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("The risk is small, although you can get screenshotted with your crosshair visible while playing HC."));
 
 				ImGui::Separator();
 
@@ -554,6 +565,9 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Kill sound (FFSS risk)"), &g_settings.kill_sound);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it."));
+
 				ImGui::PushItemWidth(500.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
@@ -614,6 +628,10 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Settings")))
 			{
 				ImGui::Checkbox(xorstr_("Draw PB & FF screenshots amount"), &g_settings.screenshots);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Shows the total amount of times you've been screenshotted by FF or PB."));
+
+
 				ImGui::SameLine();
 				
 				if (ImGui::Button(xorstr_("Reset counters")))
@@ -621,6 +639,9 @@ namespace big
 					g_globals.screenshots_ff = NULL;
 					g_globals.screenshots_pb = NULL;
 				}
+
+				if (g_settings.screenshots)
+					color_wrapper(xorstr_("Text##SC"), &g_settings.screenshots_color);
 
 				ImGui::Separator();
 
@@ -648,11 +669,11 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Rainbow mode"), &g_settings.rainbow_mode);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will make every Visual color have the Rainbow effect."));
+					ImGui::SetTooltip(xorstr_("This will make every visual color have the Rainbow effect."));
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Config"));
+				ImGui::Text(xorstr_("Configuration"));
 
 				if (ImGui::Button(xorstr_("Load")))
 					g_config.load();
@@ -666,6 +687,9 @@ namespace big
 
 				if (ImGui::Button(xorstr_("Unload")))
 					g_globals.g_running = false;
+
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This function is not safe at all, there is a big chance your game might crash."));
 
 				ImGui::SameLine();
 

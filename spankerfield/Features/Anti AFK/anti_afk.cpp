@@ -30,9 +30,12 @@ namespace plugins
 			const auto input = input_cache->m_Event;
 			if (!input) return;
 
-			// Shouldn't interrupt anything
-			input[ConceptJump] = 1.f;
-			input[ConceptJump] = 0.f;
+			// Picked the ones that don't conflict with player movement
+			input[ConceptMoveFB] = 1.0f;
+			input[ConceptMoveLR] = 1.0f;
+			input[ConceptFreeCameraMoveFB] = -1.0f;
+			input[ConceptFreeCameraRotateX] = 1.0f;
+			input[ConceptFreeCameraRotateY] = 1.0f;
 
 			last_check = GetTickCount64();
 		}

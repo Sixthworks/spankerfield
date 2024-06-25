@@ -8,6 +8,11 @@
 
 namespace big
 {
+	float radians_to_degrees(float radians)
+	{
+		return radians * (180.0f / PI);
+	}
+
 	float degrees_to_radians(float degrees)
 	{
 		return degrees * ((float)(PI) / 180.0f);

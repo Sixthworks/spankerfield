@@ -3,6 +3,7 @@
 
 namespace big
 {
+	float radians_to_degrees(float radians);
 	float degrees_to_radians(float degrees);
 	float get_fov_radius(float fov_degrees, float screen_width, float screen_height);
 	void normalize_angle(Vector2& angle);

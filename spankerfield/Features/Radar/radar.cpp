@@ -1,9 +1,12 @@
 #include "radar.h"
 #include "../../settings.h"
 #include "../../Utilities/other.h"
+#include "../../Utilities/math.h"
 #include "../../Rendering/draw-list.h"
 
 #pragma warning( disable : 4244 )
+
+#define M_PI 3.14159265358979323846
 
 using namespace big;
 namespace plugins
@@ -34,7 +37,7 @@ namespace plugins
 
 		const auto aiming = weapon->m_pAuthoritativeAiming;
 		if (!aiming) return;
-
+		
 		const auto yaw = aiming->m_Yaw;
 		if (!yaw) return;
 
@@ -45,14 +48,14 @@ namespace plugins
 		// Radar filler
 		if (g_settings.radar_circular)
 		{
-			m_drawing->AddCircleFilled(center, radius, ImColor(0, 0, 0, 160));
+			m_drawing->AddCircleFilled(center, radius, g_settings.radar_background_color);
 
 			if (g_settings.radar_outline)
 				m_drawing->AddCircle(center, radius, g_settings.radar_outline_color);
 		}
 		else
 		{
-			m_drawing->DrawFillArea(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, ImColor(0, 0, 0, 160));
+			m_drawing->DrawFillArea(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, g_settings.radar_background_color);
 
 			if (g_settings.radar_outline)
 				m_drawing->DrawBoxOutline(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, g_settings.radar_outline_color);
@@ -60,7 +63,7 @@ namespace plugins
 
 		// You
 		if (g_settings.radar_draw_you)
-			m_drawing->AddCircleFilled(center, 3.5f, ImColor(255, 255, 255, 200));
+			m_drawing->AddCircleFilled(center, 3.5f, g_settings.radar_you_color);
 
 		// Cross (for both rectangular and circular radars)
 		if (g_settings.radar_cross)

@@ -83,6 +83,7 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.crosshair_color);
         g_rainbow_manager.add_color(g_settings.radar_outline_color);
         g_rainbow_manager.add_color(g_settings.radar_cross_color);
+        g_rainbow_manager.add_color(g_settings.radar_you_color);
         g_rainbow_manager.add_color(g_settings.radar_enemies_color);
         g_rainbow_manager.add_color(g_settings.radar_enemy_vehicles_color);
         g_rainbow_manager.add_color(g_settings.blacklist_color);
@@ -91,6 +92,7 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.explosives_color);
         g_rainbow_manager.add_color(g_settings.missiles_color);
         g_rainbow_manager.add_color(g_settings.spectator_color);
+        g_rainbow_manager.add_color(g_settings.screenshots_color);
     }
 
 	void rainbow_mode()
