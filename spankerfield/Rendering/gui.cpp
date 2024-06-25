@@ -348,7 +348,8 @@ namespace big
 
 				ImGui::Text(xorstr_("Skeleton color"));
 
-				color_wrapper(xorstr_("Bones##SKC"), &g_settings.skeleton_color);
+				color_wrapper(xorstr_("Not visible##SK"), &g_settings.skeleton_color_occluded);
+				color_wrapper(xorstr_("Visible##SK"), &g_settings.skeleton_color);
 
 				ImGui::Separator();
 

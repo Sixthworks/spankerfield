@@ -84,6 +84,7 @@ namespace big
 		bool skeleton{ true };
 		bool skeleton_use_dots{ true };
 		float skeleton_dots_distance{ 22.5f };
+		ImColor skeleton_color_occluded{ 220, 220, 220, 255 };
 		ImColor skeleton_color{ 220, 220, 220, 255 };
 
 		bool draw_crosshair{ true };
@@ -252,6 +253,7 @@ namespace big
 			g_settings.skeleton = j[xorstr_("settings")][xorstr_("skeleton")];
 			g_settings.skeleton_use_dots = j[xorstr_("settings")][xorstr_("skeleton_use_dots")];
 			g_settings.skeleton_dots_distance = j[xorstr_("settings")][xorstr_("skeleton_dots_distance")];
+			g_settings.skeleton_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color_occluded")]);
 			g_settings.skeleton_color = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color")]);
 
 			g_settings.draw_crosshair = j[xorstr_("settings")][xorstr_("draw_crosshair")];
@@ -356,7 +358,8 @@ namespace big
 						{ xorstr_("skeleton"), g_settings.skeleton },
 						{ xorstr_("skeleton_use_dots"), g_settings.skeleton_use_dots },
 						{ xorstr_("skeleton_dots_distance"), g_settings.skeleton_dots_distance },
-			            { xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
+					    { xorstr_("skeleton_color_occluded"), color_to_string(g_settings.skeleton_color_occluded) },
+					    { xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
 						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
 						{ xorstr_("crosshair_in_vehicles"), g_settings.crosshair_in_vehicles },
 						{ xorstr_("crosshair_shadow"), g_settings.crosshair_shadow },
