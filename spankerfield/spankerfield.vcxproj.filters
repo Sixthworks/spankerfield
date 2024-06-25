@@ -84,7 +84,7 @@
     <ClCompile Include="SDK\type_info.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\vtablehook.cpp">
+    <ClCompile Include="Utilities\vmt_hook.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\w2s.cpp">
@@ -269,7 +269,7 @@
     <ClInclude Include="SDK\type_info.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\vtablehook.h">
+    <ClInclude Include="Utilities\vmt_hook.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\w2s.h">

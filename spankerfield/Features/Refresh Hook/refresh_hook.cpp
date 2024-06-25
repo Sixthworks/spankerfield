@@ -1,6 +1,6 @@
 #include "refresh_hook.h"
 #include "../../Hooks/hooks.h"
-#include "../../Utilities/vtablehook.h"
+#include "../../Utilities/vmt_hook.h"
 
 using namespace big;
 namespace plugins
@@ -23,9 +23,7 @@ namespace plugins
 			if (!refresh)
 			{
 				refresh = true;
-
-				if (PreFrame::oPreFrameUpdate)
-				    hook_vtable_func(reinterpret_cast<PDWORD64*>(border_input_node->m_Vtable), reinterpret_cast<PBYTE>(PreFrame::oPreFrameUpdate), 3);
+				PreFrame::pPreFrameHook->Release();
 			}
 
 			return;
@@ -34,7 +32,9 @@ namespace plugins
 		{
 			refresh = false;
 
-			PreFrame::oPreFrameUpdate = reinterpret_cast<PreFrame::PreFrameUpdate_t>(hook_vtable_func(reinterpret_cast<PDWORD64*>(border_input_node->m_Vtable), reinterpret_cast<PBYTE>(&PreFrame::hkPreFrame), 3));
+			PreFrame::pPreFrameHook->Setup(border_input_node->m_Vtable);
+			PreFrame::pPreFrameHook->Hook(3, PreFrame::PreFrameUpdate);
+
 			LOG(INFO) << xorstr_("Refreshed PreFrameUpdate.");
 		}
 	}

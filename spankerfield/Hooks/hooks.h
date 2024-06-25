@@ -1,14 +1,16 @@
 #pragma once
 #include "../SDK/sdk.h"
+#include "../Utilities/vmt_hook.h"
 
 namespace big
 {
 	// For the refresh hook plugin
 	namespace PreFrame
 	{
-		using PreFrameUpdate_t = void(*)(float dt);
-		extern PreFrameUpdate_t oPreFrameUpdate;
-		void hkPreFrame(float delta_time);
+		extern std::unique_ptr<VMTHook> pPreFrameHook;
+		typedef int(__fastcall* PreFrameUpdate_t) (void*, void*, float);
+
+		int __fastcall PreFrameUpdate(void* ecx, void* edx, float delta_time);
 	}
 
 	// Hooking

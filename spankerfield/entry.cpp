@@ -1,6 +1,5 @@
 ﻿#include "common.h"
 #include "Rendering/renderer.h"
-#include "Utilities/vtablehook.h"
 #include "Utilities/thread_pool.h"
 #include "Hooks/hooks.h"
 #include "global.h"

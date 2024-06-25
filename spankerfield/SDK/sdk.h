@@ -314,7 +314,7 @@ public:
 	char _0x0000[8];
 	InputCache* m_InputCache; //0x0008 
 	char _0x0010[48];
-	__int64 m_Vtable; //0x0040 
+	void* m_Vtable; //0x0040 
 	char _0x0048[8];
 	Keyboard* m_pKeyboard; //0x0050 
 	Mouse* m_pMouse; //0x0058 
