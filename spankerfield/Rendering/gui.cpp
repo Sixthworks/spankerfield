@@ -240,6 +240,7 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw vehicles##ESP"), &g_settings.esp_draw_vehicles);
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
 				
 				ImGui::Text(xorstr_("Teammates color"));
@@ -282,24 +283,31 @@ namespace big
 
 				ImGui::Separator();
 				
+				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw vehicle tag"), &g_settings.esp_draw_vehicle_tag);
+
+				ImGui::Spacing();
+
 				ImGui::Text(xorstr_("Text spacing"));
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Text spacing##ESP"), &g_settings.esp_text_spacing, 0.f, 50.f);
 				ImGui::PopItemWidth();
 
-				ImGui::Spacing();
+				ImGui::Text(xorstr_("Text color"));
 
-				ImGui::Checkbox(xorstr_("Draw health"), &g_settings.esp_draw_health);
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
+				color_wrapper(xorstr_("Not visible##TX"), &g_settings.text_color_occluded);
+				color_wrapper(xorstr_("Visible##TX"), &g_settings.text_color);
+
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Draw health bar"), &g_settings.esp_draw_health);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Health location"), &g_settings.esp_health_location, 0, 3);
 				ImGui::PopItemWidth();
-
-				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Draw vehicle tag"), &g_settings.esp_draw_vehicle_tag);
 
 				ImGui::Separator();
 
@@ -334,14 +342,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.skeleton_use_dots);
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.skeleton_dots_distance, 1.f, 5000.f);
-				ImGui::PopItemWidth();
-
-				ImGui::Separator();
-
-				ImGui::Text(xorstr_("Text color"));
-
-				color_wrapper(xorstr_("Not visible##TX"), &g_settings.text_color_occluded);
-				color_wrapper(xorstr_("Visible##TX"), &g_settings.text_color);
+				ImGui::PopItemWidth();	
 
 				ImGui::Text(xorstr_("Skeleton color"));
 
@@ -350,9 +351,10 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw personal health bar"), &g_settings.draw_health_bar);
-				ImGui::Checkbox(xorstr_("Player health"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Vehicle health"), &g_settings.health_bar_vehicle);
+				ImGui::Checkbox(xorstr_("Player##HB"), &g_settings.health_bar_soldier);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Vehicle##HB"), &g_settings.health_bar_vehicle);
 
 				ImGui::Text(xorstr_("Size"));
 
@@ -360,8 +362,6 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Width##HB"), &g_settings.health_bar_width, 1.f, (float)g_globals.g_width);
 				ImGui::SliderFloat(xorstr_("Height##HB"), &g_settings.health_bar_height, 1.f, (float)g_globals.g_height);
 				ImGui::PopItemWidth();
-
-				ImGui::Separator();
 
 				ImGui::Text(xorstr_("Position"));
 

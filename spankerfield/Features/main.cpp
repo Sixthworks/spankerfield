@@ -6,13 +6,10 @@ namespace big
 {
 	void features::draw()
 	{
-		// This has to be done before the visuals run
+		// Unfortunately we have to do this
 		plugins::refresh_preframe_hook();
-		
-		// For fun
-		plugins::rainbow_mode();
 
-		// Rest
+		plugins::rainbow_mode();
 		plugins::draw_screenshots();
 		plugins::draw_crosshair();
 		plugins::draw_spectators();

@@ -115,7 +115,7 @@ namespace big
 		float radar_y{ 245.f };
 		float radar_width{ 320.f };
 		float radar_height{ 320.f };
-		float radar_distance{ 400.f };
+		float radar_distance{ 150.f };
 		ImColor radar_outline_color{ 255, 255, 255, 255 };
 		ImColor radar_cross_color{ 255, 255, 255, 175 };
 		ImColor radar_teammates_color{ 170, 170, 170, 255 };
