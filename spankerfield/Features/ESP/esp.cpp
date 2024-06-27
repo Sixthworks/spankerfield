@@ -3,9 +3,9 @@
 #include "../../global.h"
 #include "../../SDK/sdk.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Rendering/Maps/nicknames.h"
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/other.h"
-#include "../../Rendering/nicknames.h"
 
 using namespace big;
 namespace plugins

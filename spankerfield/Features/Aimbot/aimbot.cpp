@@ -322,7 +322,15 @@ namespace plugins
 {
 	void aimbot(float delta_time)
 	{
-		if (!GetAsyncKeyState(g_settings.aim_key))
+		// Controller support
+		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
+
+		// Pressed status
+		auto is_pressed = [=]() {
+			return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
+		};
+
+		if (!is_pressed())
 			return;
 
 		const auto game_context = ClientGameContext::GetInstance();
@@ -349,6 +357,15 @@ namespace plugins
 
 		const auto client_weapon = weapon->m_pWeapon;
 		if (!client_weapon) return;
+
+		// Controller support
+		if (using_controller)
+		{
+			// Simulate a little bit of mouse movement, otherwise aiming simulation won't be valid
+			const auto mouse_device = BorderInputNode::GetInstance()->m_pMouse->m_pDevice;
+			if (IsValidPtr(mouse_device))
+				mouse_device->m_Buffer.x = mouse_device->m_Buffer.x - 1;
+		}
 
 		const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
 		if (!aiming_simulation) return;

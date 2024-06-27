@@ -11,7 +11,8 @@ private:
     ImColor current_color;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_update_time;
-    std::vector<std::reference_wrapper<ImColor>> managed_colors;
+    std::vector<std::pair<std::reference_wrapper<ImColor>, ImColor>> managed_colors;
+    bool is_active = false;
 
     void update_rainbow_color(float delta_time)
     {
@@ -41,23 +42,48 @@ private:
         );
     }
 
+    void update_original_colors()
+    {
+        for (auto& [color_ref, original_color] : managed_colors)
+            original_color = color_ref.get();
+    }
+
+    void restore_original_colors()
+    {
+        for (auto& [color_ref, original_color] : managed_colors)
+            color_ref.get() = original_color;
+    }
 public:
     RainbowColorManager() : last_update_time(std::chrono::high_resolution_clock::now()) {}
 
     void add_color(ImColor& color)
     {
-        managed_colors.push_back(color);
+        managed_colors.emplace_back(color, color); // Store reference and original color
     }
 
     void update()
     {
+        if (!is_active) return;
+
         auto current_time = std::chrono::high_resolution_clock::now();
         float delta_time = std::chrono::duration<float>(current_time - last_update_time).count();
         last_update_time = current_time;
 
         update_rainbow_color(delta_time);
-        for (auto& color_ref : managed_colors)
+        for (auto& [color_ref, original_color] : managed_colors)
             color_ref.get() = current_color;
+    }
+
+    void activate()
+    {
+        update_original_colors();
+        is_active = true;
+    }
+
+    void deactivate()
+    {
+        is_active = false;
+        restore_original_colors();
     }
 };
 
@@ -95,19 +121,29 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.screenshots_color);
     }
 
-	void rainbow_mode()
-	{
-        if (!g_settings.rainbow_mode) return;
-
-        // Initialize them one time only
-        if (!colors_initialized)
+    static bool was_active = false;
+    void rainbow_mode()
+    {
+        if (g_settings.rainbow_mode)
         {
-            init_colors();
+            if (!colors_initialized)
+            {
+                init_colors();
+                colors_initialized = true;
+            }
 
-            colors_initialized = true;
+            if (!was_active)
+            {
+                g_rainbow_manager.activate();
+                was_active = true;
+            }
+
+            g_rainbow_manager.update();
         }
-
-        // Update
-        g_rainbow_manager.update();
-	}
+        else if (was_active)
+        {
+            g_rainbow_manager.deactivate();
+            was_active = false;
+        }
+    }
 }

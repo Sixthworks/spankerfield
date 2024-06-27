@@ -67,10 +67,7 @@ void DumpClassPointers()
 		std::sort(classes.begin(), classes.end(), cmpFun);
 
 		for (const auto& it : classes)
-		{
-			ss << "\n"
-				<< it.className << " = 0x" << it.classPtr;
-		}
+			ss << "\n" << it.className << xorstr_(" = 0x") << it.classPtr;
 
 		file << ss.str() << std::endl;
 		file.close();
@@ -119,33 +116,33 @@ std::string MemberInfo::GetTypeName()
 {
 	switch (GetTypeCode())
 	{
-	case kTypeCode_Void: return "Void";
-	case kTypeCode_DbObject: return "DbObject";
-	case kTypeCode_ValueType: return "ValueType";
-	case kTypeCode_Class: return "Class";
-	case kTypeCode_Array: return "Array";
-	case kTypeCode_FixedArray: return "FixedArray";
-	case kTypeCode_String: return "String";
-	case kTypeCode_CString: return "CString";
-	case kTypeCode_Enum: return "Enum";
-	case kTypeCode_FileRef: return "FileRef";
-	case kTypeCode_Boolean: return "Boolean";
-	case kTypeCode_Int8: return "Int8";
-	case kTypeCode_Uint8: return "Uint8";
-	case kTypeCode_Int16: return "Int16";
-	case kTypeCode_Uint16: return "Uint16";
-	case kTypeCode_Int32: return "Int32";
-	case kTypeCode_Uint32: return "Uint32";
-	case kTypeCode_Int64: return "Int64";
-	case kTypeCode_Uint64: return "Uint64";
-	case kTypeCode_Float32: return "Float32";
-	case kTypeCode_Float64: return "Float64";
-	case kTypeCode_Guid: return "Guid";
-	case kTypeCode_SHA1: return "SHA1";
-	case kTypeCode_ResourceRef: return "ResourceRef";
+	case kTypeCode_Void: return xorstr_("Void");
+	case kTypeCode_DbObject: return xorstr_("DbObject");
+	case kTypeCode_ValueType: return xorstr_("ValueType");
+	case kTypeCode_Class: return xorstr_("Class");
+	case kTypeCode_Array: return xorstr_("Array");
+	case kTypeCode_FixedArray: return xorstr_("FixedArray");
+	case kTypeCode_String: return xorstr_("String");
+	case kTypeCode_CString: return xorstr_("CString");
+	case kTypeCode_Enum: return xorstr_("Enum");
+	case kTypeCode_FileRef: return xorstr_("FileRef");
+	case kTypeCode_Boolean: return xorstr_("Boolean");
+	case kTypeCode_Int8: return xorstr_("Int8");
+	case kTypeCode_Uint8: return xorstr_("Uint8");
+	case kTypeCode_Int16: return xorstr_("Int16");
+	case kTypeCode_Uint16: return xorstr_("Uint16");
+	case kTypeCode_Int32: return xorstr_("Int32");
+	case kTypeCode_Uint32: return xorstr_("Uint32");
+	case kTypeCode_Int64: return xorstr_("Int64");
+	case kTypeCode_Uint64: return xorstr_("Uint64");
+	case kTypeCode_Float32: return xorstr_("Float32");
+	case kTypeCode_Float64: return xorstr_("Float64");
+	case kTypeCode_Guid: return xorstr_("Guid");
+	case kTypeCode_SHA1: return xorstr_("SHA1");
+	case kTypeCode_ResourceRef: return xorstr_("ResourceRef");
 	default:
 		char buffer[32];
-		sprintf_s(buffer, "Undefined[%i]", GetTypeCode());
+		sprintf_s(buffer, xorstr_("Undefined[%i]"), GetTypeCode());
 		return buffer;
 	}
 }

@@ -380,7 +380,7 @@
     <ClInclude Include="Utilities\math.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\bone_manager.h">
+    <ClInclude Include="Rendering\Maps\bone_manager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Overheat\overheat.h">
@@ -419,7 +419,7 @@
     <ClInclude Include="Features\Anti AFK\anti_afk.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\nicknames.h">
+    <ClInclude Include="Rendering\Maps\nicknames.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Name Spoofer\name_spoofer.h">
@@ -432,6 +432,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Features\Rainbow Mode\rainbow_mode.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Maps\key_map.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

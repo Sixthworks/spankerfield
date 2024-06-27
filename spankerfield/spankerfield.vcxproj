@@ -220,10 +220,11 @@
     <ClInclude Include="Features\Risky\risky.h" />
     <ClInclude Include="Features\Screenshots\screenshots.h" />
     <ClInclude Include="logger.h" />
-    <ClInclude Include="Rendering\bone_manager.h" />
+    <ClInclude Include="Rendering\Maps\bone_manager.h" />
     <ClInclude Include="Rendering\font.h" />
     <ClInclude Include="Rendering\gui.h" />
-    <ClInclude Include="Rendering\nicknames.h" />
+    <ClInclude Include="Rendering\Maps\key_map.h" />
+    <ClInclude Include="Rendering\Maps\nicknames.h" />
     <ClInclude Include="Rendering\renderer.h" />
     <ClInclude Include="SDK\class_info.h" />
     <ClInclude Include="settings.h" />

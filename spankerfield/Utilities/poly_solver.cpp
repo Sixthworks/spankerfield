@@ -96,7 +96,7 @@ namespace big
         if (fabs(r) < std::numeric_limits<float>::epsilon())
         {
             cubic_solutions.clear();
-            int cubic_solution_count = SolveCubic(1, 0, p, q, cubic_solutions);
+            int cubic_solution_count = SolveCubic(1, 0, (float)p, (float)q, cubic_solutions);
             for (int i = 0; i < cubic_solution_count; ++i)
             {
                 Sol.push_back(cubic_solutions[i] - A / 4.0);
@@ -105,7 +105,7 @@ namespace big
             return cubic_solution_count + 1;
         }
 
-        SolveCubic(1, -p / 2.0, -r, r * p / 2.0 - q * q / 8.0, cubic_solutions);
+        SolveCubic(1, (float)-p / 2.0f, (float)-r, (float)r * (float)p / 2.0f - (float)q * (float)q / 8.0f, cubic_solutions);
 
         double z = cubic_solutions[0];
         double u = z * z - r;
@@ -130,8 +130,8 @@ namespace big
         }
 
         std::vector<double> quadratic_solutions;
-        SolveQuadratic(1, q / 2.0 + v, z - u, quadratic_solutions);
-        SolveQuadratic(1, q / 2.0 - v, z + u, quadratic_solutions);
+        SolveQuadratic(1, (float)q / 2.0f + (float)v, (float)z - (float)u, quadratic_solutions);
+        SolveQuadratic(1, (float)q / 2.0f - (float)v, (float)z + (float)u, quadratic_solutions);
 
         for (double sol : quadratic_solutions)
         {

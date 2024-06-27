@@ -202,4 +202,34 @@ namespace big
 		CloseHandle(snapshot);
 		return false;
 	}
+
+	bool is_controller_connected()
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+		DWORD dwResult = XInputGetState(0, &state);
+
+		if (dwResult == ERROR_SUCCESS)
+			return true;
+		else
+			return false;
+	}
+
+	bool is_left_trigger_pressed(float threshold)
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+		DWORD result = XInputGetState(0, &state);
+
+		if (result == ERROR_SUCCESS)
+		{
+			float trigger_value = state.Gamepad.bLeftTrigger / 255.0f;
+
+			return trigger_value > threshold;
+		}
+
+		return false;
+	}
 }

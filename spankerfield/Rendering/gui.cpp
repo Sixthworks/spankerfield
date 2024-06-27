@@ -1,6 +1,7 @@
 #include "gui.h"
 #include "renderer.h"
-#include "bone_manager.h"
+#include "Maps/bone_manager.h"
+#include "Maps/key_map.h"
 #include "../common.h"
 #include "../global.h"
 #include "../settings.h"
@@ -122,9 +123,49 @@ namespace big
 				}
 
 				ImGui::Text(xorstr_("Aim key"));
+
+				// Controller support
+				if (is_controller_connected())
+				{
+					ImGui::Text(xorstr_("Controller detected, additional settings added"));
+
+					ImGui::Checkbox(xorstr_("Use left trigger (LT) for aiming"), &g_settings.aim_support_controller);
+
+					ImGui::Spacing();
+				}
+
 				ImGui::PushItemWidth(300.f);
-				ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
+
+				static bool custom_aim_key = false;
+				if (custom_aim_key)
+					ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
+				else
+				{
+					const char* current_item = xorstr_("Select a key");
+					auto it = key_map.find(g_settings.aim_key);
+					if (it != key_map.end())
+						current_item = it->second.c_str();
+
+					if (ImGui::BeginCombo(xorstr_("##Aimbot"), current_item))
+					{
+						for (const auto& [key, name] : key_map)
+						{
+							bool is_selected = (g_settings.aim_key == key);
+							if (ImGui::Selectable(name.c_str(), is_selected))
+								g_settings.aim_key = key;
+
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+				}
+
 				ImGui::PopItemWidth();
+
+				ImGui::Checkbox(xorstr_("Use old aim key selector (legacy)"), &custom_aim_key);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of Spankerfield."));
 
 				ImGui::Checkbox(xorstr_("Auto bone mode (from upper to lower body)"), &g_settings.aim_bone_priority);
 				
@@ -569,7 +610,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it."));
 
-				ImGui::PushItemWidth(500.f);
+				ImGui::PushItemWidth(550.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
 				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is a WAVE audio file"));
