@@ -34,20 +34,18 @@ namespace big
 		auto file_path = get_appdata_folder();
 		file_path /= xorstr_("imgui.ini");
 
-		ImGui::CreateContext();
+		ImGuiContext* context = ImGui::CreateContext();
+		context->IO.DeltaTime = 1.0f / 60.0f;
 
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.DeltaTime = 1.0f / 60.0f;
+		static std::string path = file_path.make_preferred().string();
+		context->IO.IniFilename = path.c_str();
 
 		ImGui_ImplDX11_Init(m_d3d_device.Get(), m_d3d_device_context.Get());
 		ImGui_ImplWin32_Init(g_globals.g_hwnd);
 
-		io.Fonts->AddFontDefault();
-
 		ImFontConfig font_cfg{};
 		font_cfg.FontDataOwnedByAtlas = false;
-		
-		std::strcpy(font_cfg.Name, xorstr_("Rubik"));
+		std::strcpy(font_cfg.Name, xorstr_("Open Sans"));
 
 		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
 			const_cast<std::uint8_t*>(font_main),
@@ -55,10 +53,8 @@ namespace big
 			MAIN_FONT_SIZE, // See font.h to edit
 			&font_cfg);
 
-		io.FontDefault = m_font;
+		context->IO.FontDefault = m_font;
 		
-		m_monospace_font = ImGui::GetIO().Fonts->AddFontDefault();
-
 		g_gui.dx_init();
 		g_renderer = this;
 	}

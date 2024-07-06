@@ -25,7 +25,6 @@ namespace big
 		comptr<ID3D11DeviceContext> m_d3d_device_context;
 	public:
 		ImFont *m_font;
-		ImFont *m_monospace_font;
 	private:
 		void mouse_act();
 	};
