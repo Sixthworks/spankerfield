@@ -56,7 +56,7 @@ namespace plugins
 			if (std::filesystem::exists(file_path) && !std::filesystem::is_directory(file_path))
 			{
 				// Wave only so that we don't have any issues
-				bool is_wav_file = file_path.size() > 3 && std::equal(file_path.end() - 4, file_path.end(), ".wav", [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+				bool is_wav_file = file_path.size() > 3 && std::equal(file_path.end() - 4, file_path.end(), xorstr_(".wav"), [](char a, char b) { return std::tolower(a) == std::tolower(b); });
 
 				if (is_wav_file)
 				{

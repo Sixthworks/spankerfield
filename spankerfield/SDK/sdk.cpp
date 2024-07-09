@@ -103,7 +103,7 @@ bool ClientControllableEntity::IsAlive()
 
 WeaponClass WeaponFiring::GetWeaponClass()
 {
-	auto pData = reinterpret_cast<WeaponEntityData*>(this->m_weaponComponentData);
-	if (IsValidPtr(pData)) return pData->m_WeaponClass;
+	auto data = reinterpret_cast<WeaponEntityData*>(this->m_weaponComponentData);
+	if (IsValidPtr(data)) return data->m_WeaponClass;
 	return WeaponClass::None;
 }

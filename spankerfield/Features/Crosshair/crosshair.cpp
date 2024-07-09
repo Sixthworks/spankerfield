@@ -39,7 +39,7 @@ namespace plugins
 		if (g_settings.crosshair_shadow)
 		{
 			// Shadow offset, should be made as a setting, but nope
-			float offset = 1.25f;
+			constexpr float offset = 1.2f;
 
 			ImVec2 horizontal_start_shadow = ImVec2(horizontal_start.x + offset, horizontal_start.y + offset);
 			ImVec2 horizontal_end_shadow = ImVec2(horizontal_end.x + offset, horizontal_end.y + offset);

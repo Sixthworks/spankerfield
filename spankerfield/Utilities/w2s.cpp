@@ -83,7 +83,8 @@ namespace big
 		corners[0] = min;
 		corners[1] = max;
 
-		for (auto& v3 : corners) {
+		for (auto& v3 : corners)
+		{
 			if (!world_to_screen(v3))
 				return false;
 		}

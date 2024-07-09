@@ -10,7 +10,7 @@
 using namespace big;
 namespace plugins
 {
-	int exclusive = 193738923; // Random persona ID which won't occur in a game by random chance.
+	static int exclusive = 193738923; // Random persona ID which won't occur in a game by random chance.
 
 	std::filesystem::path get_path()
 	{
@@ -54,7 +54,7 @@ namespace plugins
 		{
 			blacklisted_s element;
 			element.name = name;
-			element.persona_id = data["Persona ID"];
+			element.persona_id = data[xorstr_("Persona ID")];
 			temp.push_back(element);
 		}
 

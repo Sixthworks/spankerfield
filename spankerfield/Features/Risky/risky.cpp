@@ -25,9 +25,17 @@ namespace plugins
 			const auto weapon = WeaponFiring::GetInstance();
 			if (!weapon) return;
 
+			const auto sway = weapon->m_Sway;
+			if (!sway) return;
+
+			const auto data = sway->m_Data;
+			if (!data) return;
+
 			const auto is_hit_type = [weapon]() -> bool
 			{
-				switch (weapon->GetWeaponClass())
+				const auto type = weapon->GetWeaponClass();
+				
+				switch (type)
 				{
 				case WeaponClass::_12gauge:
 				case WeaponClass::_338Magnum:
@@ -55,12 +63,6 @@ namespace plugins
 					return false;
 				}
 			};
-
-			const auto sway = weapon->m_Sway;
-			if (!sway) return;
-
-			const auto data = sway->m_Data;
-			if (!data) return;
 
 			if (is_hit_type())
 			{
