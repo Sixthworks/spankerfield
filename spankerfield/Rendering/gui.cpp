@@ -104,6 +104,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Locks on targets without them being fully visible to you."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No recoil"), &g_settings.no_recoil);
 
@@ -138,7 +140,7 @@ namespace big
 
 				static bool custom_aim_key = false;
 				if (custom_aim_key)
-					ImGui::InputInt("Key (info on keys in thread)##Aimbot", &g_settings.aim_key);
+					ImGui::InputInt(xorstr_("Key##Aimbot"), &g_settings.aim_key);
 				else
 				{
 					const char* current_item = xorstr_("Select a key");
@@ -165,7 +167,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Use old aim key selector (legacy)"), &custom_aim_key);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of Spankerfield."));
+					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of spankerfield."));
 
 				ImGui::Checkbox(xorstr_("Auto bone mode (from upper to lower body)"), &g_settings.aim_bone_priority);
 				
@@ -214,7 +216,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
 
-				// This is for current weapon only, and made for debugging, you can make all of these as features
+				// This is for current weapon only, and made for debugging, you can make all of these as standalone plugins
 				if (enable_editor)
 				{
 					const auto weapon_firing = get_weapon_firing();
@@ -355,8 +357,12 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw explosives"), &g_settings.explosives);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a number sign for every explosive entity on the server."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw laser guided missiles"), &g_settings.missiles_own);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws boxes for TOW/SRAW missiles."));
 
 				ImGui::Text(xorstr_("Colors"));
 
@@ -383,6 +389,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw skeleton"), &g_settings.skeleton);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.skeleton_use_dots);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws little dots on locations where bones end."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.skeleton_dots_distance, 1.f, 5000.f);
 				ImGui::PopItemWidth();	
@@ -435,6 +443,8 @@ namespace big
 					ImGui::PushItemWidth(300.f);
 					ImGui::SliderFloat(xorstr_("Spacing between health bars##HB"), &g_settings.health_bar_spacing, 1.f, 100.f);
 					ImGui::PopItemWidth();
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("How many space in pixels there is between two health bars."));
 				}
 
 				ImGui::EndTabItem();
@@ -445,10 +455,14 @@ namespace big
 				ImGui::Checkbox(xorstr_("Radar"), &g_settings.radar);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Circular shape"), &g_settings.radar_circular);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Makes the radar have a circle shape instead of the default square one."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw self##RDR"), &g_settings.radar_draw_you);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a little dot in the center to help you better orient."));
 
 				ImGui::PushItemWidth(300.f);
 
@@ -457,7 +471,7 @@ namespace big
 				if (radar_size < 0)
 					radar_size = g_settings.radar_width; // You can even use height, since they are the same
 
-				if (ImGui::SliderFloat(xorstr_("Radar size##RDR"), &radar_size, 0.f, (float)g_globals.g_height))
+				if (ImGui::SliderFloat(xorstr_("Radar size##RDR"), &radar_size, 100.f, (float)g_globals.g_height))
 				{
 					// Should've made this one variable, honestly
 					g_settings.radar_width = radar_size;
@@ -514,6 +528,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Spectator list"), &g_settings.spectator_list);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Raw drawing"), &g_settings.spectator_raw_drawing);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Uses the traditional drawing for the spectator list, and not a window."));
 
 				ImGui::Separator();
 
@@ -590,8 +606,12 @@ namespace big
 					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS is running."));
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Automatically turns the jet to achieve the best possible speed."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
+				ImGui::Checkbox(xorstr_("Unlock everything (BF4DB risk)"), &g_settings.unlock_all);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Unlocks everything but works for attachments only, do not recommend using it though."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No hardcore restrictions (PBSS risk)"), &g_settings.no_hc_restrictions);
 				if (ImGui::IsItemHovered())
@@ -613,7 +633,7 @@ namespace big
 				ImGui::PushItemWidth(550.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
-				ImGui::Text(xorstr_("Make sure the file exists, has latin only characters, and is a WAVE audio file"));
+				ImGui::Text(xorstr_("Make sure the file exists, has roman/latin characters only, and is a WAVE audio file"));
 
 				ImGui::EndTabItem();
 			}
@@ -621,6 +641,8 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Blacklist")))
 			{
 				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &g_settings.blacklist);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws blacklisted players in the center part of the screen."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
 				ImGui::PopItemWidth();
@@ -637,9 +659,7 @@ namespace big
 					for (const auto& rs : plugins::blacklisted)
 					{
 						if (ImGui::Selectable(rs.name.c_str(), false))
-						{
 							plugins::selected = i;
-					    }
 
 						i++;
 					}
@@ -713,6 +733,15 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will make every visual color have the Rainbow effect."));
 
+				if (g_settings.rainbow_mode)
+				{
+					ImGui::SameLine(); // Want to keep it on the same line
+
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("Speed##RM"), &g_settings.rainbow_speed, 0.1f, 2.0f);
+					ImGui::PopItemWidth();
+				}
+
 				ImGui::Separator();
 
 				ImGui::Text(xorstr_("Configuration"));
@@ -731,7 +760,7 @@ namespace big
 					g_globals.g_running = false;
 
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This function is not safe at all, there is a big chance your game might crash."));
+					ImGui::SetTooltip(xorstr_("This function is not safe at all, there is a big chance your game might crash when injecting the cheat again."));
 
 				ImGui::SameLine();
 

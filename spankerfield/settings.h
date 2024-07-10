@@ -13,6 +13,7 @@ namespace big
 
 		bool streamer_mode;
 		bool rainbow_mode;
+		float rainbow_speed{ 0.5f };
 
 		bool spoof_name;
 		bool spoof_restore;
@@ -187,6 +188,7 @@ namespace big
 
 			g_settings.streamer_mode = j[xorstr_("settings")][xorstr_("streamer_mode")];
 			g_settings.rainbow_mode = j[xorstr_("settings")][xorstr_("rainbow_mode")];
+			g_settings.rainbow_speed = j[xorstr_("settings")][xorstr_("rainbow_speed")];
 
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
 			g_settings.aim_support_controller = j[xorstr_("settings")][xorstr_("aim_support_controller")];
@@ -332,6 +334,7 @@ namespace big
 					    { xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
 						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
 						{ xorstr_("rainbow_mode"), g_settings.rainbow_mode },
+						{ xorstr_("rainbow_speed"), g_settings.rainbow_speed },
 						{ xorstr_("esp"), g_settings.esp },
 						{ xorstr_("esp_draw_teammates"), g_settings.esp_draw_teammates },
 						{ xorstr_("esp_draw_vehicles"), g_settings.esp_draw_vehicles },

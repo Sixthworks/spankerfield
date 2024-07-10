@@ -2,12 +2,13 @@
 #include "../../settings.h"
 #include "../../Rendering/draw-list.h"
 
+using namespace big;
+
 // Class
 class RainbowColorManager
 {
 private:
     float hue = 0.0f;
-    const float rainbow_speed = 0.5f;
     ImColor current_color;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_update_time;
@@ -16,7 +17,7 @@ private:
 
     void update_rainbow_color(float delta_time)
     {
-        hue += rainbow_speed * delta_time;
+        hue += g_settings.rainbow_speed * delta_time;
         if (hue > 1.0f) hue -= 1.0f;
 
         float r, g, b;
@@ -90,7 +91,6 @@ public:
 // Code
 RainbowColorManager g_rainbow_manager;
 
-using namespace big;
 namespace plugins
 {
     static bool colors_initialized = false;
