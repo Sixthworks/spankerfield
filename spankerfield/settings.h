@@ -23,6 +23,7 @@ namespace big
 		bool aimbot;
 		bool aim_support_controller;
 		bool aim_must_be_visible{ true };
+		bool aim_must_not_reload{ true };
 		bool aim_fov_method{ true };
 		bool aim_bone_priority{ true };
 		bool aim_draw_fov;
@@ -34,6 +35,7 @@ namespace big
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 
 		bool no_recoil;
+		bool no_spread;
 
 		bool anti_afk{ true };
 		int anti_afk_timer{ 150000 };
@@ -193,6 +195,7 @@ namespace big
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
 			g_settings.aim_support_controller = j[xorstr_("settings")][xorstr_("aim_support_controller")];
 			g_settings.aim_must_be_visible = j[xorstr_("settings")][xorstr_("aim_must_be_visible")];
+			g_settings.aim_must_not_reload = j[xorstr_("settings")][xorstr_("aim_must_not_reload")];
 			g_settings.aim_bone_priority = j[xorstr_("settings")][xorstr_("aim_bone_priority")];
 			g_settings.aim_fov_method = j[xorstr_("settings")][xorstr_("aim_fov_method")];
 			g_settings.aim_draw_fov = j[xorstr_("settings")][xorstr_("aim_draw_fov")];
@@ -204,6 +207,7 @@ namespace big
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 
 			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
+			g_settings.no_spread = j[xorstr_("settings")][xorstr_("no_spread")];
 
 			g_settings.anti_afk = j[xorstr_("settings")][xorstr_("anti_afk")];
 			g_settings.anti_afk_timer = j[xorstr_("settings")][xorstr_("anti_afk_timer")];
@@ -327,7 +331,7 @@ namespace big
 		{
 			return nlohmann::json{
 				{
-					"settings",
+					xorstr_("settings"),
 					{
 					    { xorstr_("blacklist"), g_settings.blacklist },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
@@ -385,6 +389,7 @@ namespace big
 						{ xorstr_("aimbot"), g_settings.aimbot },
 					    { xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 					    { xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
+						{ xorstr_("aim_must_not_reload"), g_settings.aim_must_not_reload },
 						{ xorstr_("aim_fov_method"), g_settings.aim_fov_method },
 						{ xorstr_("aim_bone_priority"), g_settings.aim_bone_priority },
 						{ xorstr_("aim_draw_fov"), g_settings.aim_draw_fov },
@@ -395,6 +400,7 @@ namespace big
 			            { xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
+						{ xorstr_("no_spread"), g_settings.no_spread },
 						{ xorstr_("anti_afk"), g_settings.anti_afk },
 						{ xorstr_("anti_afk_timer"), g_settings.anti_afk_timer },
 						{ xorstr_("unlock_all"), g_settings.unlock_all },

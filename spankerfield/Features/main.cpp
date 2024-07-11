@@ -32,7 +32,7 @@ namespace big
 		plugins::unlock_all();
 		plugins::anti_afk();
 		plugins::no_hc_restrictions();
-		plugins::no_recoil();
+		plugins::sway_modify();
 		plugins::overheat_control();
 		plugins::kill_sound();
 

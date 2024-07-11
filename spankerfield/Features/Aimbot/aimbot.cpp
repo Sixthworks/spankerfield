@@ -355,8 +355,20 @@ namespace plugins
 		const auto weapon = weapon_component->GetActiveSoldierWeapon();
 		if (!weapon) return;
 
+		const auto primary_fire = weapon->m_pPrimary;
+		if (!primary_fire) return;
+
 		const auto client_weapon = weapon->m_pWeapon;
 		if (!client_weapon) return;
+
+		if (g_settings.aim_must_not_reload)
+		{
+			if (primary_fire->m_ReloadTimer >= 0.01f) // 0.01 is the best value we can use, because sometimes the value can be approx 0.0000012517 when not reloading
+			{
+				// Don't run the code if reloading
+				return;
+			}
+		}
 
 		// Controller support
 		if (using_controller)

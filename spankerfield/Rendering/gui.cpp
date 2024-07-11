@@ -107,7 +107,13 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Locks on targets without them being fully visible to you."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("No recoil"), &g_settings.no_recoil);
+				ImGui::Checkbox(xorstr_("Don't aim while reloading"), &g_settings.aim_must_not_reload);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
+
+				ImGui::Checkbox(xorstr_("No recoil (BF4DB risk)"), &g_settings.no_recoil);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
 
 				if (g_settings.aim_fov_method)
 				{
@@ -301,6 +307,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw box"), &g_settings.esp_draw_box);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Fill box"), &g_settings.esp_box_fill);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Fills/paints the inside of a box with a solid color."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
 				ImGui::PopItemWidth();
@@ -316,6 +324,8 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw line"), &g_settings.esp_draw_line);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a line from the selected location to an enemy."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Line point location"), &g_settings.esp_draw_line_from, 0, 8);
 				ImGui::SliderFloat(xorstr_("Line thickness"), &g_settings.esp_line_thickness, 0.1f, 10.f);
@@ -403,6 +413,8 @@ namespace big
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw personal health bar"), &g_settings.draw_health_bar);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a health bar indicating the local player/vehicle health state."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Player##HB"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();

@@ -3,7 +3,7 @@
 
 namespace plugins
 {
-	void no_recoil();
+	void sway_modify();
 	void unlock_all();
 	void no_hc_restrictions();
 }
