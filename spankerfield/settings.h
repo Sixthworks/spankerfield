@@ -149,7 +149,7 @@ namespace big
 
 		bool minimap{ true };
 		bool obs_check{ true };
-		
+
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
 	};
@@ -333,9 +333,9 @@ namespace big
 				{
 					xorstr_("settings"),
 					{
-					    { xorstr_("blacklist"), g_settings.blacklist },
+						{ xorstr_("blacklist"), g_settings.blacklist },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
-					    { xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
+						{ xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
 						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
 						{ xorstr_("rainbow_mode"), g_settings.rainbow_mode },
 						{ xorstr_("rainbow_speed"), g_settings.rainbow_speed },
@@ -351,7 +351,7 @@ namespace big
 						{ xorstr_("esp_box_color"), color_to_string(g_settings.esp_box_color) },
 						{ xorstr_("esp_box_fill"), g_settings.esp_box_fill },
 						{ xorstr_("esp_box_fill_color"), color_to_string(g_settings.esp_box_fill_color) },
-					    { xorstr_("esp_draw_line"), g_settings.esp_draw_line },
+						{ xorstr_("esp_draw_line"), g_settings.esp_draw_line },
 						{ xorstr_("esp_draw_line_from"), g_settings.esp_draw_line_from },
 						{ xorstr_("esp_line_thickness"), g_settings.esp_line_thickness },
 						{ xorstr_("esp_line_color_occluded"), color_to_string(g_settings.esp_line_color_occluded) },
@@ -367,8 +367,8 @@ namespace big
 						{ xorstr_("skeleton"), g_settings.skeleton },
 						{ xorstr_("skeleton_use_dots"), g_settings.skeleton_use_dots },
 						{ xorstr_("skeleton_dots_distance"), g_settings.skeleton_dots_distance },
-					    { xorstr_("skeleton_color_occluded"), color_to_string(g_settings.skeleton_color_occluded) },
-					    { xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
+						{ xorstr_("skeleton_color_occluded"), color_to_string(g_settings.skeleton_color_occluded) },
+						{ xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
 						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
 						{ xorstr_("crosshair_in_vehicles"), g_settings.crosshair_in_vehicles },
 						{ xorstr_("crosshair_shadow"), g_settings.crosshair_shadow },
@@ -376,19 +376,19 @@ namespace big
 						{ xorstr_("crosshair_thickness"), g_settings.crosshair_thickness },
 						{ xorstr_("crosshair_color"), color_to_string(g_settings.crosshair_color) },
 						{ xorstr_("draw_health_bar"), g_settings.draw_health_bar },
-			            { xorstr_("health_bar_soldier"), g_settings.health_bar_soldier },
-			            { xorstr_("health_bar_vehicle"), g_settings.health_bar_vehicle },
-			            { xorstr_("health_bar_width"), g_settings.health_bar_width },
-			            { xorstr_("health_bar_height"), g_settings.health_bar_height },
-			            { xorstr_("health_bar_x"), g_settings.health_bar_x },
-			            { xorstr_("health_bar_y"), g_settings.health_bar_y },
-			            { xorstr_("health_bar_use_center_x"), g_settings.health_bar_use_center_x },
-			            { xorstr_("health_bar_spacing"), g_settings.health_bar_spacing },
-			            { xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
-			            { xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
+						{ xorstr_("health_bar_soldier"), g_settings.health_bar_soldier },
+						{ xorstr_("health_bar_vehicle"), g_settings.health_bar_vehicle },
+						{ xorstr_("health_bar_width"), g_settings.health_bar_width },
+						{ xorstr_("health_bar_height"), g_settings.health_bar_height },
+						{ xorstr_("health_bar_x"), g_settings.health_bar_x },
+						{ xorstr_("health_bar_y"), g_settings.health_bar_y },
+						{ xorstr_("health_bar_use_center_x"), g_settings.health_bar_use_center_x },
+						{ xorstr_("health_bar_spacing"), g_settings.health_bar_spacing },
+						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
+						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
 						{ xorstr_("aimbot"), g_settings.aimbot },
-					    { xorstr_("aim_support_controller"), g_settings.aim_support_controller },
-					    { xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
+						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
+						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
 						{ xorstr_("aim_must_not_reload"), g_settings.aim_must_not_reload },
 						{ xorstr_("aim_fov_method"), g_settings.aim_fov_method },
 						{ xorstr_("aim_bone_priority"), g_settings.aim_bone_priority },
@@ -397,7 +397,7 @@ namespace big
 						{ xorstr_("aim_fov_color"), color_to_string(g_settings.aim_fov_color) },
 						{ xorstr_("aim_min_time_to_target"), g_settings.aim_min_time_to_target },
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
-			            { xorstr_("aim_key"), g_settings.aim_key },
+						{ xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
@@ -410,11 +410,11 @@ namespace big
 						{ xorstr_("infantry_alert"), g_settings.infantry_alert },
 						{ xorstr_("infantry_alert_light_tech"), g_settings.infantry_alert_light_tech },
 						{ xorstr_("infantry_alert_distance"), g_settings.infantry_alert_distance },
-			            { xorstr_("infantry_alert_color"), color_to_string(g_settings.infantry_alert_color) },
-			            { xorstr_("infantry_alert_text_size"), g_settings.infantry_alert_text_size },
-			            { xorstr_("infantry_alert_use_default_pos"), g_settings.infantry_alert_use_default_pos },
-			            { xorstr_("infantry_alert_x"), g_settings.infantry_alert_x },
-			            { xorstr_("infantry_alert_y"), g_settings.infantry_alert_y },
+						{ xorstr_("infantry_alert_color"), color_to_string(g_settings.infantry_alert_color) },
+						{ xorstr_("infantry_alert_text_size"), g_settings.infantry_alert_text_size },
+						{ xorstr_("infantry_alert_use_default_pos"), g_settings.infantry_alert_use_default_pos },
+						{ xorstr_("infantry_alert_x"), g_settings.infantry_alert_x },
+						{ xorstr_("infantry_alert_y"), g_settings.infantry_alert_y },
 						{ xorstr_("radar"), g_settings.radar },
 						{ xorstr_("radar_draw_teammates"), g_settings.radar_draw_teammates },
 						{ xorstr_("radar_draw_you"), g_settings.radar_draw_you },
@@ -425,16 +425,16 @@ namespace big
 						{ xorstr_("radar_width"), g_settings.radar_width },
 						{ xorstr_("radar_height"), g_settings.radar_height },
 						{ xorstr_("radar_distance"), g_settings.radar_distance },
-			            { xorstr_("radar_background_color"), color_to_string(g_settings.radar_background_color) },
-			            { xorstr_("radar_you_color"), color_to_string(g_settings.radar_you_color) },
-					    { xorstr_("radar_outline_color"), color_to_string(g_settings.radar_outline_color) },
+						{ xorstr_("radar_background_color"), color_to_string(g_settings.radar_background_color) },
+						{ xorstr_("radar_you_color"), color_to_string(g_settings.radar_you_color) },
+						{ xorstr_("radar_outline_color"), color_to_string(g_settings.radar_outline_color) },
 						{ xorstr_("radar_cross_color"), color_to_string(g_settings.radar_cross_color) },
 						{ xorstr_("radar_teammates_color"), color_to_string(g_settings.radar_teammates_color) },
 						{ xorstr_("radar_enemies_color"), color_to_string(g_settings.radar_enemies_color) },
 						{ xorstr_("radar_teammate_vehicles_color"), color_to_string(g_settings.radar_teammate_vehicles_color) },
 						{ xorstr_("radar_enemy_vehicles_color"), color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ xorstr_("explosives"), g_settings.explosives },
-			            { xorstr_("explosives_color"), color_to_string(g_settings.explosives_color) },
+						{ xorstr_("explosives_color"), color_to_string(g_settings.explosives_color) },
 						{ xorstr_("missiles_own"), g_settings.missiles_own },
 						{ xorstr_("missiles_color"), color_to_string(g_settings.missiles_color) },
 						{ xorstr_("jet_speed"), g_settings.jet_speed },
@@ -442,9 +442,9 @@ namespace big
 						{ xorstr_("spectator_raw_drawing"), g_settings.spectator_raw_drawing },
 						{ xorstr_("spectator_x"), g_settings.spectator_x },
 						{ xorstr_("spectator_y"), g_settings.spectator_y },
-			            { xorstr_("spectator_color"), color_to_string(g_settings.spectator_color) },
-			            { xorstr_("kill_sound"), g_settings.kill_sound },
-			            { xorstr_("kill_sound_path"), g_settings.kill_sound_path },
+						{ xorstr_("spectator_color"), color_to_string(g_settings.spectator_color) },
+						{ xorstr_("kill_sound"), g_settings.kill_sound },
+						{ xorstr_("kill_sound_path"), g_settings.kill_sound_path },
 						{ xorstr_("minimap"), g_settings.minimap },
 						{ xorstr_("obs_check"), g_settings.obs_check },
 						{ xorstr_("screenshots"), g_settings.screenshots },
@@ -503,7 +503,7 @@ namespace big
 				LOG(INFO) << xorstr_("Updating settings.");
 				save();
 			}
-			
+
 			return true;
 		}
 	private:

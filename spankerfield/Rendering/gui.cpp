@@ -176,7 +176,7 @@ namespace big
 					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of spankerfield."));
 
 				ImGui::Checkbox(xorstr_("Auto bone mode (from upper to lower body)"), &g_settings.aim_bone_priority);
-				
+
 				if (!g_settings.aim_bone_priority)
 				{
 					ImGui::Text(xorstr_("Aim bone"));
@@ -237,11 +237,11 @@ namespace big
 						ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
 						ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
 						ImGui::PopItemWidth();
-						
+
 						ImGui::Text(xorstr_("Overheat"));
 						ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
 						ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
-						
+
 						static bool is_overheated = false;
 						if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
 							weapon_firing->m_IsOverheated = is_overheated;
@@ -262,7 +262,7 @@ namespace big
 						ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
 
 						ImGui::Text(xorstr_("Other"));
-						
+
 						if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
 						{
 							static bool instant_hit = false;
@@ -293,7 +293,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw vehicles##ESP"), &g_settings.esp_draw_vehicles);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
-				
+
 				ImGui::Text(xorstr_("Teammates color"));
 
 				color_wrapper(xorstr_("Teammate##ESP"), &g_settings.esp_teammate_color);
@@ -316,7 +316,7 @@ namespace big
 				ImGui::Text(xorstr_("Box color"));
 
 				if (g_settings.esp_box_fill)
-				    color_wrapper(xorstr_("Filler##BX"), &g_settings.esp_box_fill_color);
+					color_wrapper(xorstr_("Filler##BX"), &g_settings.esp_box_fill_color);
 
 				color_wrapper(xorstr_("Not visible##BX"), &g_settings.esp_box_color_occluded);
 				color_wrapper(xorstr_("Visible##BX"), &g_settings.esp_box_color);
@@ -337,7 +337,7 @@ namespace big
 				color_wrapper(xorstr_("Visible##LC"), &g_settings.esp_line_color_occluded);
 
 				ImGui::Separator();
-				
+
 				ImGui::Checkbox(xorstr_("Draw name"), &g_settings.esp_draw_name);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw distance"), &g_settings.esp_draw_distance);
@@ -403,7 +403,7 @@ namespace big
 					ImGui::SetTooltip(xorstr_("Draws little dots on locations where bones end."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.skeleton_dots_distance, 1.f, 5000.f);
-				ImGui::PopItemWidth();	
+				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Skeleton color"));
 
@@ -489,14 +489,14 @@ namespace big
 					g_settings.radar_width = radar_size;
 					g_settings.radar_height = radar_size;
 				}
-				
+
 				ImGui::PopItemWidth();
 
-				
+
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Distance##RDR"), &g_settings.radar_distance, 1.f, 10000.f);
 				ImGui::PopItemWidth();
-				
+
 				ImGui::Checkbox(xorstr_("Draw cross##RDR"), &g_settings.radar_cross);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw outline##RDR"), &g_settings.radar_outline);
@@ -518,10 +518,10 @@ namespace big
 				ImGui::Text(xorstr_("Colors"));
 
 				if (g_settings.radar_cross)
-				    color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
+					color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
 
 				if (g_settings.radar_outline)
-				    color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
+					color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
 
 				if (g_settings.radar_draw_you)
 					color_wrapper(xorstr_("Self##RDR"), &g_settings.radar_you_color);
@@ -585,7 +585,7 @@ namespace big
 					ImGui::SameLine();
 					ImGui::SliderFloat(xorstr_("Y##IA"), &g_settings.infantry_alert_y, 0.f, (float)g_globals.g_height);
 					ImGui::PopItemWidth();
-					
+
 					// If we add this section give it a space
 					ImGui::Spacing();
 				}
@@ -694,7 +694,7 @@ namespace big
 				ImGui::PopItemWidth();
 
 				if (ImGui::Button(xorstr_("Add player to blacklist")))
-                    plugins::add_to_blacklist(nick);
+					plugins::add_to_blacklist(nick);
 
 				ImGui::EndTabItem();
 			}
@@ -707,7 +707,7 @@ namespace big
 
 
 				ImGui::SameLine();
-				
+
 				if (ImGui::Button(xorstr_("Reset counters")))
 				{
 					g_globals.screenshots_ff = NULL;
@@ -721,7 +721,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Spoof local name"), &g_settings.spoof_name);
 				ImGui::SameLine();
-				
+
 				if (ImGui::Button(xorstr_("Restore local name")))
 				{
 					*g_settings.spoofed_name = '\0';

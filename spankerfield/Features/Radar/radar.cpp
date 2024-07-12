@@ -61,9 +61,12 @@ namespace plugins
 				m_drawing->DrawBoxOutline(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, g_settings.radar_outline_color);
 		}
 
+		// Icon scale factor based on size
+		float icon_scale_factor = min(g_settings.radar_width, g_settings.radar_height) / 320.0f; // Assuming 320 is the base size
+
 		// You
 		if (g_settings.radar_draw_you)
-			m_drawing->AddCircleFilled(center, 3.5f, g_settings.radar_you_color);
+			m_drawing->AddCircleFilled(center, 3.5f * icon_scale_factor, g_settings.radar_you_color);
 
 		// Cross (for both rectangular and circular radars)
 		if (g_settings.radar_cross)
@@ -145,14 +148,14 @@ namespace plugins
 						if (IsValidPtr(name))
 						{
 							ImColor color = teammate ? g_settings.radar_teammate_vehicles_color : g_settings.radar_enemy_vehicles_color;
-							m_drawing->AddText(x, y - 3.f, color, 15.f, FL_CENTER_X, format_vehicle(name).c_str());
+							m_drawing->AddText(x, y - 3.f * icon_scale_factor, color, 15.f * icon_scale_factor, FL_CENTER_X, format_vehicle(name).c_str());
 						}
 					}
 				}
 				else
 				{
 					ImColor color = teammate ? g_settings.radar_teammates_color : g_settings.radar_enemies_color;
-					m_drawing->AddCircleFilled(ImVec2(x, y), 3.5f, color);
+					m_drawing->AddCircleFilled(ImVec2(x, y), 3.5f * icon_scale_factor, color);
 				}
 			}
 		}
