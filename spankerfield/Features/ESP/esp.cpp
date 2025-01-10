@@ -236,6 +236,22 @@ namespace plugins
                     draw_esp_text(x, y, xorstr_("VEHICLE"), g_settings.esp_additional_tags_color, g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle));
                 }
 
+                // Aim Point, credit VincentVega
+                if (g_settings.esp_draw_aim_point)
+                {
+                    if (g_globals.g_has_pred_aim_point)
+                    {
+                        Vector2 aimpoint_screen_coords;
+                        if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
+                        {
+                            m_drawing->AddCircleFilled(
+                                ImVec2(aimpoint_screen_coords.x, aimpoint_screen_coords.y),
+                                6.0f,
+                                g_settings.esp_aim_point_color);
+                        }
+                    }
+                }
+
                 if (g_settings.skeleton)
                 {
                     bool dots = g_settings.skeleton_use_dots && distance <= g_settings.skeleton_dots_distance;

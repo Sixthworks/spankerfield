@@ -51,30 +51,65 @@ namespace plugins
 			    return;
 
 			auto velocity = sqrt(pow(vehicle_velocity.x, 2) + pow(vehicle_velocity.y, 2) + pow(vehicle_velocity.z, 2)) * 3.6f;
-			if (velocity < 314.f && velocity > 312.f)
+
+			switch (vehicle_data->GetVehicleType())
 			{
-				input[ConceptMoveForward] = 1.0f;
-				input[ConceptMoveFB] = 1.0f;
-				input[ConceptFreeCameraMoveFB] = 1.0f;
-				input[ConceptFreeCameraTurboSpeed] = 0.0f;
-				input[ConceptSprint] = 0.0f;
-			}
-			else if (velocity >= 316.f)
-			{
-				input[ConceptMoveBackward] = 1.0f;
-				input[ConceptMoveFB] = -1.0f;
-				input[ConceptFreeCameraMoveFB] = -1.0f;
-				input[ConceptFreeCameraTurboSpeed] = 0.0f;
-				input[ConceptSprint] = 0.0f;
-				input[ConceptBrake] = 1.0f;
-				input[ConceptCrawl] = 1.0f;
-			}
-			else if (velocity <= 312.f)
-			{
-				input[ConceptMoveFB] = 1.0f;
-				input[ConceptFreeCameraMoveFB] = 1.0f;
-				input[ConceptFreeCameraTurboSpeed] = 1.0f;
-				input[ConceptSprint] = 1.0f;
+			case VehicleData::VehicleType::JET:
+				if (velocity < 314.f && velocity > 311.f)
+				{
+					input[ConceptMoveForward] = 1.0f;
+					input[ConceptMoveFB] = 1.0f;
+					input[ConceptFreeCameraMoveFB] = 1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 0.0f;
+					input[ConceptSprint] = 0.0f;
+				}
+				else if (velocity >= 315.f)
+				{
+					input[ConceptMoveBackward] = 1.0f;
+					input[ConceptMoveFB] = -1.0f;
+					input[ConceptFreeCameraMoveFB] = -1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 0.0f;
+					input[ConceptSprint] = 0.0f;
+					input[ConceptBrake] = 1.0f;
+					input[ConceptCrawl] = 1.0f;
+				}
+				else if (velocity <= 311.f)
+				{
+					input[ConceptMoveFB] = 1.0f;
+					input[ConceptFreeCameraMoveFB] = 1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 1.0f;
+					input[ConceptSprint] = 1.0f;
+				}
+				return;
+			case VehicleData::VehicleType::JETBOMBER:
+				if (velocity < 317.f && velocity > 313.f)
+				{
+					input[ConceptMoveForward] = 1.0f;
+					input[ConceptMoveFB] = 1.0f;
+					input[ConceptFreeCameraMoveFB] = 1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 0.0f;
+					input[ConceptSprint] = 0.0f;
+				}
+				else if (velocity >= 318.f)
+				{
+					input[ConceptMoveBackward] = 1.0f;
+					input[ConceptMoveFB] = -1.0f;
+					input[ConceptFreeCameraMoveFB] = -1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 0.0f;
+					input[ConceptSprint] = 0.0f;
+					input[ConceptBrake] = 1.0f;
+					input[ConceptCrawl] = 1.0f;
+				}
+				else if (velocity <= 313.f)
+				{
+					input[ConceptMoveFB] = 1.0f;
+					input[ConceptFreeCameraMoveFB] = 1.0f;
+					input[ConceptFreeCameraTurboSpeed] = 1.0f;
+					input[ConceptSprint] = 1.0f;
+				}
+				return;
+			default:
+				return;
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 #include "../../global.h"
 #include "../../Utilities/math.h"
 #include "../../Utilities/w2s.h"
-#include "../../Utilities/poly_solver.h"
+#include "../../Utilities/quartic.h"
 #include "../../Utilities/other.h"
 #include "../../Rendering/draw-list.h"
 
@@ -78,56 +78,32 @@ namespace big
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
 		Vector3 gravity_vec(0, -fabs(gravity), 0);
-
-		float shortest_air_time = FLT_MAX;
-
-		if (gravity != 0.0f)
+		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
 		{
-			const double a = 0.25 * gravity * gravity;
-			const double b = enemy_velocity.y * gravity;
-			const double c = (relative_pos.y * gravity) + enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
-			const double d = 2.0 * relative_pos.Dot(enemy_velocity);
-			const double e = relative_pos.Dot(relative_pos);
+			return cur_pos + velocity * time + .5f * accel * time * time;
+		};
 
-			std::vector<double> solutions;
-			int num_solutions = m_Solver->SolveQuartic(a, b, c, d, e, solutions);
+		float shortest_air_time = 0.0f;
 
-			for (double air_time : solutions)
-			{
-				if (air_time > 0 && air_time < shortest_air_time)
-					shortest_air_time = static_cast<float>(air_time);
-			}
-		}
-		else
+		const double a = 0.25 * gravity * gravity;
+		const double b = enemy_velocity.y * gravity;
+		const double c = (relative_pos.y * gravity) + enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
+		const double d = 2.0 * relative_pos.Dot(enemy_velocity);
+		const double e = relative_pos.Dot(relative_pos);
+
+		const auto& roots = solve_quartic(b / (a), c / (a), d / (a), e / (a));
+
+		for (int i = 0; i < 4; ++i)
 		{
-			const double a = enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
-			const double b = 2.0 * relative_pos.Dot(enemy_velocity);
-			const double c = relative_pos.Dot(relative_pos);
-
-			if (a != 0.0f)
-			{
-				double d = b * b - (4 * a * c);
-				if (d >= 0.0f)
-				{
-					const auto t1 = (-b - sqrt(d)) / (2.0f * a);
-					const auto t2 = (-b + sqrt(d)) / (2.0f * a);
-
-					if (t1 > 0.f && t2 > 0.f)
-						shortest_air_time = std::min<float>(t1, t2);
-					else if (t1 < 0.f && t2 > 0.f)
-						shortest_air_time = t2;
-					else if (t1 > 0.f && t2 < 0.f)
-						shortest_air_time = t1;
-				}
-			}
+			if (roots[i].real() > 0.0f && (shortest_air_time == 0.0f || roots[i].real() < shortest_air_time))
+				shortest_air_time = roots[i].real();
 		}
 
-		if (shortest_air_time == FLT_MAX)
+		if (shortest_air_time <= 0.0f)
 			return 0.0f;
-
-		aim_point = aim_point + (enemy_velocity * shortest_air_time);
-		if (gravity != 0.0f)
-			aim_point.y += 0.5f * gravity * shortest_air_time * shortest_air_time;
+		
+		// Extrapolate position on velocity, and account for bullet drop
+		aim_point = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 
 		float zero_angle = 0.0f;
 		if (zero_entry.m_ZeroDistance > 0.0f)
@@ -395,6 +371,10 @@ namespace plugins
 		Vector3 temporary_aim = target.m_WorldPosition;
 		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, target.m_Player->GetSoldier(), temporary_aim, shoot_space);
 		target.m_WorldPosition = temporary_aim;
+		
+        // Credit VincentVega
+		g_globals.g_pred_aim_point = target.m_WorldPosition;
+		g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
 		if (g_settings.aim_max_time_to_target <= 0.f) return;
 
@@ -413,15 +393,13 @@ namespace plugins
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
 		vDir.Normalize();
 
-		// Vertical angle
-		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-
 		// Adjust the elevation based on distance and vertical angle
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0f)); // 175 works best, tuning is possible
+		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); // 175 works best, tuning is possible
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
-			atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z)) - elevation_adjustment
+			vertical_angle - elevation_adjustment
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;

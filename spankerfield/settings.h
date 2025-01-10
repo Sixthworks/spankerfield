@@ -48,12 +48,14 @@ namespace big
 
 		bool infantry_alert{ true };
 		bool infantry_alert_light_tech{ true };
+		bool infantry_alert_indicators{ true };
 		float infantry_alert_distance{ 22.5f };
 		float infantry_alert_text_size{ 20.f };
 		bool infantry_alert_use_default_pos{ true };
 		float infantry_alert_x{ 30.f };
 		float infantry_alert_y{ 400.f };
 		ImColor infantry_alert_color{ 151, 106, 255, 255 };
+		ImColor infantry_alert_indicator_color{ 255, 65, 65, 255 };
 
 		bool esp{ true };
 		bool esp_draw_teammates;
@@ -90,6 +92,9 @@ namespace big
 		float skeleton_dots_distance{ 22.5f };
 		ImColor skeleton_color_occluded{ 220, 220, 220, 255 };
 		ImColor skeleton_color{ 220, 220, 220, 255 };
+
+		bool esp_draw_aim_point;
+		ImColor esp_aim_point_color{ 220, 220, 220, 255 };
 
 		bool draw_crosshair{ true };
 		bool crosshair_in_vehicles{ true };
@@ -220,8 +225,10 @@ namespace big
 
 			g_settings.infantry_alert = j[xorstr_("settings")][xorstr_("infantry_alert")];
 			g_settings.infantry_alert_light_tech = j[xorstr_("settings")][xorstr_("infantry_alert_light_tech")];
+			g_settings.infantry_alert_indicators = j[xorstr_("settings")][xorstr_("infantry_alert_indicators")];
 			g_settings.infantry_alert_distance = j[xorstr_("settings")][xorstr_("infantry_alert_distance")];
 			g_settings.infantry_alert_color = string_to_color(j[xorstr_("settings")][xorstr_("infantry_alert_color")]);
+			g_settings.infantry_alert_indicator_color = string_to_color(j[xorstr_("settings")][xorstr_("infantry_alert_indicator_color")]);
 			g_settings.infantry_alert_text_size = j[xorstr_("settings")][xorstr_("infantry_alert_text_size")];
 			g_settings.infantry_alert_use_default_pos = j[xorstr_("settings")][xorstr_("infantry_alert_use_default_pos")];
 			g_settings.infantry_alert_x = j[xorstr_("settings")][xorstr_("infantry_alert_x")];
@@ -263,6 +270,9 @@ namespace big
 			g_settings.skeleton_dots_distance = j[xorstr_("settings")][xorstr_("skeleton_dots_distance")];
 			g_settings.skeleton_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color_occluded")]);
 			g_settings.skeleton_color = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color")]);
+
+			g_settings.esp_draw_aim_point = j[xorstr_("settings")][xorstr_("esp_draw_aim_point")];
+			g_settings.esp_aim_point_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_aim_point_color")]);
 
 			g_settings.draw_crosshair = j[xorstr_("settings")][xorstr_("draw_crosshair")];
 			g_settings.crosshair_in_vehicles = j[xorstr_("settings")][xorstr_("crosshair_in_vehicles")];
@@ -369,6 +379,8 @@ namespace big
 						{ xorstr_("skeleton_dots_distance"), g_settings.skeleton_dots_distance },
 						{ xorstr_("skeleton_color_occluded"), color_to_string(g_settings.skeleton_color_occluded) },
 						{ xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
+						{ xorstr_("esp_draw_aim_point"), g_settings.esp_draw_aim_point },
+						{ xorstr_("esp_aim_point_color"), color_to_string(g_settings.esp_aim_point_color) },
 						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
 						{ xorstr_("crosshair_in_vehicles"), g_settings.crosshair_in_vehicles },
 						{ xorstr_("crosshair_shadow"), g_settings.crosshair_shadow },
@@ -409,8 +421,10 @@ namespace big
 						{ xorstr_("overheat_control_critical"), g_settings.overheat_control_critical },
 						{ xorstr_("infantry_alert"), g_settings.infantry_alert },
 						{ xorstr_("infantry_alert_light_tech"), g_settings.infantry_alert_light_tech },
+						{ xorstr_("infantry_alert_indicators"), g_settings.infantry_alert_indicators },
 						{ xorstr_("infantry_alert_distance"), g_settings.infantry_alert_distance },
 						{ xorstr_("infantry_alert_color"), color_to_string(g_settings.infantry_alert_color) },
+						{ xorstr_("infantry_alert_indicator_color"), color_to_string(g_settings.infantry_alert_indicator_color) },
 						{ xorstr_("infantry_alert_text_size"), g_settings.infantry_alert_text_size },
 						{ xorstr_("infantry_alert_use_default_pos"), g_settings.infantry_alert_use_default_pos },
 						{ xorstr_("infantry_alert_x"), g_settings.infantry_alert_x },

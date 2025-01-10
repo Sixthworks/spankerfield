@@ -173,7 +173,6 @@
     <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
     <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="MinHook\buffer.c" />
     <ClCompile Include="MinHook\hde\hde32.c" />
@@ -198,7 +197,7 @@
     <ClCompile Include="Utilities\math.cpp" />
     <ClCompile Include="Utilities\other.cpp" />
     <ClCompile Include="Utilities\path.cpp" />
-    <ClCompile Include="Utilities\poly_solver.cpp" />
+    <ClCompile Include="Utilities\quartic.cpp" />
     <ClCompile Include="Utilities\thread_pool.cpp" />
     <ClCompile Include="Utilities\vmt_hook.cpp" />
     <ClCompile Include="Utilities\w2s.cpp" />
@@ -281,7 +280,7 @@
     <ClInclude Include="Utilities\math.h" />
     <ClInclude Include="Utilities\other.h" />
     <ClInclude Include="Utilities\path.h" />
-    <ClInclude Include="Utilities\poly_solver.h" />
+    <ClInclude Include="Utilities\quartic.h" />
     <ClInclude Include="Utilities\thread_pool.h" />
     <ClInclude Include="Utilities\vmt_hook.h" />
     <ClInclude Include="Utilities\w2s.h" />

@@ -159,9 +159,6 @@
     <ClCompile Include="Features\Missiles\missiles.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\poly_solver.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Risky\risky.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -189,7 +186,7 @@
     <ClCompile Include="Features\Rainbow Mode\rainbow_mode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
+    <ClCompile Include="Utilities\quartic.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -401,9 +398,6 @@
     <ClInclude Include="Features\Missiles\missiles.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\poly_solver.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Risky\risky.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -438,6 +432,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Maps\key_map.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\quartic.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

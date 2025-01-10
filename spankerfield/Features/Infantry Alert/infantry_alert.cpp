@@ -1,9 +1,11 @@
-#include "infantry_alert.h"
+﻿#include "infantry_alert.h"
 #include "../../settings.h"
 #include "../../global.h"
 #include "../../Utilities/other.h"
 #include "../../Utilities/math.h"
 #include "../../Rendering/draw-list.h"
+
+#define M_PI 3.14159265358979323846
 
 using namespace big;
 namespace plugins
@@ -81,12 +83,53 @@ namespace plugins
 				continue;
 
 			float difference_y = local_pos.y - pos.y;
-			if (difference_y > 45.f)
+			if (abs(difference_y) > 45.f)
 				continue;
+
+			// Vertical indication
+			const char* vertical_indicator;
+
+			if (difference_y > 5.f) // Adding a small threshold to avoid flickering
+				vertical_indicator = xorstr_("DOWN");
+			else if (difference_y < -5.f)
+				vertical_indicator = xorstr_("UP");
+			else
+				vertical_indicator = ""; // Enemy is roughly at your level
 
 			if (!drawing)
 			{
-				m_drawing->AddText(g_settings.infantry_alert_use_default_pos ? g_globals.g_width / 2.f : g_settings.infantry_alert_x, g_settings.infantry_alert_use_default_pos ? (g_globals.g_height / 2.f) + 100.f : g_settings.infantry_alert_y, g_settings.infantry_alert_color, g_settings.infantry_alert_text_size, FL_CENTER_X, xorstr_("Enemy nearby"));
+				struct text_line
+				{
+					const char* text;
+					float size_multiplier;
+					ImColor color;
+				};
+
+				text_line lines[] = {
+					{ xorstr_("Enemy nearby"), 1.0f, g_settings.infantry_alert_color  },
+					{ vertical_indicator, 0.9f, g_settings.infantry_alert_indicator_color } // You can add other indicators if you want, you can even add a horizontal indicator (pointing arrows)
+				};
+
+				const float line_spacing = 20.f;
+				const float base_x = g_settings.infantry_alert_use_default_pos ? g_globals.g_width / 2.f : g_settings.infantry_alert_x;
+				const float base_y = g_settings.infantry_alert_use_default_pos ? (g_globals.g_height / 2.f) + 100.f : g_settings.infantry_alert_y;
+
+				for (int i = 0; i < 2; i++)
+				{
+					// Check if we should draw indicators
+					if (i > 0 && !g_settings.infantry_alert_indicators)
+						continue;
+
+					m_drawing->AddText(
+						base_x,
+						base_y + (i * line_spacing),
+						lines[i].color,
+						g_settings.infantry_alert_text_size * lines[i].size_multiplier,
+						FL_CENTER_X,
+						lines[i].text
+					);
+				}
+
 				drawing = true;
 			}
 		}

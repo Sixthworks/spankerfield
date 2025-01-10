@@ -115,6 +115,11 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
 
+				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
+
+				if (g_settings.esp_draw_aim_point)
+					color_wrapper(xorstr_("Point color##AP"), &g_settings.esp_aim_point_color);
+
 				if (g_settings.aim_fov_method)
 				{
 					ImGui::Separator();
@@ -569,6 +574,8 @@ namespace big
 				ImGui::Checkbox(xorstr_("Nearby enemies"), &g_settings.infantry_alert);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Infantry vehicles"), &g_settings.infantry_alert_light_tech);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw indicators"), &g_settings.infantry_alert_indicators);
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Alert distance"), &g_settings.infantry_alert_distance, 1.f, 500.f);
@@ -598,6 +605,7 @@ namespace big
 
 				ImGui::Text(xorstr_("Colors"));
 				color_wrapper(xorstr_("Text##IALRT"), &g_settings.infantry_alert_color);
+				color_wrapper(xorstr_("Indicators##IALRT"), &g_settings.infantry_alert_indicator_color);
 
 				ImGui::EndTabItem();
 			}
