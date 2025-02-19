@@ -207,43 +207,85 @@ namespace big
 			if (!soldier->IsAlive())
 				continue;
 
-			if (!g_settings.aim_must_be_visible)
-			{
-				if (soldier->m_Occluded)
-					continue;
-		    }
-
-			const auto ragdoll = soldier->m_pRagdollComponent;
-			if (!IsValidPtr(ragdoll))
-				continue;
-
-			// Bone selection
 			Vector3 head_vec;
 			bool got_bone = false;
 
-			if (g_settings.aim_auto_bone)
+			// Check if player is in vehicle
+			const auto vehicle = player->GetVehicle();
+			if (IsValidPtr(vehicle))
 			{
-				static const UpdatePoseResultData::BONES bone_priority[] =
-				{
-					// From upper body to lower body
-					UpdatePoseResultData::BONES::Head,
-					UpdatePoseResultData::BONES::Neck,
-					UpdatePoseResultData::BONES::Spine1,
-					UpdatePoseResultData::BONES::Spine2,
-					UpdatePoseResultData::BONES::Hips
-				};
+				// Get player bones even when in vehicle
+				const auto ragdoll = soldier->m_pRagdollComponent;
+				if (!IsValidPtr(ragdoll))
+					continue;
 
-				for (const auto& bone : bone_priority)
+				// Force update pose for vehicle passenger
+				*(BYTE*)((uintptr_t)soldier + 0x1A) = 159;
+				soldier->m_Occluded = false;
+
+				if (g_settings.aim_auto_bone)
 				{
-					if (ragdoll->GetBone(bone, head_vec))
+					static const UpdatePoseResultData::BONES bone_priority[] =
 					{
-						got_bone = true;
-						break;
+						UpdatePoseResultData::BONES::Head,
+						UpdatePoseResultData::BONES::Neck,
+						UpdatePoseResultData::BONES::Spine1,
+						UpdatePoseResultData::BONES::Spine2,
+						UpdatePoseResultData::BONES::Hips
+					};
+
+					for (const auto& bone : bone_priority)
+					{
+						if (ragdoll->GetBone(bone, head_vec))
+						{
+							got_bone = true;
+							break;
+						}
 					}
 				}
+				else
+				{
+					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+				}
 			}
-			else
-				got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+			else 
+			{
+				if (!g_settings.aim_must_be_visible)
+				{
+					if (soldier->m_Occluded)
+						continue;
+				}
+
+				const auto ragdoll = soldier->m_pRagdollComponent;
+				if (!IsValidPtr(ragdoll))
+					continue;
+
+				// Bone selection for infantry
+				if (g_settings.aim_auto_bone)
+				{
+					static const UpdatePoseResultData::BONES bone_priority[] =
+					{
+						UpdatePoseResultData::BONES::Head,
+						UpdatePoseResultData::BONES::Neck,
+						UpdatePoseResultData::BONES::Spine1,
+						UpdatePoseResultData::BONES::Spine2,
+						UpdatePoseResultData::BONES::Hips
+					};
+
+					for (const auto& bone : bone_priority)
+					{
+						if (ragdoll->GetBone(bone, head_vec))
+						{
+							got_bone = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+				}
+			}
 
 			if (!got_bone)
 				continue;
@@ -396,10 +438,22 @@ namespace plugins
 		if (!target.m_HasTarget) return;
 
 		Vector3 temporary_aim = target.m_WorldPosition;
-		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, target.m_Player->GetSoldier(), temporary_aim, shoot_space);
+
+		// Get correct entity for prediction
+		ClientControllableEntity* prediction_target = nullptr;
+		if (IsValidPtr(target.m_Player->GetVehicle()))
+		{
+			prediction_target = target.m_Player->GetVehicle();
+		}
+		else
+		{
+			prediction_target = target.m_Player->GetSoldier();
+		}
+
+		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, prediction_target, temporary_aim, shoot_space);
 		target.m_WorldPosition = temporary_aim;
 		
-        // Credit VincentVega
+		// Credit VincentVega
 		g_globals.g_pred_aim_point = target.m_WorldPosition;
 		g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
@@ -420,17 +474,17 @@ namespace plugins
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
 		vDir.Normalize();
 
-		// Adjust the elevation based on distance and vertical angle
+		// Fix vertical angle calculation
 		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); // 175 works best, tuning is possible
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); 
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
-			vertical_angle - elevation_adjustment
+			vertical_angle + elevation_adjustment  // Changed from - to +
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;
-		BotAngles.y -= zero_theta_offset;
+		BotAngles.y += zero_theta_offset;  // Changed from - to +
 		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, BotAngles);
 		aim_assist->m_AimAngles = BotAngles;
 		m_PreviousTarget = target;
