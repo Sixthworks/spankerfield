@@ -180,9 +180,17 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of spankerfield."));
 
-				ImGui::Checkbox(xorstr_("Auto bone mode (from upper to lower body)"), &g_settings.aim_bone_priority);
+				ImGui::Separator();
+				
+				ImGui::Text(xorstr_("Target Selection"));
+				const char* target_methods[] = { "FOV", "Distance with FOV" };
+				ImGui::Combo(xorstr_("Target selection method##Aimbot"), &g_settings.aim_target_selection, target_methods, IM_ARRAYSIZE(target_methods));
+				
+				ImGui::Checkbox(xorstr_("Auto aim bone"), &g_settings.aim_auto_bone);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Automatically selects the best bone for shooting (head -> torso -> hips)"));
 
-				if (!g_settings.aim_bone_priority)
+				if (!g_settings.aim_auto_bone)
 				{
 					ImGui::Text(xorstr_("Aim bone"));
 

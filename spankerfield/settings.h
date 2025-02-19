@@ -33,6 +33,8 @@ namespace big
 		float aim_max_time_to_target{ 0.8f };
 		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
+		int aim_target_selection{ 0 };
+		bool aim_auto_bone{ true };
 
 		bool no_recoil;
 		bool no_spread;
@@ -210,6 +212,8 @@ namespace big
 			g_settings.aim_max_time_to_target = j[xorstr_("settings")][xorstr_("aim_max_time_to_target")];
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
+			g_settings.aim_target_selection = j[xorstr_("settings")][xorstr_("aim_target_selection")];
+			g_settings.aim_auto_bone = j[xorstr_("settings")][xorstr_("aim_auto_bone")];
 
 			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
 			g_settings.no_spread = j[xorstr_("settings")][xorstr_("no_spread")];
@@ -411,6 +415,8 @@ namespace big
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
 						{ xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
+						{ xorstr_("aim_target_selection"), g_settings.aim_target_selection },
+						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
 						{ xorstr_("anti_afk"), g_settings.anti_afk },

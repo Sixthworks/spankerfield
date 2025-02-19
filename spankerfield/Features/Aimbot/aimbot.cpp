@@ -204,6 +204,9 @@ namespace big
 			if (!IsValidPtrWithVTable(soldier))
 				continue;
 
+			if (!soldier->IsAlive())
+				continue;
+
 			if (!g_settings.aim_must_be_visible)
 			{
 				if (soldier->m_Occluded)
@@ -218,7 +221,7 @@ namespace big
 			Vector3 head_vec;
 			bool got_bone = false;
 
-			if (g_settings.aim_bone_priority)
+			if (g_settings.aim_auto_bone)
 			{
 				static const UpdatePoseResultData::BONES bone_priority[] =
 				{
@@ -252,15 +255,37 @@ namespace big
 				continue;
 
 			float screen_distance = get_screen_distance(screen_vec, screen_size);
-			if (g_settings.aim_fov_method)
+			
+			// Проверка FOV в любом случае
+			if (screen_distance > fov_radius)
+				continue;
+
+			// Выбор цели на основе настроек
+			bool should_update_target = false;
+			
+			if (g_settings.aim_target_selection == 0) // По FOV
 			{
-				if (screen_distance > fov_radius)
+				should_update_target = screen_distance < closest_distance;
+			}
+			else if (g_settings.aim_target_selection == 1) // По расстоянию с учетом FOV
+			{
+				const auto local_soldier = local_player->GetSoldier();
+				if (!IsValidPtrWithVTable(local_soldier))
 					continue;
+
+				Matrix transform;
+				local_soldier->GetTransform(&transform);
+
+				float world_distance = (head_vec - transform.Translation()).Length();
+				float fov_weight = 1.0f - (screen_distance / fov_radius); // 0 to 1, где 1 - центр экрана
+				float weighted_distance = world_distance * (1.0f - fov_weight * 0.5f); // FOV влияет на 50% от общей оценки
+				
+				should_update_target = weighted_distance < closest_distance;
+				closest_distance = should_update_target ? weighted_distance : closest_distance;
 			}
 
-			if (screen_distance < closest_distance)
+			if (should_update_target)
 			{
-				closest_distance = screen_distance;
 				closest_player = player;
 				closest_world_pos = head_vec;
 				target_found_this_frame = true;

@@ -1,5 +1,6 @@
 #include "other.h"
 #include "../global.h"
+#include <tchar.h>
 
 namespace big
 {
