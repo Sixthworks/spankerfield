@@ -163,6 +163,8 @@ namespace big
 
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
+
+		float aim_zeroing_correction{ 0.5f }; // Default zeroing correction factor
 	};
 
 	inline settings g_settings;
@@ -218,6 +220,7 @@ namespace big
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 			g_settings.aim_target_selection = j[xorstr_("settings")][xorstr_("aim_target_selection")];
 			g_settings.aim_auto_bone = j[xorstr_("settings")][xorstr_("aim_auto_bone")];
+			g_settings.aim_zeroing_correction = j[xorstr_("settings")][xorstr_("aim_zeroing_correction")];	
 
 			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
 			g_settings.no_spread = j[xorstr_("settings")][xorstr_("no_spread")];
@@ -411,6 +414,7 @@ namespace big
 						{ xorstr_("health_bar_spacing"), g_settings.health_bar_spacing },
 						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
 						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
+
 						{ xorstr_("aimbot"), g_settings.aimbot },
 						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
@@ -426,6 +430,8 @@ namespace big
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
 						{ xorstr_("aim_target_selection"), g_settings.aim_target_selection },
 						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
+						{ xorstr_("aim_zeroing_correction"), g_settings.aim_zeroing_correction },
+						
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
 						{ xorstr_("recoil_multiplier"), g_settings.recoil_multiplier },

@@ -44,8 +44,7 @@
 !packages/repositories.config
 
 # .vs
-/.vs/
-.vs/
+/.vs/**
 
 # Build
 x64/

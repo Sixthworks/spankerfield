@@ -406,6 +406,26 @@ namespace plugins
 		const auto client_weapon = weapon->m_pWeapon;
 		if (!client_weapon) return;
 
+		// Get weapon zeroing capabilities
+		std::vector<float> available_zeroing_distances;
+		const auto weapon_modifier = client_weapon->m_pWeaponModifier;
+		if (IsValidPtr(weapon_modifier))
+		{
+			const auto zeroing = weapon_modifier->m_ZeroingModifier;
+			if (IsValidPtr(zeroing))
+			{
+				// Try all possible zeroing levels (usually 0-4 in BF)
+				for (int i = 0; i < 5; i++)
+				{
+					const auto zero_entry = zeroing->GetZeroLevelAt(i);
+					if (zero_entry.m_ZeroDistance > 0.0f)
+					{
+						available_zeroing_distances.push_back(zero_entry.m_ZeroDistance);
+					}
+				}
+			}
+		}
+
 		if (g_settings.aim_must_not_reload)
 		{
 			if (primary_fire->m_ReloadTimer >= 0.01f) // 0.01 is the best value we can use, because sometimes the value can be approx 0.0000012517 when not reloading
@@ -439,6 +459,48 @@ namespace plugins
 
 		Vector3 temporary_aim = target.m_WorldPosition;
 
+		// Calculate distance to target before prediction
+		float distance_to_target = (temporary_aim - shoot_space.Translation()).Length();
+
+		// Auto adjust zeroing based on distance
+		float current_zeroing_distance = 0.0f;
+		if (!available_zeroing_distances.empty())
+		{
+			// Find best zeroing distance
+			float best_zeroing = available_zeroing_distances[0];
+			float min_diff = std::abs(distance_to_target - best_zeroing);
+
+			for (const float zeroing_distance : available_zeroing_distances)
+			{
+				float diff = std::abs(distance_to_target - zeroing_distance);
+				if (diff < min_diff)
+				{
+					min_diff = diff;
+					best_zeroing = zeroing_distance;
+				}
+			}
+
+			// Find and set the zeroing level
+			if (IsValidPtr(weapon_modifier))
+			{
+				const auto zeroing = weapon_modifier->m_ZeroingModifier;
+				if (IsValidPtr(zeroing))
+				{
+					// Try to find matching zeroing level
+					for (int i = 0; i < 5; i++)
+					{
+						const auto zero_entry = zeroing->GetZeroLevelAt(i);
+						if (std::abs(zero_entry.m_ZeroDistance - best_zeroing) < 0.1f)
+						{
+							weapon_component->m_ZeroingDistanceLevel = i;
+							current_zeroing_distance = zero_entry.m_ZeroDistance;
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		// Get correct entity for prediction
 		ClientControllableEntity* prediction_target = nullptr;
 		if (IsValidPtr(target.m_Player->GetVehicle()))
@@ -451,6 +513,41 @@ namespace plugins
 		}
 
 		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, prediction_target, temporary_aim, shoot_space);
+
+		// Apply zeroing correction to prediction
+		if (current_zeroing_distance > 0.0f)
+		{
+			// Calculate correction factor based on distance difference
+			float distance_diff = current_zeroing_distance - distance_to_target;
+			
+			// Рассчитываем коррекцию с учетом дистанции
+			float base_correction = 1.0f;
+			if (distance_diff != 0.0f) {
+				float correction_strength = g_settings.aim_zeroing_correction * 0.1f; // Уменьшаем силу коррекции
+				float distance_ratio = std::abs(distance_diff) / current_zeroing_distance;
+				
+				if (distance_diff > 0) { // Цель ближе чем пристрелка
+					base_correction = 1.0f - (distance_ratio * correction_strength);
+				} else { // Цель дальше чем пристрелка
+					base_correction = 1.0f + (distance_ratio * correction_strength);
+				}
+			}
+
+			// Apply correction to aim point
+			Vector3 aim_direction = temporary_aim - shoot_space.Translation();
+			float current_distance = aim_direction.Length();
+			aim_direction.Normalize();
+
+			// Применяем коррекцию только к вертикальной составляющей
+			Vector3 horizontal(aim_direction.x, 0.0f, aim_direction.z);
+			horizontal.Normalize();
+			Vector3 vertical(0.0f, aim_direction.y, 0.0f);
+			
+			temporary_aim = shoot_space.Translation() + 
+				(horizontal * current_distance) +  // Горизонтальная составляющая без коррекции
+				(vertical * current_distance * base_correction); // Вертикальная составляющая с коррекцией
+		}
+
 		target.m_WorldPosition = temporary_aim;
 		
 		// Credit VincentVega
