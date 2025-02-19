@@ -227,7 +227,9 @@ namespace big
 				{
 					// From upper body to lower body
 					UpdatePoseResultData::BONES::Head,
+					UpdatePoseResultData::BONES::Neck,
 					UpdatePoseResultData::BONES::Spine1,
+					UpdatePoseResultData::BONES::Spine2,
 					UpdatePoseResultData::BONES::Hips
 				};
 

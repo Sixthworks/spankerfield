@@ -111,9 +111,42 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
 
+				ImGui::Separator();
+
 				ImGui::Checkbox(xorstr_("No recoil (BF4DB risk)"), &g_settings.no_recoil);
-				ImGui::SameLine();
+				if (g_settings.no_recoil)
+				{
+					ImGui::Indent();
+					ImGui::PushItemWidth(200.f);
+
+					ImGui::SliderFloat(xorstr_("Recoil decrease scale##RC"), &g_settings.recoil_decrease_scale, 0.0f, 100.0f, "%.2f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Controls up-down recoil (100 = full no recoil)"));
+						
+					ImGui::SliderFloat(xorstr_("Recoil multiplier##RC"), &g_settings.recoil_multiplier, 0.0f, 100.0f, "%.2f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Controls side-to-side recoil (should be 0)"));
+						
+					ImGui::PopItemWidth();
+					ImGui::Unindent();
+				}
+
+				ImGui::Separator();
+				
 				ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
+				if (g_settings.no_spread)
+				{
+					ImGui::Indent();
+					ImGui::PushItemWidth(200.f);
+					ImGui::SliderFloat(xorstr_("Spread control##SP"), &g_settings.spread_control, 0.0f, 1.0f, "%.2f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("0 = no spread)"));
+						
+					ImGui::PopItemWidth();
+					ImGui::Unindent();
+				}
+
+				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
 

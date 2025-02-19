@@ -37,7 +37,11 @@ namespace big
 		bool aim_auto_bone{ true };
 
 		bool no_recoil;
+		float recoil_decrease_scale{ 100.0f };  // Vertical recoil control
+		float recoil_multiplier{ 0.0f };  // Horizontal recoil control
+
 		bool no_spread;
+		float spread_control{ 0.0f };    // Bullet spread control
 
 		bool anti_afk{ true };
 		int anti_afk_timer{ 150000 };
@@ -217,6 +221,11 @@ namespace big
 
 			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
 			g_settings.no_spread = j[xorstr_("settings")][xorstr_("no_spread")];
+
+			g_settings.recoil_multiplier = j[xorstr_("settings")][xorstr_("recoil_multiplier")];
+			g_settings.recoil_decrease_scale = j[xorstr_("settings")][xorstr_("recoil_decrease_scale")];
+
+			g_settings.spread_control = j[xorstr_("settings")][xorstr_("spread_control")];
 
 			g_settings.anti_afk = j[xorstr_("settings")][xorstr_("anti_afk")];
 			g_settings.anti_afk_timer = j[xorstr_("settings")][xorstr_("anti_afk_timer")];
@@ -419,6 +428,9 @@ namespace big
 						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
+						{ xorstr_("recoil_multiplier"), g_settings.recoil_multiplier },
+						{ xorstr_("recoil_decrease_scale"), g_settings.recoil_decrease_scale },
+						{ xorstr_("spread_control"), g_settings.spread_control },
 						{ xorstr_("anti_afk"), g_settings.anti_afk },
 						{ xorstr_("anti_afk_timer"), g_settings.anti_afk_timer },
 						{ xorstr_("unlock_all"), g_settings.unlock_all },

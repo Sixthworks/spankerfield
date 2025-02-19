@@ -71,16 +71,16 @@ namespace plugins
 
 			if (g_settings.no_recoil)
 			{
-				data->m_ShootingRecoilDecreaseScale = 100.0f;
-				data->m_FirstShotRecoilMultiplier = 0.0f;
+				data->m_ShootingRecoilDecreaseScale = g_settings.recoil_decrease_scale; // 100.0f
+				data->m_FirstShotRecoilMultiplier = g_settings.recoil_multiplier; // 0.0f
 			}
 
 			if (g_settings.no_spread)
 			{
-				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0430) = 0.0f; // m_DeviationScaleFactorZoom
-				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0434) = 0.0f; // m_GameplayDeviationScaleFactorZoom
-				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0438) = 0.0f; // m_DeviationScaleFactorNoZoom
-				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x043C) = 0.0f; // m_GameplayDeviationScaleFactorNoZoom
+				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0430) = g_settings.spread_control; // m_DeviationScaleFactorZoom
+				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0434) = g_settings.spread_control; // m_GameplayDeviationScaleFactorZoom
+				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x0438) = g_settings.spread_control; // m_DeviationScaleFactorNoZoom
+				*reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(data) + 0x043C) = g_settings.spread_control; // m_GameplayDeviationScaleFactorNoZoom
 			}
 		}
 	}

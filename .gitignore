@@ -45,6 +45,7 @@
 
 # .vs
 /.vs/
+.vs/
 
 # Build
 x64/
