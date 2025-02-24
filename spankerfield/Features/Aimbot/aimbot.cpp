@@ -204,41 +204,88 @@ namespace big
 			if (!IsValidPtrWithVTable(soldier))
 				continue;
 
-			if (!g_settings.aim_must_be_visible)
-			{
-				if (soldier->m_Occluded)
-					continue;
-		    }
-
-			const auto ragdoll = soldier->m_pRagdollComponent;
-			if (!IsValidPtr(ragdoll))
+			if (!soldier->IsAlive())
 				continue;
 
-			// Bone selection
 			Vector3 head_vec;
 			bool got_bone = false;
 
-			if (g_settings.aim_bone_priority)
+			// Check if player is in vehicle
+			const auto vehicle = player->GetVehicle();
+			if (IsValidPtr(vehicle))
 			{
-				static const UpdatePoseResultData::BONES bone_priority[] =
-				{
-					// From upper body to lower body
-					UpdatePoseResultData::BONES::Head,
-					UpdatePoseResultData::BONES::Spine1,
-					UpdatePoseResultData::BONES::Hips
-				};
+				// Get player bones even when in vehicle
+				const auto ragdoll = soldier->m_pRagdollComponent;
+				if (!IsValidPtr(ragdoll))
+					continue;
 
-				for (const auto& bone : bone_priority)
+				// Force update pose for vehicle passenger
+				*(BYTE*)((uintptr_t)soldier + 0x1A) = 159;
+				soldier->m_Occluded = false;
+
+				if (g_settings.aim_auto_bone)
 				{
-					if (ragdoll->GetBone(bone, head_vec))
+					static const UpdatePoseResultData::BONES bone_priority[] =
 					{
-						got_bone = true;
-						break;
+						UpdatePoseResultData::BONES::Head,
+						UpdatePoseResultData::BONES::Neck,
+						UpdatePoseResultData::BONES::Spine1,
+						UpdatePoseResultData::BONES::Spine2,
+						UpdatePoseResultData::BONES::Hips
+					};
+
+					for (const auto& bone : bone_priority)
+					{
+						if (ragdoll->GetBone(bone, head_vec))
+						{
+							got_bone = true;
+							break;
+						}
 					}
 				}
+				else
+				{
+					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+				}
 			}
-			else
-				got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+			else 
+			{
+				if (!g_settings.aim_must_be_visible)
+				{
+					if (soldier->m_Occluded)
+						continue;
+				}
+
+				const auto ragdoll = soldier->m_pRagdollComponent;
+				if (!IsValidPtr(ragdoll))
+					continue;
+
+				// Bone selection for infantry
+				if (g_settings.aim_auto_bone)
+				{
+					static const UpdatePoseResultData::BONES bone_priority[] =
+					{
+						UpdatePoseResultData::BONES::Head,
+						UpdatePoseResultData::BONES::Neck,
+						UpdatePoseResultData::BONES::Spine1,
+						UpdatePoseResultData::BONES::Spine2,
+						UpdatePoseResultData::BONES::Hips
+					};
+
+					for (const auto& bone : bone_priority)
+					{
+						if (ragdoll->GetBone(bone, head_vec))
+						{
+							got_bone = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+				}
+			}
 
 			if (!got_bone)
 				continue;
@@ -252,15 +299,37 @@ namespace big
 				continue;
 
 			float screen_distance = get_screen_distance(screen_vec, screen_size);
-			if (g_settings.aim_fov_method)
+			
+			// Проверка FOV в любом случае
+			if (screen_distance > fov_radius)
+				continue;
+
+			// Выбор цели на основе настроек
+			bool should_update_target = false;
+			
+			if (g_settings.aim_target_selection == 0) // По FOV
 			{
-				if (screen_distance > fov_radius)
+				should_update_target = screen_distance < closest_distance;
+			}
+			else if (g_settings.aim_target_selection == 1) // По расстоянию с учетом FOV
+			{
+				const auto local_soldier = local_player->GetSoldier();
+				if (!IsValidPtrWithVTable(local_soldier))
 					continue;
+
+				Matrix transform;
+				local_soldier->GetTransform(&transform);
+
+				float world_distance = (head_vec - transform.Translation()).Length();
+				float fov_weight = 1.0f - (screen_distance / fov_radius); // 0 to 1, где 1 - центр экрана
+				float weighted_distance = world_distance * (1.0f - fov_weight * 0.5f); // FOV влияет на 50% от общей оценки
+				
+				should_update_target = weighted_distance < closest_distance;
+				closest_distance = should_update_target ? weighted_distance : closest_distance;
 			}
 
-			if (screen_distance < closest_distance)
+			if (should_update_target)
 			{
-				closest_distance = screen_distance;
 				closest_player = player;
 				closest_world_pos = head_vec;
 				target_found_this_frame = true;
@@ -337,6 +406,26 @@ namespace plugins
 		const auto client_weapon = weapon->m_pWeapon;
 		if (!client_weapon) return;
 
+		// Get weapon zeroing capabilities
+		std::vector<float> available_zeroing_distances;
+		const auto weapon_modifier = client_weapon->m_pWeaponModifier;
+		if (IsValidPtr(weapon_modifier))
+		{
+			const auto zeroing = weapon_modifier->m_ZeroingModifier;
+			if (IsValidPtr(zeroing))
+			{
+				// Try all possible zeroing levels (usually 0-4 in BF)
+				for (int i = 0; i < 5; i++)
+				{
+					const auto zero_entry = zeroing->GetZeroLevelAt(i);
+					if (zero_entry.m_ZeroDistance > 0.0f)
+					{
+						available_zeroing_distances.push_back(zero_entry.m_ZeroDistance);
+					}
+				}
+			}
+		}
+
 		if (g_settings.aim_must_not_reload)
 		{
 			if (primary_fire->m_ReloadTimer >= 0.01f) // 0.01 is the best value we can use, because sometimes the value can be approx 0.0000012517 when not reloading
@@ -369,10 +458,99 @@ namespace plugins
 		if (!target.m_HasTarget) return;
 
 		Vector3 temporary_aim = target.m_WorldPosition;
-		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, target.m_Player->GetSoldier(), temporary_aim, shoot_space);
+
+		// Calculate distance to target before prediction
+		float distance_to_target = (temporary_aim - shoot_space.Translation()).Length();
+
+		// Auto adjust zeroing based on distance
+		float current_zeroing_distance = 0.0f;
+		if (!available_zeroing_distances.empty())
+		{
+			// Find best zeroing distance
+			float best_zeroing = available_zeroing_distances[0];
+			float min_diff = std::abs(distance_to_target - best_zeroing);
+
+			for (const float zeroing_distance : available_zeroing_distances)
+			{
+				float diff = std::abs(distance_to_target - zeroing_distance);
+				if (diff < min_diff)
+				{
+					min_diff = diff;
+					best_zeroing = zeroing_distance;
+				}
+			}
+
+			// Find and set the zeroing level
+			if (IsValidPtr(weapon_modifier))
+			{
+				const auto zeroing = weapon_modifier->m_ZeroingModifier;
+				if (IsValidPtr(zeroing))
+				{
+					// Try to find matching zeroing level
+					for (int i = 0; i < 5; i++)
+					{
+						const auto zero_entry = zeroing->GetZeroLevelAt(i);
+						if (std::abs(zero_entry.m_ZeroDistance - best_zeroing) < 0.1f)
+						{
+							weapon_component->m_ZeroingDistanceLevel = i;
+							current_zeroing_distance = zero_entry.m_ZeroDistance;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// Get correct entity for prediction
+		ClientControllableEntity* prediction_target = nullptr;
+		if (IsValidPtr(target.m_Player->GetVehicle()))
+		{
+			prediction_target = target.m_Player->GetVehicle();
+		}
+		else
+		{
+			prediction_target = target.m_Player->GetSoldier();
+		}
+
+		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, prediction_target, temporary_aim, shoot_space);
+
+		// Apply zeroing correction to prediction
+		if (current_zeroing_distance > 0.0f)
+		{
+			// Calculate correction factor based on distance difference
+			float distance_diff = current_zeroing_distance - distance_to_target;
+			
+			// Рассчитываем коррекцию с учетом дистанции
+			float base_correction = 1.0f;
+			if (distance_diff != 0.0f) {
+				float correction_strength = g_settings.aim_zeroing_correction * 0.1f; // Уменьшаем силу коррекции
+				float distance_ratio = std::abs(distance_diff) / current_zeroing_distance;
+				
+				if (distance_diff > 0) { // Цель ближе чем пристрелка
+					base_correction = 1.0f - (distance_ratio * correction_strength);
+				} else { // Цель дальше чем пристрелка
+					base_correction = 1.0f + (distance_ratio * correction_strength);
+				}
+			}
+
+			// Apply correction to aim point
+			Vector3 aim_direction = temporary_aim - shoot_space.Translation();
+			float current_distance = aim_direction.Length();
+			aim_direction.Normalize();
+
+			// Применяем коррекцию только к вертикальной составляющей
+			Vector3 horizontal(aim_direction.x, 0.0f, aim_direction.z);
+			horizontal.Normalize();
+			Vector3 vertical(0.0f, aim_direction.y, 0.0f);
+			
+			temporary_aim = shoot_space.Translation() + 
+				(horizontal * current_distance) +  // Горизонтальная составляющая без коррекции
+				(vertical * current_distance * base_correction); // Вертикальная составляющая с коррекцией
+		}
+
 		target.m_WorldPosition = temporary_aim;
 		
-        // Credit VincentVega
+		// Credit VincentVega
 		g_globals.g_pred_aim_point = target.m_WorldPosition;
 		g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
@@ -393,17 +571,17 @@ namespace plugins
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
 		vDir.Normalize();
 
-		// Adjust the elevation based on distance and vertical angle
+		// Fix vertical angle calculation
 		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); // 175 works best, tuning is possible
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); 
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
-			vertical_angle - elevation_adjustment
+			vertical_angle + elevation_adjustment  // Changed from - to +
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;
-		BotAngles.y -= zero_theta_offset;
+		BotAngles.y += zero_theta_offset;  // Changed from - to +
 		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, BotAngles);
 		aim_assist->m_AimAngles = BotAngles;
 		m_PreviousTarget = target;

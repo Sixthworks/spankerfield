@@ -1,6 +1,5 @@
 #pragma once
 #include "../common.h"
-#include <atlstr.h>
 
 #pragma warning (disable : 4200)
 
@@ -32,6 +31,7 @@
 #define MAX_EXPLOSIVES                        128
 
 #include "type_info.h"
+#include <cstring>
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
 
@@ -3146,9 +3146,9 @@ public:
 	float m_MaxBankAngle; //0x01C4
 	float m_BankingSpeed; //0x01C8
 	char _0x01CC[4];
-	CString m_Icon; //0x01D0
-	CString m_TargetIcon; //0x01D8
-	CString m_TargetIconEnemy; //0x01E0
+	char m_Icon[8]; //0x01D0
+	char m_TargetIcon[8]; //0x01D8
+	char m_TargetIconEnemy[8]; //0x01E0
 	float m_MinGhostFrequency; //0x01E8
 	bool m_ApplyGravityWhenGuided; //0x01EC
 	bool m_WarnOnPointingMissile; //0x01ED
