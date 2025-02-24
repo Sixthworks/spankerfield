@@ -69,7 +69,6 @@ namespace big
 		float gravity = bullet->m_Gravity;
 		Vector3 my_velocity = *local_entity->GetVelocity();
 		Vector3 enemy_velocity = *enemy->GetVelocity();
-		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
 		return DoPrediction(shoot_space.Translation() + spawn_offset, aim_point, my_velocity, enemy_velocity, initial_speed, gravity, zero_entry);
 	}
@@ -300,18 +299,18 @@ namespace big
 
 			float screen_distance = get_screen_distance(screen_vec, screen_size);
 			
-			// Проверка FOV в любом случае
+			// FOV check anyway
 			if (screen_distance > fov_radius)
 				continue;
 
-			// Выбор цели на основе настроек
+			// Target selection based on settings
 			bool should_update_target = false;
 			
-			if (g_settings.aim_target_selection == 0) // По FOV
+			if (g_settings.aim_target_selection == 0) // FOV
 			{
 				should_update_target = screen_distance < closest_distance;
 			}
-			else if (g_settings.aim_target_selection == 1) // По расстоянию с учетом FOV
+			else if (g_settings.aim_target_selection == 1) // FOV + Distance
 			{
 				const auto local_soldier = local_player->GetSoldier();
 				if (!IsValidPtrWithVTable(local_soldier))
@@ -321,8 +320,8 @@ namespace big
 				local_soldier->GetTransform(&transform);
 
 				float world_distance = (head_vec - transform.Translation()).Length();
-				float fov_weight = 1.0f - (screen_distance / fov_radius); // 0 to 1, где 1 - центр экрана
-				float weighted_distance = world_distance * (1.0f - fov_weight * 0.5f); // FOV влияет на 50% от общей оценки
+				float fov_weight = 1.0f - (screen_distance / fov_radius); // 0 to 1, where 1 - is the center of the screen
+				float weighted_distance = world_distance * (1.0f - fov_weight * 0.5f); // FOV is 50% in terms of preferability
 				
 				should_update_target = weighted_distance < closest_distance;
 				closest_distance = should_update_target ? weighted_distance : closest_distance;
@@ -520,15 +519,15 @@ namespace plugins
 			// Calculate correction factor based on distance difference
 			float distance_diff = current_zeroing_distance - distance_to_target;
 			
-			// Рассчитываем коррекцию с учетом дистанции
+			// Calculate correction based on distance
 			float base_correction = 1.0f;
 			if (distance_diff != 0.0f) {
-				float correction_strength = g_settings.aim_zeroing_correction * 0.1f; // Уменьшаем силу коррекции
+				float correction_strength = g_settings.aim_zeroing_correction * 0.1f; // Reducing force
 				float distance_ratio = std::abs(distance_diff) / current_zeroing_distance;
 				
-				if (distance_diff > 0) { // Цель ближе чем пристрелка
+				if (distance_diff > 0) { // Target is closer
 					base_correction = 1.0f - (distance_ratio * correction_strength);
-				} else { // Цель дальше чем пристрелка
+				} else { // Target is further
 					base_correction = 1.0f + (distance_ratio * correction_strength);
 				}
 			}
@@ -538,14 +537,14 @@ namespace plugins
 			float current_distance = aim_direction.Length();
 			aim_direction.Normalize();
 
-			// Применяем коррекцию только к вертикальной составляющей
+			// Applying correction only to the vertical part
 			Vector3 horizontal(aim_direction.x, 0.0f, aim_direction.z);
 			horizontal.Normalize();
 			Vector3 vertical(0.0f, aim_direction.y, 0.0f);
 			
 			temporary_aim = shoot_space.Translation() + 
-				(horizontal * current_distance) +  // Горизонтальная составляющая без коррекции
-				(vertical * current_distance * base_correction); // Вертикальная составляющая с коррекцией
+				(horizontal * current_distance) +  // Horizontal
+				(vertical * current_distance * base_correction); // Vertical
 		}
 
 		target.m_WorldPosition = temporary_aim;
