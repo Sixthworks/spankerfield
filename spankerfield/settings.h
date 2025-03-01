@@ -157,6 +157,7 @@ namespace big
 
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
+		int screenhots_pb_delay{ 1000 };
 	};
 
 	inline settings g_settings;
@@ -335,6 +336,7 @@ namespace big
 			g_settings.obs_check = j[xorstr_("settings")][xorstr_("obs_check")];
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
 			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
+			g_settings.screenhots_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_pb_delay")];
 		}
 
 		nlohmann::json to_json()
@@ -463,6 +465,7 @@ namespace big
 						{ xorstr_("obs_check"), g_settings.obs_check },
 						{ xorstr_("screenshots"), g_settings.screenshots },
 						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
+						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 					},
 				},
 

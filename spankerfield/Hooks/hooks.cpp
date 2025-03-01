@@ -41,12 +41,12 @@ namespace big
 
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
-			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot.");
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("ms)");
 			g_globals.g_punkbuster = true;
 			g_globals.screenshots_pb++;
 
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(15));
+				std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_pb_delay)); // Using the desired delay of the user
 				if (oTakeScreenshot)
 					oTakeScreenshot(pThis);
 			}
