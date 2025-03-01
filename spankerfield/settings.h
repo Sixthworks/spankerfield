@@ -33,9 +33,16 @@ namespace big
 		float aim_max_time_to_target{ 0.8f };
 		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
+		int aim_target_selection{ 0 };
+		bool aim_auto_bone{ true };
+		float aim_zeroing_correction{ 0.5f };
 
 		bool no_recoil;
+		float recoil_decrease_scale{ 100.0f };  // Vertical recoil control
+		float recoil_multiplier{ 0.0f };  // Horizontal recoil control
+
 		bool no_spread;
+		float spread_control{ 0.0f };    // Bullet spread control
 
 		bool anti_afk{ true };
 		int anti_afk_timer{ 150000 };
@@ -157,6 +164,7 @@ namespace big
 
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
+		
 		int screenhots_pb_delay{ 1000 };
 	};
 
@@ -211,9 +219,17 @@ namespace big
 			g_settings.aim_max_time_to_target = j[xorstr_("settings")][xorstr_("aim_max_time_to_target")];
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
+			g_settings.aim_target_selection = j[xorstr_("settings")][xorstr_("aim_target_selection")];
+			g_settings.aim_auto_bone = j[xorstr_("settings")][xorstr_("aim_auto_bone")];
+			g_settings.aim_zeroing_correction = j[xorstr_("settings")][xorstr_("aim_zeroing_correction")];	
 
 			g_settings.no_recoil = j[xorstr_("settings")][xorstr_("no_recoil")];
 			g_settings.no_spread = j[xorstr_("settings")][xorstr_("no_spread")];
+
+			g_settings.recoil_multiplier = j[xorstr_("settings")][xorstr_("recoil_multiplier")];
+			g_settings.recoil_decrease_scale = j[xorstr_("settings")][xorstr_("recoil_decrease_scale")];
+
+			g_settings.spread_control = j[xorstr_("settings")][xorstr_("spread_control")];
 
 			g_settings.anti_afk = j[xorstr_("settings")][xorstr_("anti_afk")];
 			g_settings.anti_afk_timer = j[xorstr_("settings")][xorstr_("anti_afk_timer")];
@@ -400,6 +416,7 @@ namespace big
 						{ xorstr_("health_bar_spacing"), g_settings.health_bar_spacing },
 						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
 						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
+
 						{ xorstr_("aimbot"), g_settings.aimbot },
 						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
@@ -413,8 +430,15 @@ namespace big
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
 						{ xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
+						{ xorstr_("aim_target_selection"), g_settings.aim_target_selection },
+						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
+						{ xorstr_("aim_zeroing_correction"), g_settings.aim_zeroing_correction },
+						
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
+						{ xorstr_("recoil_multiplier"), g_settings.recoil_multiplier },
+						{ xorstr_("recoil_decrease_scale"), g_settings.recoil_decrease_scale },
+						{ xorstr_("spread_control"), g_settings.spread_control },
 						{ xorstr_("anti_afk"), g_settings.anti_afk },
 						{ xorstr_("anti_afk_timer"), g_settings.anti_afk_timer },
 						{ xorstr_("unlock_all"), g_settings.unlock_all },

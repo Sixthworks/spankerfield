@@ -44,6 +44,11 @@
 !packages/repositories.config
 
 # .vs
-/.vs/
+/.vs/**
+
+# Build
+x64/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++
+
+.cursorrules

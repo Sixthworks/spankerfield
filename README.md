@@ -1,5 +1,5 @@
-### Note
-If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
+> [!NOTE]
+> If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
 
 ![image](https://i.imgur.com/9aj6wfa.png)
 
@@ -19,48 +19,60 @@ If you are going to use / share this, pack the compiled dll with VMProtect / The
 ![image](https://i.imgur.com/Frb1kYx.png)
 
 ### Features
-```
-ImGui–based user interface,
-Unloading at runtime,
-Log console with g3log,
-Rendering through ImGui,
-Aimbot,
-Infantry alert,
-Overheat control,
-Player blacklist,
-Player ESP,
-Vehicle ESP,
-Explosives ESP,
-Conrollable jet speed,
-Auto-spot,
-Spectator list,
-Health bar,
-Name spoofer,
-Streamer mode,
-Crosshair,
-Anti-AFK,
-PunkBuster bypass,
-FairFight bypass
-```
+- **User Interface**
+  - ImGui-based interface
+  - Runtime unloading
+  - Log console with g3log
+  - ImGui rendering
+
+- **Combat Features**
+  - Aimbot
+  - Infantry alert
+  - Overheat control
+  - Player blacklist
+  - Auto-spot
+
+- **ESP Features**
+  - Player ESP
+  - Vehicle ESP 
+  - Explosives ESP
+  - Health bars
+  - Crosshair
+
+- **Vehicle Features**
+  - Controllable jet speed
+
+- **Utility Features**
+  - Spectator list
+  - Name spoofer
+  - Streamer mode
+  - Anti-AFK
+
+- **Anti-Cheat Bypass**
+  - PunkBuster bypass
+  - FairFight bypass
 
 ### How to compile
-```
-NuGet packages: (directxtk_desktop_win10, fmt, nlohmann.json),
-Release x64,
-Dynamic Link Library (.dll),
-Visual Studio 2022 (v143),
-C++ Standart - ISO C++20,
-C Standart - Old MSVC,
-Preprocessor arguments: _CRT_SECURE_NO_WARNINGS,
-Symbols: Unicode.
-```
+#### Requirements
+- Visual Studio 2022 (v143)
+- C++20 Standard
+- x64 Release build
+- Dynamic Link Library (.dll)
 
-### Planning to add
-```
-Better aimbot,
-Vehicle aimbot,
-Loadout editor,
-Kill say
-```
+#### NuGet Packages
+- directxtk_desktop_win10
+- fmt
+- nlohmann.json
+
+#### Build Settings
+- C Standard: Old MSVC
+- Preprocessor: _CRT_SECURE_NO_WARNINGS
+- Character Set: Unicode
+
+### TODO
+- [ ] Enhanced aimbot system
+- [ ] Vehicle aimbot implementation
+- [ ] Loadout editor
+- [ ] Kill say functionality
 
 I would be happy if anyone works on this cheat!
