@@ -51,6 +51,8 @@ namespace big
 					oTakeScreenshot(pThis);
 			}
 
+            // We keep g_punkbuster true for an additional 25% of the delay, in case the screenshot is still being taken after the code finishes running oTakeScreenshot
+			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(g_settings.screenhots_pb_delay * 0.25)));
 			g_globals.g_punkbuster = false;
 		}
 	}

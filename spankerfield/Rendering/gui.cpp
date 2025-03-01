@@ -771,7 +771,7 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("PB clean screenshot duration (ms)"), &g_settings.screenhots_pb_delay, 50, 1000);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Delay before drawing visuals after PunkBuster screenshot gets taken, recommended to leave at 1000 to be extra sure."));
+					ImGui::SetTooltip(xorstr_("Delay before drawing visuals after PunkBuster screenshot gets taken, recommended to leave at 500 to be extra sure."));
 				ImGui::PopItemWidth();
 
 				ImGui::SameLine();

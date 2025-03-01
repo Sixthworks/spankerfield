@@ -165,7 +165,7 @@ namespace big
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
 		
-		int screenhots_pb_delay{ 1000 };
+		int screenhots_pb_delay{ 500 };
 	};
 
 	inline settings g_settings;
