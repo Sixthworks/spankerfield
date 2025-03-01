@@ -38,11 +38,11 @@ namespace big
 		float aim_zeroing_correction{ 0.5f };
 
 		bool no_recoil;
-		float recoil_decrease_scale{ 100.0f };  // Vertical recoil control
-		float recoil_multiplier{ 0.0f };  // Horizontal recoil control
+		float recoil_decrease_scale{ 100.0f };
+		float recoil_multiplier{ 0.0f };
 
 		bool no_spread;
-		float spread_control{ 0.0f };    // Bullet spread control
+		float spread_control{ 0.0f };
 
 		bool anti_afk{ true };
 		int anti_afk_timer{ 150000 };
@@ -165,7 +165,8 @@ namespace big
 		bool screenshots{ true };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
 		
-		int screenhots_pb_delay{ 500 };
+		int screenhots_pb_delay{ 300 };
+		int screenhots_post_pb_delay{ 200 };
 	};
 
 	inline settings g_settings;
@@ -353,6 +354,7 @@ namespace big
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
 			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
 			g_settings.screenhots_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_pb_delay")];
+			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
 		}
 
 		nlohmann::json to_json()
@@ -490,6 +492,7 @@ namespace big
 						{ xorstr_("screenshots"), g_settings.screenshots },
 						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
+						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },
 					},
 				},
 

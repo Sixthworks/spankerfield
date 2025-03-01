@@ -18,20 +18,42 @@ namespace big
 		typedef BOOL(WINAPI* tBitBlt)(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
 		tBitBlt oBitBlt = nullptr;
 
+		std::atomic<bool> ff_screenshot_in_progress(false);
+		std::mutex ff_screenshot_mutex;
+
+		class scoped_ff_reset
+		{
+		public:
+			scoped_ff_reset() {
+				g_globals.g_fairfight = true;
+			}
+
+			~scoped_ff_reset() {
+				g_globals.g_fairfight = false;
+			}
+		};
+
 		BOOL WINAPI hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
 		{
 			LOG(INFO) << xorstr_("FairFight initiated a screenshot.");
-			g_globals.g_fairfight = true;
 			g_globals.screenshots_ff++;
 
-			bool result = FALSE;
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(15));
-				if (oBitBlt)
-					result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
-			}
+			std::lock_guard<std::mutex> lock(ff_screenshot_mutex);
 
-			g_globals.g_fairfight = false;
+			while (ff_screenshot_in_progress.load())
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+			ff_screenshot_in_progress.store(true);
+
+			scoped_ff_reset reset_fairfight;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+			BOOL result = FALSE;
+			if (oBitBlt)
+				result = oBitBlt(hdcDst, x, y, cx, cy, hdcSrc, x1, y1, rop);
+
+			ff_screenshot_in_progress.store(false);
 			return result;
 		}
 
@@ -39,21 +61,49 @@ namespace big
 		using takeScreenshot_t = void(__thiscall*)(void* pThis);
 		takeScreenshot_t oTakeScreenshot = nullptr;
 
-		void __fastcall hkTakeScreenshot(void* pThis)
-		{
-			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("ms)");
-			g_globals.g_punkbuster = true;
-			g_globals.screenshots_pb++;
+		std::atomic<bool> pb_screenshot_in_progress(false);
+		std::mutex pb_screenshot_mutex;
 
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_pb_delay)); // Using the desired delay of the user
-				if (oTakeScreenshot)
-					oTakeScreenshot(pThis);
+		// RAII-based Reset for g_punkbuster
+		class scoped_pb_reset {
+		public:
+			scoped_pb_reset() {
+				g_globals.g_punkbuster = true;
 			}
 
-            // We keep g_punkbuster true for an additional 25% of the delay, in case the screenshot is still being taken after the code finishes running oTakeScreenshot
-			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(g_settings.screenhots_pb_delay * 0.25)));
-			g_globals.g_punkbuster = false;
+			~scoped_pb_reset() {
+				g_globals.g_punkbuster = false; // Always reset visuals to enabled
+			}
+		};
+
+		void __fastcall hkTakeScreenshot(void* pThis)
+		{
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("+") << static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
+
+			g_globals.screenshots_pb++;
+			std::lock_guard<std::mutex> lock(pb_screenshot_mutex);
+
+			// Wait if another screenshot is in progress
+			while (pb_screenshot_in_progress.load())
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+			// Screenshot is in progress
+			pb_screenshot_in_progress.store(true);
+
+			// When this class gets created, g_punkbuster sets to true, and when this class dies after the function ends, g_punkbuster is set to false
+			scoped_pb_reset reset_punkbuster;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
+
+			if (oTakeScreenshot)
+				oTakeScreenshot(pThis);
+
+			// PBSS uses hkCopySubresourceRegion Direct3D API call which is synchronous, and the oTakeScreenshot call has ended...
+			// So that means we can re-draw our visuals back? Well, we shouldn't - just to be extra safe 
+			std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_post_pb_delay));
+
+			// Screenshot is complete
+			pb_screenshot_in_progress.store(false);
 		}
 	}
 

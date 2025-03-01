@@ -769,9 +769,15 @@ namespace big
 				ImGui::SameLine();
 
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("PB clean screenshot duration (ms)"), &g_settings.screenhots_pb_delay, 50, 1000);
+
+				ImGui::SliderInt(xorstr_("PBSS delay (before)"), &g_settings.screenhots_pb_delay, 50, 1000);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Delay before drawing visuals after PunkBuster screenshot gets taken, recommended to leave at 500 to be extra sure."));
+					ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
+
+				ImGui::SliderInt(xorstr_("PBSS delay (after)"), &g_settings.screenhots_post_pb_delay, 0, 500);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
+				
 				ImGui::PopItemWidth();
 
 				ImGui::SameLine();
