@@ -389,14 +389,32 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
 				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("Box color"), &g_settings.esp_box_color);
+				color_wrapper(xorstr_("Box color (occluded)"), &g_settings.esp_box_color_occluded);
+				color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
 
-				ImGui::Text(xorstr_("Box color"));
+				ImGui::Separator();
 
-				if (g_settings.esp_box_fill)
-					color_wrapper(xorstr_("Filler##BX"), &g_settings.esp_box_fill_color);
+				ImGui::Checkbox(xorstr_("Draw 3D box"), &g_settings.esp_draw_3d_box);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a 3D box around the player/vehicle"));
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("3D box thickness"), &g_settings.esp_3d_box_thickness, 0.5f, 3.0f);
+				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("3D box color"), &g_settings.esp_3d_box_color);
+				color_wrapper(xorstr_("3D box color (occluded)"), &g_settings.esp_3d_box_color_occluded);
 
-				color_wrapper(xorstr_("Not visible##BX"), &g_settings.esp_box_color_occluded);
-				color_wrapper(xorstr_("Visible##BX"), &g_settings.esp_box_color);
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Draw eye tracer"), &g_settings.esp_draw_eye_tracer);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a line showing where the player is looking"));
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Eye tracer distance"), &g_settings.esp_eye_tracer_distance, 1.0f, 500.0f);
+				ImGui::SliderFloat(xorstr_("Eye tracer thickness"), &g_settings.esp_eye_tracer_thickness, 0.5f, 3.0f);
+				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("Eye tracer color"), &g_settings.esp_eye_tracer_color);
+				color_wrapper(xorstr_("Eye tracer color (occluded)"), &g_settings.esp_eye_tracer_color_occluded);
 
 				ImGui::Separator();
 

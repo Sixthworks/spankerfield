@@ -39,6 +39,86 @@ namespace plugins
     }
 
     std::map<uint64_t, std::string> streamer_personas{};
+    
+    void draw_3d_box(const TransformAABBStruct& transform, const ImColor& color, float thickness = 1.0f)
+    {
+        // Get position and size of the object
+        Vector3 pos = Vector3(transform.Transform.m[3]);
+        Vector3 min = Vector3(transform.AABB.m_Min.x, transform.AABB.m_Min.y, transform.AABB.m_Min.z);
+        Vector3 max = Vector3(transform.AABB.m_Max.x, transform.AABB.m_Max.y, transform.AABB.m_Max.z);
+        
+        // Calculate all 8 corners of the 3D box
+        Vector3 corners[8];
+        corners[0] = pos + multiply_mat(Vector3(min.x, min.y, min.z), &transform.Transform); // Bottom left back
+        corners[1] = pos + multiply_mat(Vector3(max.x, min.y, min.z), &transform.Transform); // Bottom right back
+        corners[2] = pos + multiply_mat(Vector3(max.x, min.y, max.z), &transform.Transform); // Bottom right front
+        corners[3] = pos + multiply_mat(Vector3(min.x, min.y, max.z), &transform.Transform); // Bottom left front
+        corners[4] = pos + multiply_mat(Vector3(min.x, max.y, min.z), &transform.Transform); // Top left back
+        corners[5] = pos + multiply_mat(Vector3(max.x, max.y, min.z), &transform.Transform); // Top right back
+        corners[6] = pos + multiply_mat(Vector3(max.x, max.y, max.z), &transform.Transform); // Top right front
+        corners[7] = pos + multiply_mat(Vector3(min.x, max.y, max.z), &transform.Transform); // Top left front
+        
+        // Convert 3D coordinates to 2D for display on the screen
+        Vector2 screen_corners[8];
+        for (int i = 0; i < 8; i++)
+        {
+            if (!world_to_screen(corners[i], screen_corners[i]))
+                return; // If at least one corner is not visible, don't draw the box
+        }
+        
+        // Draw bottom face (0-1-2-3)
+        m_drawing->AddLine(ImVec2(screen_corners[0].x, screen_corners[0].y), ImVec2(screen_corners[1].x, screen_corners[1].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[1].x, screen_corners[1].y), ImVec2(screen_corners[2].x, screen_corners[2].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[2].x, screen_corners[2].y), ImVec2(screen_corners[3].x, screen_corners[3].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[3].x, screen_corners[3].y), ImVec2(screen_corners[0].x, screen_corners[0].y), color, thickness);
+        
+        // Draw top face (4-5-6-7)
+        m_drawing->AddLine(ImVec2(screen_corners[4].x, screen_corners[4].y), ImVec2(screen_corners[5].x, screen_corners[5].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[5].x, screen_corners[5].y), ImVec2(screen_corners[6].x, screen_corners[6].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[6].x, screen_corners[6].y), ImVec2(screen_corners[7].x, screen_corners[7].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[7].x, screen_corners[7].y), ImVec2(screen_corners[4].x, screen_corners[4].y), color, thickness);
+        
+        // Draw vertical lines connecting top and bottom faces
+        m_drawing->AddLine(ImVec2(screen_corners[0].x, screen_corners[0].y), ImVec2(screen_corners[4].x, screen_corners[4].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[1].x, screen_corners[1].y), ImVec2(screen_corners[5].x, screen_corners[5].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[2].x, screen_corners[2].y), ImVec2(screen_corners[6].x, screen_corners[6].y), color, thickness);
+        m_drawing->AddLine(ImVec2(screen_corners[3].x, screen_corners[3].y), ImVec2(screen_corners[7].x, screen_corners[7].y), color, thickness);
+    }
+
+    void draw_eye_tracer(ClientSoldierEntity* soldier, const ImColor& color, float distance, float thickness = 1.0f)
+    {
+        if (!IsValidPtrWithVTable(soldier))
+            return;
+            
+        // Get position of the head
+        Vector3 head_pos;
+        if (IsValidPtr(soldier->m_pRagdollComponent))
+        {
+            if (!soldier->m_pRagdollComponent->GetBone(UpdatePoseResultData::BONES::Head, head_pos))
+                return;
+        }
+        else
+            return;
+            
+        // Get transformation matrix of the soldier
+        Matrix transform;
+        soldier->GetTransform(&transform);
+        
+        // Direction of view is the forward vector from the transformation matrix
+        Vector3 forward = Vector3(transform.m[2][0], transform.m[2][1], transform.m[2][2]);
+        
+        // Calculate the end point of the ray
+        Vector3 end_pos = head_pos + (forward * distance);
+        
+        // Convert 3D coordinates to 2D for display on the screen
+        Vector2 head_screen, end_screen;
+        if (!world_to_screen(head_pos, head_screen) || !world_to_screen(end_pos, end_screen))
+            return;
+            
+        // Draw line from head to the direction of view
+        m_drawing->AddLine(ImVec2(head_screen.x, head_screen.y), ImVec2(end_screen.x, end_screen.y), color, thickness);
+    }
+
     void draw_esp()
     {
         if (!g_settings.esp) return;
@@ -122,6 +202,18 @@ namespace plugins
                 float box_height = box_coords[1].y - box_coords[0].y;
                 float health = IsValidPtrWithVTable(vehicle) ? health_vehicle : health_player;
                 float max_health = IsValidPtrWithVTable(vehicle) ? max_health_vehicle : max_health_player;
+
+                if (g_settings.esp_draw_3d_box)
+                {
+                    ImColor box_color = teammate ? g_settings.esp_teammate_color : (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
+                    draw_3d_box(transform, box_color, g_settings.esp_3d_box_thickness);
+                }
+                
+                if (g_settings.esp_draw_eye_tracer && IsValidPtrWithVTable(soldier))
+                {
+                    ImColor tracer_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.esp_eye_tracer_color_occluded : g_settings.esp_eye_tracer_color;
+                    draw_eye_tracer(soldier, tracer_color, g_settings.esp_eye_tracer_distance, g_settings.esp_eye_tracer_thickness);
+                }
 
                 if (g_settings.esp_draw_box)
                 {
