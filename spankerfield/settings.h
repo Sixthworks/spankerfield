@@ -179,6 +179,8 @@ namespace big
 		int screenshots_pb_clean_delay{ 12500 };
 		int screenhots_pb_delay{ 300 };
 		int screenhots_post_pb_delay{ 300 };
+
+		bool disable_watermark;
 	};
 
 	inline settings g_settings;
@@ -380,6 +382,8 @@ namespace big
 			g_settings.screenshots_pb_clean_delay = j[xorstr_("settings")][xorstr_("screenshots_pb_clean_delay")];
 			g_settings.screenhots_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_pb_delay")];
 			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
+
+			g_settings.disable_watermark = j[xorstr_("settings")][xorstr_("disable_watermark")];
 		}
 
 		nlohmann::json to_json()
@@ -529,6 +533,7 @@ namespace big
 						{ xorstr_("screenshots_pb_clean_delay"), g_settings.screenshots_pb_clean_delay },
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },
+						{ xorstr_("disable_watermark"), g_settings.disable_watermark },
 					},
 				},
 

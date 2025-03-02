@@ -831,7 +831,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Using the secondary PBSS cleaner is recommended for safety, although not mandatory."));
+				ImGui::Text(xorstr_("Additional PBSS cleaner (recommended for safety, not mandatory)."));
 
 				ImGui::Checkbox(xorstr_("Extra PBSS cleaner"), &g_settings.screenshots_pb_clean);
 
@@ -842,7 +842,7 @@ namespace big
 				{
 					ImGui::PushItemWidth(300.f);
 
-					ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenhots_pb_delay, 100, 30000);
+					ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 30000);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("Delay between each clean frame update."));
 
@@ -867,7 +867,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
 
-				ImGui::Separator();
+				ImGui::Separator();			
 
 				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
 				if (ImGui::IsItemHovered())
@@ -886,6 +886,22 @@ namespace big
 					ImGui::PushItemWidth(300.f);
 					ImGui::SliderFloat(xorstr_("Speed##RM"), &g_settings.rainbow_speed, 0.1f, 2.0f);
 					ImGui::PopItemWidth();
+				}
+
+				ImGui::Checkbox(xorstr_("Disable watermark"), &g_settings.disable_watermark);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This option disables the cheat's watermark from showing on the screen from time to time."));
+
+				if (!g_settings.disable_watermark)
+				{
+					ImGui::SameLine();
+
+					static bool debug_watermark;
+					if (ImGui::Checkbox(xorstr_("Debug watermark"), &debug_watermark))
+						plugins::toggle_watermark_debug(debug_watermark);
+
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Lets you debug the watermark, mostly developer only."));
 				}
 
 				ImGui::Separator();

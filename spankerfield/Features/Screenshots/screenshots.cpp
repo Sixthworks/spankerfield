@@ -25,9 +25,9 @@ namespace plugins
 		};
 
 		// Draw FF screenshots
-		draw_screenshot_text(xorstr_("FairFight screenshots: "), g_globals.screenshots_ff);
+		draw_screenshot_text(xorstr_("FF screenshots: "), g_globals.screenshots_ff);
 
 		// Draw PB screenshots
-		draw_screenshot_text(xorstr_("PunkBuster screenshots: "), g_globals.screenshots_pb);
+		draw_screenshot_text(xorstr_("PB screenshots: "), g_globals.screenshots_pb);
 	}
 }

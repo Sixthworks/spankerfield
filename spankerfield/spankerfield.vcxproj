@@ -170,6 +170,7 @@
     <ClCompile Include="Features\Risky\risky.cpp" />
     <ClCompile Include="Features\Screenshots\screenshots.cpp" />
     <ClCompile Include="Features\Spectator List\spectators.cpp" />
+    <ClCompile Include="Features\Watermark\watermark.cpp" />
     <ClCompile Include="Hooks\hooks.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="Features\Refresh Hook\refresh_hook.h" />
     <ClInclude Include="Features\Risky\risky.h" />
     <ClInclude Include="Features\Screenshots\screenshots.h" />
+    <ClInclude Include="Features\Watermark\watermark.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="Rendering\Maps\bone_manager.h" />
     <ClInclude Include="Rendering\font.h" />

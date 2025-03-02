@@ -8,7 +8,7 @@ namespace big
 	{
 		// Unfortunately we have to do this
 		plugins::refresh_preframe_hook();
-
+		plugins::draw_watermark();
 		plugins::rainbow_mode();
 		plugins::draw_screenshots();
 		plugins::draw_crosshair();

@@ -19,6 +19,7 @@
 #include "Kill Sound/kill_sound.h"
 #include "Refresh Hook/refresh_hook.h"
 #include "Rainbow Mode/rainbow_mode.h"
+#include "Watermark/watermark.h"
 
 namespace big
 {
