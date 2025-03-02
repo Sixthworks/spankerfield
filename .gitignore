@@ -48,6 +48,7 @@
 
 # Build
 x64/
+build/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++
 

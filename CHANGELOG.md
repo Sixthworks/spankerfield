@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.1] - 2025-02-20
+### Added
+- Tooltip formatting with color support (8a36cfb52a1ec7ae37c300e2e228fba58595af42)
+- Weapon untested functions from SDK
+### Fixed
+- SDK offset padding for weapon fireing
+
 ## [2.0.0] - 2025-02-19
 ### Added
 - Zero point correction system for aiming (a4c2a57)

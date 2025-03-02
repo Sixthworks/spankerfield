@@ -111,14 +111,6 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::SliderFloat(xorstr_("Aim zeroing correction"), &g_settings.aim_zeroing_correction, 0.0f, 1.0f, "%.4f");
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Adjusts the zeroing correction factor for aiming."));
-
-
-				ImGui::Separator();
-
-				
 				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
 
 				if (g_settings.esp_draw_aim_point)

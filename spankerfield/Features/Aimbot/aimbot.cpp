@@ -13,49 +13,49 @@ using namespace big;
 
 namespace big
 {
-	float AimbotPredictor::PredictLocation(ClientSoldierEntity* local_entity, ClientControllableEntity* enemy, Vector3& aim_point, const Matrix& shoot_space)
+	AimbotPredictor::PredictionResult AimbotPredictor::PredictTarget(
+		ClientSoldierEntity* local_entity,
+		ClientControllableEntity* enemy,
+		const Vector3& aim_point,
+		const Matrix& shoot_space,
+		bool is_vehicle)
 	{
-		if (!IsValidPtr(local_entity))
-			return 0;
+		PredictionResult result;
+		result.predicted_position = aim_point;
 
-		if (!IsValidPtr(enemy))
-			return 0;
+		// Для транспорта используем упрощенную логику
+		if (is_vehicle) {
+			Vector3 vDir = aim_point - shoot_space.Translation();
+			result.success = true;
+			return result;
+		}
+
+		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
+			return result;
 
 		const auto weapon_component = local_entity->m_pWeaponComponent;
 		if (!IsValidPtr(weapon_component))
-			return 0;
+			return result;
 
 		const auto weapon = weapon_component->GetActiveSoldierWeapon();
 		if (!IsValidPtr(weapon))
-			return 0;
+			return result;
 
 		const auto client_weapon = weapon->m_pWeapon;
 		if (!IsValidPtr(client_weapon))
-			return 0;
+			return result;
 
 		const auto weapon_firing = WeaponFiring::GetInstance();
 		if (!IsValidPtrWithVTable(weapon_firing))
-			return 0;
+			return result;
 
 		const auto firing = weapon_firing->m_pPrimaryFire;
 		if (!IsValidPtrWithVTable(firing))
-			return 0;
+			return result;
 
 		const auto firing_data = firing->m_FiringData;
 		if (!IsValidPtrWithVTable(firing_data))
-			return 0;
-
-		const auto weapon_modifier = client_weapon->m_pWeaponModifier;
-		auto zero_entry = WeaponZeroingEntry(-1.0f, -1.0f);
-		if (IsValidPtr(weapon_modifier))
-		{
-			const auto zeroing = weapon_modifier->m_ZeroingModifier;
-			if (IsValidPtr(zeroing))
-			{
-				int level_index = weapon_component->m_ZeroingDistanceLevel;
-				zero_entry = zeroing->GetZeroLevelAt(level_index);
-			}
-		}
+			return result;
 
 		Vector4 spawn_offset_4 = firing_data->m_ShotConfigData.m_PositionOffset;
 		Vector3 spawn_offset = Vector3(spawn_offset_4.x, spawn_offset_4.y, spawn_offset_4.z);
@@ -64,19 +64,38 @@ namespace big
 
 		const auto bullet = firing_data->m_ShotConfigData.m_ProjectileData;
 		if (!IsValidPtr(bullet))
-			return 0;
+			return result;
 
 		float gravity = bullet->m_Gravity;
 		Vector3 my_velocity = *local_entity->GetVelocity();
 		Vector3 enemy_velocity = *enemy->GetVelocity();
+		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
-		return DoPrediction(shoot_space.Translation() + spawn_offset, aim_point, my_velocity, enemy_velocity, initial_speed, gravity, zero_entry);
+		// Получаем угол коррекции от базового предикта
+		result.zero_angle = DoPrediction(shoot_space.Translation() + spawn_offset, 
+									   result.predicted_position, 
+									   my_velocity, 
+									   enemy_velocity, 
+									   initial_speed, 
+									   gravity,
+									   WeaponZeroingEntry(-1.0f, -1.0f));
+		result.success = true;
+
+		return result;
 	}
 
-	float AimbotPredictor::DoPrediction(const Vector3& shoot_space, Vector3& aim_point, const Vector3& my_velocity, const Vector3& enemy_velocity, const Vector3& bullet_speed, const float gravity, const WeaponZeroingEntry& zero_entry)
+	float AimbotPredictor::DoPrediction(
+		const Vector3& shoot_space,
+		Vector3& aim_point,
+		const Vector3& my_velocity,
+		const Vector3& enemy_velocity,
+		const Vector3& bullet_speed,
+		const float gravity,
+		const WeaponZeroingEntry& zero_entry)
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
 		Vector3 gravity_vec(0, -fabs(gravity), 0);
+		
 		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
 		{
 			return cur_pos + velocity * time + .5f * accel * time * time;
@@ -101,18 +120,10 @@ namespace big
 		if (shortest_air_time <= 0.0f)
 			return 0.0f;
 		
-		// Extrapolate position on velocity, and account for bullet drop
+		// extrapolate position based on velocity and account for bullet drop
 		aim_point = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 
-		float zero_angle = 0.0f;
-		if (zero_entry.m_ZeroDistance > 0.0f)
-		{
-			float zero_air_time = zero_entry.m_ZeroDistance / bullet_speed.Length();
-			float zero_drop = 0.5f * fabs(gravity) * zero_air_time * zero_air_time;
-			zero_angle = atan2(zero_drop, zero_entry.m_ZeroDistance);
-		}
-
-		return zero_angle;
+		return 0.0f;
 	}
 
 	AimbotSmoother::AimbotSmoother()
@@ -386,7 +397,12 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!IsValidPtrWithVTable(local_player)) return;
 
-		if (local_player->GetVehicle()) return;
+		// Check if player is in vehicle
+		if (local_player->GetVehicle()) 
+		{
+			vehicle_aimbot(delta_time);
+			return;
+		}
 
 		const auto local_soldier = local_player->GetSoldier();
 		if (!IsValidPtrWithVTable(local_soldier)) return;
@@ -402,42 +418,16 @@ namespace plugins
 		const auto primary_fire = weapon->m_pPrimary;
 		if (!primary_fire) return;
 
-		const auto client_weapon = weapon->m_pWeapon;
-		if (!client_weapon) return;
-
-		// Get weapon zeroing capabilities
-		std::vector<float> available_zeroing_distances;
-		const auto weapon_modifier = client_weapon->m_pWeaponModifier;
-		if (IsValidPtr(weapon_modifier))
-		{
-			const auto zeroing = weapon_modifier->m_ZeroingModifier;
-			if (IsValidPtr(zeroing))
-			{
-				// Try all possible zeroing levels (usually 0-4 in BF)
-				for (int i = 0; i < 5; i++)
-				{
-					const auto zero_entry = zeroing->GetZeroLevelAt(i);
-					if (zero_entry.m_ZeroDistance > 0.0f)
-					{
-						available_zeroing_distances.push_back(zero_entry.m_ZeroDistance);
-					}
-				}
-			}
-		}
-
 		if (g_settings.aim_must_not_reload)
 		{
-			if (primary_fire->m_ReloadTimer >= 0.01f) // 0.01 is the best value we can use, because sometimes the value can be approx 0.0000012517 when not reloading
-			{
-				// Don't run the code if reloading
+			if (primary_fire->m_ReloadTimer >= 0.01f)
 				return;
-			}
 		}
 
 		// Controller support
 		if (using_controller)
 		{
-			// Simulate a little bit of mouse movement, otherwise aiming simulation won't be valid
+			// Simulate a little bit of mouse movement
 			const auto mouse_device = BorderInputNode::GetInstance()->m_pMouse->m_pDevice;
 			if (IsValidPtr(mouse_device))
 				mouse_device->m_Buffer.x = mouse_device->m_Buffer.x - 1;
@@ -449,56 +439,11 @@ namespace plugins
 		const auto aim_assist = aiming_simulation->m_pFPSAimer;
 		if (!aim_assist) return;
 
-		Matrix shoot_space = client_weapon->m_ShootSpace;
+		Matrix shoot_space = weapon->m_pWeapon->m_ShootSpace;
 
 		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
 		if (!IsValidPtr(target.m_Player)) return;
-
 		if (!target.m_HasTarget) return;
-
-		Vector3 temporary_aim = target.m_WorldPosition;
-
-		// Calculate distance to target before prediction
-		float distance_to_target = (temporary_aim - shoot_space.Translation()).Length();
-
-		// Auto adjust zeroing based on distance
-		float current_zeroing_distance = 0.0f;
-		if (!available_zeroing_distances.empty())
-		{
-			// Find best zeroing distance
-			float best_zeroing = available_zeroing_distances[0];
-			float min_diff = std::abs(distance_to_target - best_zeroing);
-
-			for (const float zeroing_distance : available_zeroing_distances)
-			{
-				float diff = std::abs(distance_to_target - zeroing_distance);
-				if (diff < min_diff)
-				{
-					min_diff = diff;
-					best_zeroing = zeroing_distance;
-				}
-			}
-
-			// Find and set the zeroing level
-			if (IsValidPtr(weapon_modifier))
-			{
-				const auto zeroing = weapon_modifier->m_ZeroingModifier;
-				if (IsValidPtr(zeroing))
-				{
-					// Try to find matching zeroing level
-					for (int i = 0; i < 5; i++)
-					{
-						const auto zero_entry = zeroing->GetZeroLevelAt(i);
-						if (std::abs(zero_entry.m_ZeroDistance - best_zeroing) < 0.1f)
-						{
-							weapon_component->m_ZeroingDistanceLevel = i;
-							current_zeroing_distance = zero_entry.m_ZeroDistance;
-							break;
-						}
-					}
-				}
-			}
-		}
 
 		// Get correct entity for prediction
 		ClientControllableEntity* prediction_target = nullptr;
@@ -511,45 +456,21 @@ namespace plugins
 			prediction_target = target.m_Player->GetSoldier();
 		}
 
-		float zero_theta_offset = m_AimbotPredictor.PredictLocation(local_soldier, prediction_target, temporary_aim, shoot_space);
+		// Выполняем предикт
+		auto prediction = m_AimbotPredictor.PredictTarget(
+			local_soldier,
+			prediction_target,
+			target.m_WorldPosition,
+			shoot_space
+		);
 
-		// Apply zeroing correction to prediction
-		if (current_zeroing_distance > 0.0f)
-		{
-			// Calculate correction factor based on distance difference
-			float distance_diff = current_zeroing_distance - distance_to_target;
-			
-			// Calculate correction based on distance
-			float base_correction = 1.0f;
-			if (distance_diff != 0.0f) {
-				float correction_strength = g_settings.aim_zeroing_correction * 0.1f; // Reducing force
-				float distance_ratio = std::abs(distance_diff) / current_zeroing_distance;
-				
-				if (distance_diff > 0) { // Target is closer
-					base_correction = 1.0f - (distance_ratio * correction_strength);
-				} else { // Target is further
-					base_correction = 1.0f + (distance_ratio * correction_strength);
-				}
-			}
+		if (!prediction.success)
+			return;
 
-			// Apply correction to aim point
-			Vector3 aim_direction = temporary_aim - shoot_space.Translation();
-			float current_distance = aim_direction.Length();
-			aim_direction.Normalize();
-
-			// Applying correction only to the vertical part
-			Vector3 horizontal(aim_direction.x, 0.0f, aim_direction.z);
-			horizontal.Normalize();
-			Vector3 vertical(0.0f, aim_direction.y, 0.0f);
-			
-			temporary_aim = shoot_space.Translation() + 
-				(horizontal * current_distance) +  // Horizontal
-				(vertical * current_distance * base_correction); // Vertical
-		}
-
-		target.m_WorldPosition = temporary_aim;
+		// Обновляем целевую позицию
+		target.m_WorldPosition = prediction.predicted_position;
 		
-		// Credit VincentVega
+		// Update global prediction point
 		g_globals.g_pred_aim_point = target.m_WorldPosition;
 		g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
@@ -576,13 +497,130 @@ namespace plugins
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
-			vertical_angle + elevation_adjustment  // Changed from - to +
+			vertical_angle + elevation_adjustment
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;
-		BotAngles.y += zero_theta_offset;  // Changed from - to +
 		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, BotAngles);
 		aim_assist->m_AimAngles = BotAngles;
+		m_PreviousTarget = target;
+	}
+
+	void vehicle_aimbot(float delta_time)
+	{
+		// Controller support
+		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
+
+		// Pressed status
+		auto is_pressed = [=]() {
+			return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
+		};
+
+		if (!is_pressed())
+			return;
+
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return;
+
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return;
+
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!IsValidPtrWithVTable(local_player)) return;
+
+		// Get local vehicle
+		const auto local_vehicle = local_player->GetVehicle();
+		if (!IsValidPtrWithVTable(local_vehicle)) return;
+
+		// Получаем компоненты транспорта
+		if (!IsValidPtr(local_vehicle->m_pComponents)) return;
+
+		// Получаем компонент оружия
+		const auto weapon_component = local_vehicle->m_pComponents->GetComponentByClassId<WeaponComponentData>(0x1A);
+		if (!IsValidPtr(weapon_component)) return;
+
+		const auto weapon_firing = weapon_component->m_WeaponFiring;
+		if (!IsValidPtrWithVTable(weapon_firing)) return;
+
+		// Получаем компонент прицеливания
+		const auto aim_assist = weapon_firing->m_Sway;
+		if (!IsValidPtr(aim_assist)) return;
+		if (!IsValidPtr(aim_assist->m_Data)) return;
+
+		// Get shoot space matrix
+		Matrix shoot_space;
+		local_vehicle->GetTransform(&shoot_space);
+
+		// Get closest target
+		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
+		if (!IsValidPtr(target.m_Player)) return;
+		if (!target.m_HasTarget) return;
+
+		// Get correct entity for prediction
+		ClientControllableEntity* prediction_target = nullptr;
+		if (IsValidPtr(target.m_Player->GetVehicle()))
+		{
+			prediction_target = target.m_Player->GetVehicle();
+		}
+		else
+		{
+			prediction_target = target.m_Player->GetSoldier();
+		}
+
+		// Do prediction for vehicle
+		auto prediction = m_AimbotPredictor.PredictTarget(
+			nullptr,
+			prediction_target,
+			target.m_WorldPosition,
+			shoot_space,
+			true // Specify that this is a vehicle
+		);
+
+		if (!prediction.success)
+			return;
+
+		target.m_WorldPosition = prediction.predicted_position;
+		
+		// Update global prediction point
+		g_globals.g_pred_aim_point = target.m_WorldPosition;
+		g_globals.g_has_pred_aim_point = target.m_HasTarget;
+
+		if (g_settings.aim_max_time_to_target <= 0.f) return;
+
+		// Handle target switching and smoothing
+		if (target.m_Player != m_PreviousTarget.m_Player)
+		{
+			Vector2 vec_rand =
+			{
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
+			};
+			m_AimbotSmoother.ResetTimes(vec_rand);
+		}
+
+		m_AimbotSmoother.Update(delta_time);
+
+		// Calculate aim angles
+		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
+		vDir.Normalize();
+
+		// Calculate vertical angle with improved elevation for vehicles
+		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0));
+
+		Vector2 bot_angles = {
+			-atan2(vDir.x, vDir.z),
+			vertical_angle + elevation_adjustment + prediction.zero_angle
+		};
+
+		// Применяем сглаживание к углам прицеливания
+		Vector2 current_angles = { aim_assist->m_Data->m_ShootingRecoilDecreaseScale, weapon_firing->m_RecoilAngleY };
+		m_AimbotSmoother.SmoothAngles(current_angles, bot_angles);
+
+		// Применяем углы прицеливания
+		aim_assist->m_Data->m_ShootingRecoilDecreaseScale = current_angles.x;
+		weapon_firing->m_RecoilAngleY = current_angles.y;
+
 		m_PreviousTarget = target;
 	}
 
