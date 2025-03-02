@@ -34,11 +34,11 @@ namespace big
 	{
 		float colors[4];
 		colors[0] = color->Value.x;
-		colors[1] = color->Value.y;
+		colors[1] = color->Value.y; 
 		colors[2] = color->Value.z;
 		colors[3] = color->Value.w;
 
-		bool result = ImGui::ColorEdit4(label, colors);
+		bool result = ImGui::ColorEdit4(label, colors, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
 		if (result)
 			*color = {colors[0], colors[1], colors[2], colors[3]};
 

@@ -14,6 +14,9 @@ namespace big
 {
 	namespace ScreenshotCleaner
 	{
+
+	#pragma region FFSS
+
 		// FFSS
 		typedef BOOL(WINAPI* tBitBlt)(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
 		tBitBlt oBitBlt = nullptr;
@@ -56,6 +59,10 @@ namespace big
 			ff_screenshot_in_progress.store(false);
 			return result;
 		}
+
+	#pragma endregion
+
+	#pragma region PBSS
 
 		// PBSS disable method
 		using takeScreenshot_t = void(__thiscall*)(void* pThis);
@@ -179,6 +186,8 @@ namespace big
 				// Proceed with the original call for non-PunkBuster operations
 				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
 		}
+
+	#pragma endregion
 	}
 
 	namespace Present

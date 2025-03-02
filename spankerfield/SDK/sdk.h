@@ -2137,14 +2137,25 @@ public:
 	BulletEntityData* m_ProjectileData; //0x0050 
 	char _0x0058[24];
 	float m_SpawnDelay; //0x0070 
-	__int32 m_BulletsPerShell; //0x0074 
-	__int32 m_BulletsPerShot; //0x0078 
-	__int32 m_BulletsPerBurst; //0x007C 
-	unsigned char m_RelativeTargetAiming; //0x0080 
-	unsigned char m_ForceSpawnToCamera; //0x0081 
-	unsigned char m_SpawnVisualAtWeaponBone; //0x0082 
-	unsigned char m_ActiveForceSpawnToCamera; //0x0083 
-	char N00001926[12]; //0x0084 
+	char pad_0074[4]; //0x0074
+	__int32 m_BulletsPerShell; //0x0078 
+	__int32 m_BulletsPerShot; //0x007C 
+	__int32 m_BulletsPerBurst; //0x0080 
+
+	/*
+		High probability of a dumper's error 
+		just commented old code
+	*/
+	// unsigned char m_RelativeTargetAiming; //0x0080 
+    // unsigned char m_ForceSpawnToCamera; //0x0081 
+    // unsigned char m_SpawnVisualAtWeaponBone; //0x0082 
+    // unsigned char m_ActiveForceSpawnToCamera; //0x0083 
+    // char N00001926[12]; //0x0084
+	unsigned char m_RelativeTargetAiming; //0x0084
+	unsigned char m_ForceSpawnToCamera; //0x0085 
+	unsigned char m_SpawnVisualAtWeaponBone; //0x0086 
+	unsigned char m_ActiveForceSpawnToCamera; //0x0087 
+	char N00001926[12]; //0x0088 
 };//Size=0x0090
 
 class FiringFunctionData

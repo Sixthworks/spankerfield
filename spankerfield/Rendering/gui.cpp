@@ -8,6 +8,7 @@
 #include "../ImGui/imgui.h"
 #include "../Features/main.h"
 #include "../Utilities/other.h"
+#include "utils/Tooltip.h"
 
 namespace big
 {
@@ -110,14 +111,6 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::SliderFloat(xorstr_("Aim zeroing correction"), &g_settings.aim_zeroing_correction, 0.0f, 1.0f, "%.4f");
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Adjusts the zeroing correction factor for aiming."));
-
-
-				ImGui::Separator();
-
-				
 				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
 
 				if (g_settings.esp_draw_aim_point)
@@ -283,54 +276,81 @@ namespace big
 				if (enable_editor)
 				{
 					const auto weapon_firing = get_weapon_firing();
-					const auto primary_fire = weapon_firing->m_pPrimaryFire;
-					const auto data = primary_fire->m_FiringData;
-
-					if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
+					if (!IsValidPtrWithVTable(weapon_firing))
 					{
-						ImGui::Text(xorstr_("Bullet count"));
-						ImGui::PushItemWidth(300.f);
-						ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 100);
-						ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
-						ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
-						ImGui::PopItemWidth();
-
-						ImGui::Text(xorstr_("Overheat"));
-						ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
-						ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
-
-						static bool is_overheated = false;
-						if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
-							weapon_firing->m_IsOverheated = is_overheated;
-
-						ImGui::Text(xorstr_("Bullet speed"));
-						ImGui::PushItemWidth(300.f);
-						ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.0f, 10000.f);
-						ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.0f, 10000.f);
-						ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
-						ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
-						ImGui::PopItemWidth();
-
-						ImGui::Text(xorstr_("Recoil"));
-
-						ImGui::InputFloat(xorstr_("Recoil time multiplier##WP"), &weapon_firing->m_RecoilTimeMultiplier, 0.0f, 10000.f);
-						ImGui::InputFloat(xorstr_("Recoil angle X##WP"), &weapon_firing->m_RecoilAngleX, 0.0f, 1000.f);
-						ImGui::InputFloat(xorstr_("Recoil angle Y##WP"), &weapon_firing->m_RecoilAngleY, 0.0f, 1000.f);
-						ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
-
-						ImGui::Text(xorstr_("Other"));
-
-						if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
+						ImGui::Text("Weapon firing not found - you are not in world or address is invalid");
+					}
+					else
+					{
+						const auto primary_fire = weapon_firing->m_pPrimaryFire;
+						if (!IsValidPtrWithVTable(primary_fire))
 						{
-							static bool instant_hit = false;
-							if (ImGui::Checkbox(xorstr_("Instant Hit"), &instant_hit))
-								data->m_ShotConfigData.m_ProjectileData->m_InstantHit = instant_hit;
+							ImGui::Text("Primary fire not found - you are not in world or address is invalid");
+						}
+						else
+						{
+							const auto data = primary_fire->m_FiringData;
+							if (!IsValidPtrWithVTable(data))
+							{
+								ImGui::Text("Firing data not found - you are not in world or address is invalid");
+							}
+							else if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
+							{
+								ImGui::Text(xorstr_("Bullet count"));
+								ImGui::PushItemWidth(300.f);
+								ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 100);
+								ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
+								ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
+								ImGui::PopItemWidth();
 
-							ImGui::PushItemWidth(300.f);
-							ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.0f, 10.f);
-							ImGui::InputFloat(xorstr_("Time to live##WP"), &data->m_ShotConfigData.m_ProjectileData->m_TimeToLive, 0.0f, 10.f);
-							ImGui::InputFloat(xorstr_("End damage##WP"), &data->m_ShotConfigData.m_ProjectileData->m_EndDamage, 0.0f, 10.f);
-							ImGui::PopItemWidth();
+								ImGui::Text(xorstr_("Overheat"));
+								ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
+								ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
+
+								static bool is_overheated = false;
+								if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
+									weapon_firing->m_IsOverheated = is_overheated;
+
+								ImGui::Text(xorstr_("Bullet speed"));
+								ImGui::PushItemWidth(300.f);
+								ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.0f, 10000.f);
+								ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.0f, 10000.f);
+								ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
+								ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
+								ImGui::PopItemWidth();
+
+								ImGui::Text(xorstr_("Recoil"));
+
+								ImGui::InputFloat(xorstr_("Recoil time multiplier##WP"), &weapon_firing->m_RecoilTimeMultiplier, 0.0f, 10000.f);
+								ImGui::InputFloat(xorstr_("Recoil angle X##WP"), &weapon_firing->m_RecoilAngleX, 0.0f, 1000.f);
+								ImGui::InputFloat(xorstr_("Recoil angle Y##WP"), &weapon_firing->m_RecoilAngleY, 0.0f, 1000.f);
+								ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
+
+								ImGui::Text(xorstr_("Other"));
+
+								if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
+								{
+									static bool instant_hit = false;
+									if (ImGui::Checkbox(xorstr_("Instant Hit"), &instant_hit))
+										data->m_ShotConfigData.m_ProjectileData->m_InstantHit = instant_hit;
+
+									ImGui::PushItemWidth(300.f);
+									ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.0f, 10.f);
+									ImGui::InputFloat(xorstr_("Time to live##WP"), &data->m_ShotConfigData.m_ProjectileData->m_TimeToLive, 0.0f, 10.f);
+									ImGui::InputFloat(xorstr_("End damage##WP"), &data->m_ShotConfigData.m_ProjectileData->m_EndDamage, 0.0f, 10.f);
+									ImGui::PopItemWidth();
+								}
+
+								ImGui::Separator();
+
+								ImGui::Text(xorstr_("I dont know what this is"));
+								ImGui::WarningTooltip(xorstr_("You can test what it is at your own risk."));
+
+								ImGui::Checkbox(xorstr_("Relative target aiming"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_RelativeTargetAiming));
+								ImGui::Checkbox(xorstr_("Force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ForceSpawnToCamera));
+								ImGui::Checkbox(xorstr_("Spawn visual at weapon bone"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_SpawnVisualAtWeaponBone));
+								ImGui::Checkbox(xorstr_("Active force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ActiveForceSpawnToCamera));
+							}
 						}
 					}
 				}
@@ -369,14 +389,32 @@ namespace big
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
 				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("Box color"), &g_settings.esp_box_color);
+				color_wrapper(xorstr_("Box color (occluded)"), &g_settings.esp_box_color_occluded);
+				color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
 
-				ImGui::Text(xorstr_("Box color"));
+				ImGui::Separator();
 
-				if (g_settings.esp_box_fill)
-					color_wrapper(xorstr_("Filler##BX"), &g_settings.esp_box_fill_color);
+				ImGui::Checkbox(xorstr_("Draw 3D box"), &g_settings.esp_draw_3d_box);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a 3D box around the player/vehicle"));
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("3D box thickness"), &g_settings.esp_3d_box_thickness, 0.5f, 3.0f);
+				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("3D box color"), &g_settings.esp_3d_box_color);
+				color_wrapper(xorstr_("3D box color (occluded)"), &g_settings.esp_3d_box_color_occluded);
 
-				color_wrapper(xorstr_("Not visible##BX"), &g_settings.esp_box_color_occluded);
-				color_wrapper(xorstr_("Visible##BX"), &g_settings.esp_box_color);
+				ImGui::Separator();
+
+				ImGui::Checkbox(xorstr_("Draw eye tracer"), &g_settings.esp_draw_eye_tracer);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a line showing where the player is looking"));
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Eye tracer distance"), &g_settings.esp_eye_tracer_distance, 1.0f, 500.0f);
+				ImGui::SliderFloat(xorstr_("Eye tracer thickness"), &g_settings.esp_eye_tracer_thickness, 0.5f, 3.0f);
+				ImGui::PopItemWidth();
+				color_wrapper(xorstr_("Eye tracer color"), &g_settings.esp_eye_tracer_color);
+				color_wrapper(xorstr_("Eye tracer color (occluded)"), &g_settings.esp_eye_tracer_color_occluded);
 
 				ImGui::Separator();
 

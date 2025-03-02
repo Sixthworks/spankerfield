@@ -79,6 +79,17 @@ namespace big
 		bool esp_box_fill;
 		ImColor esp_box_fill_color{ 0, 0, 0, 70 };
 
+		bool esp_draw_3d_box{ false };
+		ImColor esp_3d_box_color_occluded{ 24, 162, 162, 255 };
+		ImColor esp_3d_box_color{ 97, 59, 230, 255 };
+		float esp_3d_box_thickness{ 1.0f };
+
+		bool esp_draw_eye_tracer{ false };
+		float esp_eye_tracer_distance{ 150.0f };
+		float esp_eye_tracer_thickness{ 1.0f };
+		ImColor esp_eye_tracer_color_occluded{ 24, 162, 162, 255 };
+		ImColor esp_eye_tracer_color{ 255, 0, 0, 255 };
+
 		bool esp_draw_line{ true };
 		int esp_draw_line_from{ 1 };
 		float esp_line_thickness{ 1.f };
@@ -268,6 +279,17 @@ namespace big
 			g_settings.esp_box_fill = j[xorstr_("settings")][xorstr_("esp_box_fill")];
 			g_settings.esp_box_fill_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_box_fill_color")]);
 
+			g_settings.esp_draw_3d_box = j[xorstr_("settings")][xorstr_("esp_draw_3d_box")];
+			g_settings.esp_3d_box_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_3d_box_color_occluded")]);
+			g_settings.esp_3d_box_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_3d_box_color")]);
+			g_settings.esp_3d_box_thickness = j[xorstr_("settings")][xorstr_("esp_3d_box_thickness")];
+
+			g_settings.esp_draw_eye_tracer = j[xorstr_("settings")][xorstr_("esp_draw_eye_tracer")];
+			g_settings.esp_eye_tracer_distance = j[xorstr_("settings")][xorstr_("esp_eye_tracer_distance")];
+			g_settings.esp_eye_tracer_thickness = j[xorstr_("settings")][xorstr_("esp_eye_tracer_thickness")];
+			g_settings.esp_eye_tracer_color_occluded = string_to_color(j[xorstr_("settings")][xorstr_("esp_eye_tracer_color_occluded")]);
+			g_settings.esp_eye_tracer_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_eye_tracer_color")]);
+
 			g_settings.esp_draw_line = j[xorstr_("settings")][xorstr_("esp_draw_line")];
 			g_settings.esp_draw_line_from = j[xorstr_("settings")][xorstr_("esp_draw_line_from")];
 			g_settings.esp_line_thickness = j[xorstr_("settings")][xorstr_("esp_line_thickness")];
@@ -384,6 +406,15 @@ namespace big
 						{ xorstr_("esp_box_color"), color_to_string(g_settings.esp_box_color) },
 						{ xorstr_("esp_box_fill"), g_settings.esp_box_fill },
 						{ xorstr_("esp_box_fill_color"), color_to_string(g_settings.esp_box_fill_color) },
+						{ xorstr_("esp_draw_3d_box"), g_settings.esp_draw_3d_box },
+						{ xorstr_("esp_3d_box_color_occluded"), color_to_string(g_settings.esp_3d_box_color_occluded) },
+						{ xorstr_("esp_3d_box_color"), color_to_string(g_settings.esp_3d_box_color) },
+						{ xorstr_("esp_3d_box_thickness"), g_settings.esp_3d_box_thickness },
+						{ xorstr_("esp_draw_eye_tracer"), g_settings.esp_draw_eye_tracer },
+						{ xorstr_("esp_eye_tracer_distance"), g_settings.esp_eye_tracer_distance },
+						{ xorstr_("esp_eye_tracer_thickness"), g_settings.esp_eye_tracer_thickness },
+						{ xorstr_("esp_eye_tracer_color_occluded"), color_to_string(g_settings.esp_eye_tracer_color_occluded) },
+						{ xorstr_("esp_eye_tracer_color"), color_to_string(g_settings.esp_eye_tracer_color) },
 						{ xorstr_("esp_draw_line"), g_settings.esp_draw_line },
 						{ xorstr_("esp_draw_line_from"), g_settings.esp_draw_line_from },
 						{ xorstr_("esp_line_thickness"), g_settings.esp_line_thickness },

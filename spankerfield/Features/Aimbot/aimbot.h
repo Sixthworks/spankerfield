@@ -7,9 +7,28 @@ namespace big
 	class AimbotPredictor
 	{
 	public:
-		float PredictLocation(ClientSoldierEntity* local_entity, ClientControllableEntity* enemy, Vector3& aim_point, const Matrix& shoot_space);
+		struct PredictionResult {
+			Vector3 predicted_position;
+			float zero_angle;
+			bool success;
+			
+			PredictionResult() : zero_angle(0.0f), success(false) {}
+		};
+
+		PredictionResult PredictTarget(ClientSoldierEntity* local_entity, 
+									 ClientControllableEntity* enemy, 
+									 const Vector3& aim_point, 
+									 const Matrix& shoot_space,
+									 bool is_vehicle = false);
+
 	private:
-		float DoPrediction(const Vector3& shoot_space, Vector3& aim_point, const Vector3& my_velocity, const Vector3& enemy_velocity, const Vector3& bullet_speed, const float gravity, const WeaponZeroingEntry& zero_entry);
+		float DoPrediction(const Vector3& shoot_space, 
+						  Vector3& aim_point, 
+						  const Vector3& my_velocity, 
+						  const Vector3& enemy_velocity, 
+						  const Vector3& bullet_speed, 
+						  const float gravity,
+						  const WeaponZeroingEntry& zero_entry);
 	};
 
 	// Smoother
@@ -65,5 +84,6 @@ namespace big
 namespace plugins
 {
 	void aimbot(float delta_time);
+	void vehicle_aimbot(float delta_time);
 	void draw_fov();
 }
