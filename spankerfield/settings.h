@@ -178,7 +178,7 @@ namespace big
 		bool screenshots_pb_clean{ true };
 		int screenshots_pb_clean_delay{ 12500 };
 		int screenhots_pb_delay{ 300 };
-		int screenhots_post_pb_delay{ 200 };
+		int screenhots_post_pb_delay{ 300 };
 	};
 
 	inline settings g_settings;
