@@ -19,8 +19,10 @@ namespace big
 		bool g_should_draw;
 		bool g_fairfight;
 		bool g_punkbuster;
+		bool g_punkbuster_alt;
 		int screenshots_ff;
 		int screenshots_pb;
+		int screenshots_clean_frames;
 
 		Vector3 g_pred_aim_point{ 0.0f, 0.0f, 0.0f };
 		bool g_has_pred_aim_point{ false };

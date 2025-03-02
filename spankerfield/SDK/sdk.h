@@ -26,6 +26,7 @@
 #define OFFSET_WEAPONSHOOTSPACE       OFFSET_FIRING_WEAPON + 0x28
 #define OFFSET_TAKESCREENSHOT         0x14015D4F0 // 48 8B C4 55 48 8D 68 A1 48 81 EC ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 58 08 48 89 78 10 48 8B D9 8B 05 ? ? ? ?
 #define OFFSET_SOMESCOREMANAGER       0x1423822D8 // 48 8B 05 ? ? ? ? 4C 8B 60 18 (https://www.unknowncheats.me/forum/battlefield-4/133815-getting-clientplayerscore-k-d-etc-without-calling-game-function.html + https://www.unknowncheats.me/forum/1044753-post19.html)
+#define OFFSET_PBSSRETURN			  0x140CBCD29
 
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128

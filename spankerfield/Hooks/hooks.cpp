@@ -57,15 +57,15 @@ namespace big
 			return result;
 		}
 
-		// PBSS
+		// PBSS disable method
 		using takeScreenshot_t = void(__thiscall*)(void* pThis);
 		takeScreenshot_t oTakeScreenshot = nullptr;
 
 		std::atomic<bool> pb_screenshot_in_progress(false);
 		std::mutex pb_screenshot_mutex;
 
-		// RAII-based Reset for g_punkbuster
-		class scoped_pb_reset {
+		class scoped_pb_reset // RAII-based Reset for g_punkbuster
+		{
 		public:
 			scoped_pb_reset() {
 				g_globals.g_punkbuster = true;
@@ -78,7 +78,7 @@ namespace big
 
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
-			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("+") << static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot] (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("+") << static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
 
 			g_globals.screenshots_pb++;
 			std::lock_guard<std::mutex> lock(pb_screenshot_mutex);
@@ -105,6 +105,80 @@ namespace big
 			// Screenshot is complete
 			pb_screenshot_in_progress.store(false);
 		}
+
+		// PBSS clean method
+		ID3D11Texture2D* pCleanScreenShot = nullptr; // Clean Screenshot Texture for PBSS
+		DWORD pbLastCleanFrame = 0;
+		std::mutex clean_screenshot_mutex;
+
+		void UpdateCleanFrame(IDXGISwapChain* pSwapChain, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+		{
+			auto current_tick_count = GetTickCount();
+
+			// Update the clean screenshot every 15 seconds (to minimize interruptions)
+			if (current_tick_count > pbLastCleanFrame + g_settings.screenshots_pb_clean_delay)
+			{
+				if (g_globals.screenshots_clean_frames > 5)
+				{
+					ID3D11Texture2D* pBuffer = nullptr;
+					HRESULT hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBuffer));
+
+					if (SUCCEEDED(hr))
+					{
+						D3D11_TEXTURE2D_DESC td;
+						pBuffer->GetDesc(&td);
+
+						std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
+
+						// Release the previous clean screenshot texture
+						if (pCleanScreenShot)
+						{
+							pCleanScreenShot->Release();
+							pCleanScreenShot = nullptr;
+						}
+
+						// Create a new clean screenshot texture
+						pDevice->CreateTexture2D(&td, nullptr, &pCleanScreenShot);
+
+						// Copy the current screen buffer to the clean screenshot texture
+						pContext->CopyResource(pCleanScreenShot, pBuffer);
+
+						pBuffer->Release();
+						pbLastCleanFrame = current_tick_count;
+
+						g_globals.g_punkbuster_alt = false;
+					}
+				}
+				else
+					g_globals.g_punkbuster_alt = true;
+			}
+		}
+
+		using CopySubresourceRegion_t = void(*)(ID3D11DeviceContext* pContext, ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox);
+		CopySubresourceRegion_t oCopySubresourceRegion = nullptr;
+
+		void hkCopySubresourceRegion(ID3D11DeviceContext* pContext, ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox)
+		{
+			void* return_address = _ReturnAddress();
+
+			// Check if the call is from PunkBuster's screenshot logic
+			if (reinterpret_cast<DWORD_PTR>(return_address) == OFFSET_PBSSRETURN)
+			{
+				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkCopySubresourceRegion]");
+				g_globals.screenshots_pb++;
+
+				std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
+
+				// Replace the source resource with the clean screenshot texture
+				if (g_settings.screenshots_pb_clean && pCleanScreenShot)
+					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
+				else
+					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
+			}
+			else
+				// Proceed with the original call for non-PunkBuster operations
+				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
+		}
 	}
 
 	namespace Present
@@ -126,11 +200,22 @@ namespace big
 					g_globals.g_width = renderer->m_pScreen->m_Width;
 					g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
 
-					// AA flag check + Hooked PB Take Screenshot Function + Hooked BitBlt
-					g_globals.g_should_draw = !punkbuster_capturing() && !g_globals.g_punkbuster && !g_globals.g_fairfight;
+					// Update the clean screenshot texture
+					if (g_settings.screenshots_pb_clean)
+					    ScreenshotCleaner::UpdateCleanFrame(pThis, renderer->m_pDevice, renderer->m_pContext);
+
+					g_globals.g_should_draw = !punkbuster_capturing() // Anti-Aliasing flag check
+						&& !g_globals.g_punkbuster // hkTakeScreenshot hook
+						&& (!g_globals.g_punkbuster_alt || !g_settings.screenshots_pb_clean) // hkCopySubresourceRegion hook (only matters if cleaner method is active)
+						&& !g_globals.g_fairfight; // BitBlt hook
 
 					if (g_globals.g_should_draw)
+					{
+						g_globals.screenshots_clean_frames = 0;
 						g_renderer->on_present();
+					}
+					else
+						g_globals.screenshots_clean_frames++;
 				}
 			}
 
@@ -242,11 +327,15 @@ namespace big
 
 			MH_CreateHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT), &ScreenshotCleaner::hkTakeScreenshot, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oTakeScreenshot));
 			MH_EnableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
-			LOG(INFO) << xorstr_("Hooked PBSS.");
+			LOG(INFO) << xorstr_("Hooked TakeScreenshot.");
 
 			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
 			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8]);
 			LOG(INFO) << xorstr_("Hooked Present.");
+
+			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pContext))[46], ScreenshotCleaner::hkCopySubresourceRegion, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oCopySubresourceRegion));
+			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pContext))[46]);
+			LOG(INFO) << xorstr_("Hooked CopySubresourceRegion.");
 
 			PreFrame::pPreFrameHook = std::make_unique<VMTHook>();
 			PreFrame::pPreFrameHook->Setup(border_input_node->m_Vtable);
@@ -259,17 +348,20 @@ namespace big
 
 	void hooking::disable()
 	{
-		PreFrame::pPreFrameHook->Release();
-		LOG(INFO) << xorstr_("Disabled PreFrameUpdate.");
+		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pContext))[46]);
+		LOG(INFO) << xorstr_("Disabled CopySubresourceRegion.");
 
 		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
 		LOG(INFO) << xorstr_("Disabled Present.");
 
+		MH_DisableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
+		LOG(INFO) << xorstr_("Disabled TakeScreenshot.");
+
 		MH_DisableHook(&BitBlt);
 		LOG(INFO) << xorstr_("Disabled BitBlt.");
 
-		MH_DisableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
-		LOG(INFO) << xorstr_("Disabled PBSS.");
+		PreFrame::pPreFrameHook->Release();
+		LOG(INFO) << xorstr_("Disabled PreFrameUpdate.");
 
 		if (WndProc::oWndProc)
 		{

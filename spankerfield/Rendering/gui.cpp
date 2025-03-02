@@ -705,7 +705,7 @@ namespace big
 				ImGui::PushItemWidth(550.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
-				ImGui::Text(xorstr_("Make sure the file exists, has roman/latin characters only, and is a WAVE audio file"));
+				ImGui::Text(xorstr_("Make sure the file exists, has roman/latin characters only in the name, and is a WAVE audio file"));
 
 				ImGui::EndTabItem();
 			}
@@ -765,21 +765,6 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Shows the total amount of times you've been screenshotted by FF or PB."));
 
-
-				ImGui::SameLine();
-
-				ImGui::PushItemWidth(300.f);
-
-				ImGui::SliderInt(xorstr_("PBSS delay (before)"), &g_settings.screenhots_pb_delay, 50, 1000);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
-
-				ImGui::SliderInt(xorstr_("PBSS delay (after)"), &g_settings.screenhots_post_pb_delay, 0, 500);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
-				
-				ImGui::PopItemWidth();
-
 				ImGui::SameLine();
 
 				if (ImGui::Button(xorstr_("Reset counters")))
@@ -790,6 +775,41 @@ namespace big
 
 				if (g_settings.screenshots)
 					color_wrapper(xorstr_("Text##SC"), &g_settings.screenshots_color);
+
+				if (ImGui::CollapsingHeader("PBSS delay"))
+				{
+					ImGui::PushItemWidth(300.f);
+
+					ImGui::SliderInt(xorstr_("before taking screenshot"), &g_settings.screenhots_pb_delay, 50, 1000);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
+
+					ImGui::SliderInt(xorstr_("after taking screenshot"), &g_settings.screenhots_post_pb_delay, 0, 500);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
+
+					ImGui::PopItemWidth();
+				}
+
+				ImGui::Separator();
+
+				ImGui::Text(xorstr_("Using the secondary PBSS cleaner is recommended for safety, although not mandatory."));
+
+				ImGui::Checkbox(xorstr_("Extra PBSS cleaner"), &g_settings.screenshots_pb_clean);
+
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Sends a screenshot with no visuals to PunkBuster in addition to just disabling visuals before a screenshot gets taken (may cause flickering)."));
+
+				if (g_settings.screenshots_pb_clean)
+				{
+					ImGui::PushItemWidth(300.f);
+
+					ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenhots_pb_delay, 100, 30000);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Delay between each clean frame update."));
+
+					ImGui::PopItemWidth();
+				}
 
 				ImGui::Separator();
 
@@ -808,6 +828,8 @@ namespace big
 				ImGui::PopItemWidth();
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
+
+				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
 				if (ImGui::IsItemHovered())
