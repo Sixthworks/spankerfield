@@ -108,8 +108,7 @@ namespace plugins
             else if (watermark_visible && current_time > next_watermark_time)
             {
                 watermark_visible = false;
-                // Wait 10-30 minutes before showing again
-                std::uniform_int_distribution<int> wait_time(600, 1800); // 600-1800 seconds (10-30 minutes)
+                std::uniform_int_distribution<int> wait_time(300, 600); // 600-1800 seconds (5-10 minutes)
                 next_watermark_time = current_time + std::chrono::seconds(wait_time(rng));
             }
         }
