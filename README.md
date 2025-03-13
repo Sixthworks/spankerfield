@@ -52,22 +52,22 @@
   - PunkBuster bypass
   - FairFight bypass
 
-### How to compile
-#### Requirements
-- Visual Studio 2022 (v143)
-- C++20 Standard
-- x64 Release build
-- Dynamic Link Library (.dll)
+### Build settings
+Configuration Properties -> General -> `Configuration Type: Dynamic Link Library (.dll)`
+Configuration Properties -> General -> `Platform Toolset: Visual Studio 2022 (v143)`
+Configuration Properties -> General -> `C++ Language Standard: ISO C++20 Standard (/std:c++20)`
+Configuration Properties -> Advanced -> `Character Set: Use Unicode Character Set`
 
-#### NuGet Packages
-- directxtk_desktop_win10
-- fmt
-- nlohmann.json
-
-#### Build Settings
-- C Standard: Old MSVC
-- Preprocessor: _CRT_SECURE_NO_WARNINGS
-- Character Set: Unicode
+- C/C++ -> Preprocessor -> Preprocessor Definitions: `_CRT_SECURE_NO_WARNINGS`
+- C/C++ -> Precompiled Headers -> Precompiled Header File: `common.h`
+- C/C++ -> General Additional Include Directories: `$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)`
+- Linker -> Input -> Additional Dependencies: ```fmt.lib
+DirectXTK.lib
+freetype.lib
+g3log.lib
+minhook.x64.lib
+%(AdditionalDependencies)```
+- Linker -> General -> Additional Library Directories: `$(ProjectDir)lib;%(AdditionalLibraryDirectories)`
 
 ### TODO
 - [ ] Enhanced aimbot system
