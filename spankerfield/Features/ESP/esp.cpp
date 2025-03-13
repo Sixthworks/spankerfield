@@ -351,8 +351,8 @@ namespace plugins
                             aim_point_changed = true;
                         }
 
-                        // Only draw if less than 400ms has passed since last change
-                        if (aim_point_changed && (current_time - last_aim_point_change_time <= 400))
+                        // Only draw if less than 500ms has passed since last change
+                        if (aim_point_changed && (current_time - last_aim_point_change_time <= 500))
                         {
                             Vector2 aimpoint_screen_coords;
                             if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
@@ -360,8 +360,8 @@ namespace plugins
                                 // Calculate alpha based on time elapsed
                                 float alpha_multiplier = 1.0f;
 
-                                // Start fading out after 250ms
-                                if (current_time - last_aim_point_change_time > 250)
+                                // Start fading out
+                                if (current_time - last_aim_point_change_time > 300)
                                 {
                                     alpha_multiplier = 1.0f - ((current_time - last_aim_point_change_time - 300) / 200.0f);
                                     if (alpha_multiplier < 0.0f) alpha_multiplier = 0.0f;
