@@ -22,6 +22,7 @@ namespace big
 		bool g_punkbuster_alt;
 		int screenshots_ff;
 		int screenshots_pb;
+		bool screenshots_pb_just_taken;
 		uint32_t screenshots_clean_frames{ 0 };
 
 		Vector3 g_pred_aim_point{ 0.0f, 0.0f, 0.0f };

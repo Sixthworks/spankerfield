@@ -77,32 +77,40 @@ namespace big
 
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
-			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot] (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("+") << static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
+			// If we're not using the new method
+			if (!g_settings.screenshots_pb_clean)
+			{
+				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot] (using a delay of ") << g_settings.screenhots_pb_delay << xorstr_("+") << static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
 
-			g_globals.screenshots_pb++;
-			std::lock_guard<std::mutex> lock(pb_screenshot_mutex);
+				g_globals.screenshots_pb++;
+				g_globals.screenshots_pb_just_taken = true;
+				std::lock_guard<std::mutex> lock(pb_screenshot_mutex);
 
-			// Wait if another screenshot is in progress
-			while (pb_screenshot_in_progress.load())
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				// Wait if another screenshot is in progress
+				while (pb_screenshot_in_progress.load())
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-			// Screenshot is in progress
-			pb_screenshot_in_progress.store(true);
+				// Screenshot is in progress
+				pb_screenshot_in_progress.store(true);
 
-			// When this class gets created, g_punkbuster sets to true, and when this class dies after the function ends, g_punkbuster is set to false
-			scoped_pb_reset reset_punkbuster;
+				// When this class gets created, g_punkbuster sets to true, and when this class dies after the function ends, g_punkbuster is set to false
+				scoped_pb_reset reset_punkbuster;
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
+				std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
 
-			if (oTakeScreenshot)
-				oTakeScreenshot(pThis);
+				if (oTakeScreenshot)
+					oTakeScreenshot(pThis);
 
-			// PBSS uses hkCopySubresourceRegion Direct3D API call which is synchronous, and the oTakeScreenshot call has ended...
-			// So that means we can re-draw our visuals back? Well, we shouldn't - just to be extra safe 
-			std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_post_pb_delay));
+				// PBSS uses hkCopySubresourceRegion Direct3D API call which is synchronous, and the oTakeScreenshot call has ended...
+				// So that means we can re-draw our visuals back? Well, we shouldn't - just to be extra safe 
+				std::this_thread::sleep_for(std::chrono::milliseconds(g_settings.screenhots_post_pb_delay));
 
-			// Screenshot is complete
-			pb_screenshot_in_progress.store(false);
+				// Screenshot is complete
+				pb_screenshot_in_progress.store(false);
+			}
+			else
+				// Else don't even use this hook
+                oTakeScreenshot(pThis);
 		}
 
 		// PBSS clean method
@@ -167,7 +175,12 @@ namespace big
 			if (reinterpret_cast<DWORD_PTR>(return_address) == OFFSET_PBSSRETURN)
 			{
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkCopySubresourceRegion]");
-				g_globals.screenshots_pb++;
+
+				// Because hkCopySubresourceRegion is called after this which increases screenshots_pb, and we don't want to do this
+				if (g_globals.screenshots_pb_just_taken)
+					g_globals.screenshots_pb_just_taken = false;
+				else
+					g_globals.screenshots_pb++;
 
 				std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
 

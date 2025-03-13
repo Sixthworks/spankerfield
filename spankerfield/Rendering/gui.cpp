@@ -114,7 +114,13 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
 
 				if (g_settings.esp_draw_aim_point)
+				{
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("Point scale##AP"), &g_settings.esp_aim_point_size, 0.1f, 10.f);
+					ImGui::PopItemWidth();
+
 					color_wrapper(xorstr_("Point color##AP"), &g_settings.esp_aim_point_color);
+				}
 
 				if (g_settings.aim_fov_method)
 				{
@@ -410,7 +416,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Draws a line showing where the player is looking"));
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Eye tracer distance"), &g_settings.esp_eye_tracer_distance, 1.0f, 500.0f);
+				ImGui::SliderFloat(xorstr_("Eye tracer distance"), &g_settings.esp_eye_tracer_distance, 1.0f, 30.0f);
 				ImGui::SliderFloat(xorstr_("Eye tracer thickness"), &g_settings.esp_eye_tracer_thickness, 0.5f, 3.0f);
 				ImGui::PopItemWidth();
 				color_wrapper(xorstr_("Eye tracer color"), &g_settings.esp_eye_tracer_color);
@@ -814,35 +820,31 @@ namespace big
 				if (g_settings.screenshots)
 					color_wrapper(xorstr_("Text##SC"), &g_settings.screenshots_color);
 
-				if (ImGui::CollapsingHeader("PBSS delay"))
+				ImGui::Checkbox(xorstr_("Disable old PBSS bypass"), &g_settings.screenshots_pb_clean);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This makes the cheat only use the new PBSS cleaning method and ignore the old one."));
+
+				if (ImGui::CollapsingHeader("PBSS bypass settings"))
 				{
 					ImGui::PushItemWidth(300.f);
 
-					ImGui::SliderInt(xorstr_("before taking screenshot"), &g_settings.screenhots_pb_delay, 50, 1000);
+					ImGui::SliderInt(xorstr_("update frame delay"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
+						ImGui::SetTooltip(xorstr_("Delay between each clean frame update for the new method."));
 
-					ImGui::SliderInt(xorstr_("after taking screenshot"), &g_settings.screenhots_post_pb_delay, 0, 500);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
+					if (!g_settings.screenshots_pb_clean)
+					{
+						ImGui::SliderInt(xorstr_("before taking screenshot (old method)"), &g_settings.screenhots_pb_delay, 50, 1000);
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
+
+						ImGui::SliderInt(xorstr_("after taking screenshot (old method)"), &g_settings.screenhots_post_pb_delay, 0, 500);
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
+					}
 
 					ImGui::PopItemWidth();
 				}
-
-				ImGui::Separator();
-
-				ImGui::Text(xorstr_("Additional PBSS cleaner (clean frame)"));
-
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Sends a fake texture to the anti-cheat when it requests a screenshot with visuals disabled (may cause flickering)."));
-
-				ImGui::SameLine();
-
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Delay between each clean frame update."));
-				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 

@@ -119,6 +119,11 @@ namespace plugins
         m_drawing->AddLine(ImVec2(head_screen.x, head_screen.y), ImVec2(end_screen.x, end_screen.y), color, thickness);
     }
 
+    // For aim point
+    Vector3 last_aim_point = Vector3(0, 0, 0);
+    ULONGLONG last_aim_point_change_time = 0;
+    bool aim_point_changed = false;
+
     void draw_esp()
     {
         if (!g_settings.esp) return;
@@ -333,14 +338,50 @@ namespace plugins
                 {
                     if (g_globals.g_has_pred_aim_point)
                     {
-                        Vector2 aimpoint_screen_coords;
-                        if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
+                        ULONGLONG current_time = GetTickCount64();
+
+                        // Check if aim point has changed
+                        if (g_globals.g_pred_aim_point.x != last_aim_point.x ||
+                            g_globals.g_pred_aim_point.y != last_aim_point.y ||
+                            g_globals.g_pred_aim_point.z != last_aim_point.z)
                         {
-                            m_drawing->AddCircleFilled(
-                                ImVec2(aimpoint_screen_coords.x, aimpoint_screen_coords.y),
-                                6.0f,
-                                g_settings.esp_aim_point_color);
+                            // Aim point has changed, update last position and time
+                            last_aim_point = g_globals.g_pred_aim_point;
+                            last_aim_point_change_time = current_time;
+                            aim_point_changed = true;
                         }
+
+                        // Only draw if less than 400ms has passed since last change
+                        if (aim_point_changed && (current_time - last_aim_point_change_time <= 400))
+                        {
+                            Vector2 aimpoint_screen_coords;
+                            if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
+                            {
+                                // Calculate alpha based on time elapsed
+                                float alpha_multiplier = 1.0f;
+
+                                // Start fading out after 250ms
+                                if (current_time - last_aim_point_change_time > 250)
+                                {
+                                    alpha_multiplier = 1.0f - ((current_time - last_aim_point_change_time - 300) / 200.0f);
+                                    if (alpha_multiplier < 0.0f) alpha_multiplier = 0.0f;
+                                }
+
+                                // Apply alpha to color
+                                ImColor aim_point_color = g_settings.esp_aim_point_color;
+                                aim_point_color.Value.w *= alpha_multiplier;
+
+                                m_drawing->AddCircleFilled(
+                                    ImVec2(aimpoint_screen_coords.x, aimpoint_screen_coords.y),
+                                    g_settings.esp_aim_point_size,
+                                    aim_point_color);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Reset changed flag if we don't have a prediction point
+                        aim_point_changed = false;
                     }
                 }
 

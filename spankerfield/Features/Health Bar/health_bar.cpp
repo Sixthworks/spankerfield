@@ -34,12 +34,18 @@ namespace plugins
 
 		// Variables
 		float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
-		
+		const float STANDARD_MAX_HEALTH = 100.0f;
+		const float HARDCORE_MAX_HEALTH = 60.0f;
+		bool is_hardcore = false;
+
 		// Player
 		if (IsValidPtr(local_soldier->m_pHealthComp))
 		{
 			health_player = local_soldier->m_pHealthComp->m_Health;
 			max_health_player = local_soldier->m_pHealthComp->m_MaxHealth;
+
+			if (abs(max_health_player - HARDCORE_MAX_HEALTH) < 0.1f)
+				is_hardcore = true;
 		}
 
 		// Vehicle
@@ -75,12 +81,37 @@ namespace plugins
 			ImVec2 health_bar_size(health_bar_pos.x + health_bar_width, black_rect_pos.y + rect_height);
 
 			// Classic
-			float normalized_health = static_cast<float>(health) / max_health;
-			BYTE red = static_cast<BYTE>(255 - normalized_health * 255);
-			BYTE green = static_cast<BYTE>(normalized_health * 255);
-			ImColor health_bar_color(red, green, 0, 255);
+			ImColor health_bar_color{};
 
-			m_drawing->AddRectFilled(health_bar_pos, health_bar_size, g_settings.health_bar_use_default_color ? health_bar_color : g_settings.health_bar_color, 0.0f);
+			if (g_settings.health_bar_use_default_color)
+			{
+				// Health
+				float normalized_health;
+
+				// Adjust color calculation for hardcore soldier
+				if (!using_vehicle && is_hardcore)
+				{
+					// Scale hardcore health to match standard health color range
+					normalized_health = (health / max_health) * (STANDARD_MAX_HEALTH / HARDCORE_MAX_HEALTH);
+
+					// Clamp normalized health to valid range
+					normalized_health = fmaxf(0.0f, fminf(1.0f, normalized_health));
+				}
+				else
+				{
+					normalized_health = static_cast<float>(health) / max_health;
+				}
+
+				BYTE red = static_cast<BYTE>(255 - normalized_health * 255);
+				BYTE green = static_cast<BYTE>(normalized_health * 255);
+				health_bar_color = ImColor(red, green, 0, 255);
+			}
+			else
+			{
+				health_bar_color = g_settings.health_bar_color;
+			}
+
+			m_drawing->AddRectFilled(health_bar_pos, health_bar_size, health_bar_color, 0.0f);
 		};
 		
 		// Drawing

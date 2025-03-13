@@ -29,8 +29,8 @@ namespace big
 		bool aim_draw_fov;
 		float aim_fov{ 35.f };
 		ImColor aim_fov_color{ 255, 255, 255, 200 };
-		float aim_min_time_to_target{ 0.4f };
-		float aim_max_time_to_target{ 0.8f };
+		float aim_min_time_to_target{ 0.25f };
+		float aim_max_time_to_target{ 0.7f };
 		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Head };
 		int aim_target_selection{ 0 };
@@ -71,47 +71,48 @@ namespace big
 		ImColor esp_teammate_color{ 63, 147, 216, 255 };
 		ImColor esp_additional_tags_color{ 228, 213, 106, 255 };
 
-		bool esp_draw_box{ true };
+		bool esp_draw_box{ false };
 		int esp_box_style{ 4 };
-		ImColor esp_box_color_occluded{ 24, 162, 162, 255 };
-		ImColor esp_box_color{ 97, 59, 230, 255 };
+		ImColor esp_box_color_occluded{ 255, 255, 255, 255 };
+		ImColor esp_box_color{ 255, 0, 0, 255 };
 
 		bool esp_box_fill;
 		ImColor esp_box_fill_color{ 0, 0, 0, 70 };
 
-		bool esp_draw_3d_box{ false };
-		ImColor esp_3d_box_color_occluded{ 24, 162, 162, 255 };
-		ImColor esp_3d_box_color{ 97, 59, 230, 255 };
+		bool esp_draw_3d_box{ true };
+		ImColor esp_3d_box_color_occluded{ 255, 255, 255, 255 };
+		ImColor esp_3d_box_color{ 255, 0, 0, 255 };
 		float esp_3d_box_thickness{ 1.0f };
 
 		bool esp_draw_eye_tracer{ false };
-		float esp_eye_tracer_distance{ 150.0f };
+		float esp_eye_tracer_distance{ 8.0f };
 		float esp_eye_tracer_thickness{ 1.0f };
-		ImColor esp_eye_tracer_color_occluded{ 24, 162, 162, 255 };
+		ImColor esp_eye_tracer_color_occluded{ 255, 255, 255, 255 };
 		ImColor esp_eye_tracer_color{ 255, 0, 0, 255 };
 
 		bool esp_draw_line{ true };
 		int esp_draw_line_from{ 1 };
 		float esp_line_thickness{ 1.f };
-		ImColor esp_line_color_occluded{ 24, 162, 162, 120 };
-		ImColor esp_line_color{ 220, 220, 220, 120 };
+		ImColor esp_line_color_occluded{ 220, 220, 220, 120 };
+		ImColor esp_line_color{ 255, 255, 255, 120 };
 
 		bool esp_draw_health{ true };
-		int esp_health_location{ 0 };
-		bool esp_draw_name{ true };
-		bool esp_draw_distance{ true };
+		int esp_health_location{ 1 };
+		bool esp_draw_name{ false };
+		bool esp_draw_distance{ false };
 		bool esp_draw_vehicle_tag{ true };
 		float esp_text_spacing{ 9.25f };
-		ImColor text_color_occluded{ 24, 162, 162, 255 };
-		ImColor text_color{ 137, 111, 227, 255 };
+		ImColor text_color_occluded{ 255, 255, 0, 255 };
+		ImColor text_color{ 255, 0, 0, 255 };
 
 		bool skeleton{ true };
-		bool skeleton_use_dots{ true };
+		bool skeleton_use_dots;
 		float skeleton_dots_distance{ 22.5f };
-		ImColor skeleton_color_occluded{ 220, 220, 220, 255 };
-		ImColor skeleton_color{ 220, 220, 220, 255 };
+		ImColor skeleton_color_occluded{ 0, 0, 0, 255 };
+		ImColor skeleton_color{ 255, 255, 0, 255 };
 
 		bool esp_draw_aim_point;
+		float esp_aim_point_size{ 3.5f };
 		ImColor esp_aim_point_color{ 220, 220, 220, 255 };
 
 		bool draw_crosshair{ true };
@@ -119,7 +120,7 @@ namespace big
 		bool crosshair_shadow{ true };
 		float crosshair_size{ 20.f };
 		float crosshair_thickness{ 1.f };
-		ImColor crosshair_color{ 255, 0, 0, 255 };
+		ImColor crosshair_color{ 0, 0, 0, 255 };
 
 		bool draw_health_bar;
 		bool health_bar_soldier{ true };
@@ -134,7 +135,7 @@ namespace big
 		ImColor health_bar_color{ 138, 107, 255, 255 };
 
 		bool radar;
-		bool radar_circular{ true };
+		bool radar_circular;
 		bool radar_draw_teammates;
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
@@ -146,8 +147,8 @@ namespace big
 		float radar_distance{ 150.f };
 		ImColor radar_background_color{ 0, 0, 0, 160 };
 		ImColor radar_you_color{ 255, 255, 255, 200 };
-		ImColor radar_outline_color{ 255, 255, 255, 255 };
-		ImColor radar_cross_color{ 255, 255, 255, 175 };
+		ImColor radar_outline_color{ 0, 0, 0, 255 };
+		ImColor radar_cross_color{ 55, 55, 55, 175 };
 		ImColor radar_teammates_color{ 170, 170, 170, 255 };
 		ImColor radar_enemies_color{ 215, 133, 30, 255 };
 		ImColor radar_teammate_vehicles_color{ 190, 190, 190, 255 };
@@ -174,11 +175,11 @@ namespace big
 		bool obs_check{ true };
 
 		bool screenshots{ true };
-		ImColor screenshots_color{ 255, 255, 255, 255 };
-		bool screenshots_pb_clean{ true };
+		bool screenshots_pb_clean; // Disable old PBSS, false by default
 		int screenshots_pb_clean_delay{ 12500 };
 		int screenhots_pb_delay{ 300 };
 		int screenhots_post_pb_delay{ 300 };
+		ImColor screenshots_color{ 255, 255, 255, 255 };
 
 		bool disable_watermark;
 	};
@@ -315,6 +316,7 @@ namespace big
 			g_settings.skeleton_color = string_to_color(j[xorstr_("settings")][xorstr_("skeleton_color")]);
 
 			g_settings.esp_draw_aim_point = j[xorstr_("settings")][xorstr_("esp_draw_aim_point")];
+			g_settings.esp_aim_point_size = j[xorstr_("settings")][xorstr_("esp_aim_point_size")];
 			g_settings.esp_aim_point_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_aim_point_color")]);
 
 			g_settings.draw_crosshair = j[xorstr_("settings")][xorstr_("draw_crosshair")];
@@ -337,6 +339,7 @@ namespace big
 			g_settings.health_bar_color = string_to_color(j[xorstr_("settings")][xorstr_("health_bar_color")]);
 
 			g_settings.radar = j[xorstr_("settings")][xorstr_("radar")];
+			g_settings.radar_circular = j[xorstr_("settings")][xorstr_("radar_circular")];
 			g_settings.radar_draw_teammates = j[xorstr_("settings")][xorstr_("radar_draw_teammates")];
 			g_settings.radar_draw_you = j[xorstr_("settings")][xorstr_("radar_draw_you")];
 			g_settings.radar_cross = j[xorstr_("settings")][xorstr_("radar_cross")];
@@ -438,6 +441,7 @@ namespace big
 						{ xorstr_("skeleton_color_occluded"), color_to_string(g_settings.skeleton_color_occluded) },
 						{ xorstr_("skeleton_color"), color_to_string(g_settings.skeleton_color) },
 						{ xorstr_("esp_draw_aim_point"), g_settings.esp_draw_aim_point },
+						{ xorstr_("esp_aim_point_size"), g_settings.esp_aim_point_size },
 						{ xorstr_("esp_aim_point_color"), color_to_string(g_settings.esp_aim_point_color) },
 						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
 						{ xorstr_("crosshair_in_vehicles"), g_settings.crosshair_in_vehicles },
@@ -496,6 +500,7 @@ namespace big
 						{ xorstr_("infantry_alert_x"), g_settings.infantry_alert_x },
 						{ xorstr_("infantry_alert_y"), g_settings.infantry_alert_y },
 						{ xorstr_("radar"), g_settings.radar },
+						{ xorstr_("radar_circular"), g_settings.radar_circular },
 						{ xorstr_("radar_draw_teammates"), g_settings.radar_draw_teammates },
 						{ xorstr_("radar_draw_you"), g_settings.radar_draw_you },
 						{ xorstr_("radar_cross"), g_settings.radar_cross },
