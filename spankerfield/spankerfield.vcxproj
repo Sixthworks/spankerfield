@@ -110,22 +110,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -137,7 +121,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile>common.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,170 +129,106 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>fmt.lib;DirectXTK.lib;freetype.lib;g3log.lib;minhook.x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="common.cpp" />
-    <ClCompile Include="entry.cpp" />
-    <ClCompile Include="Features\Aimbot\aimbot.cpp" />
-    <ClCompile Include="Features\Anti AFK\anti_afk.cpp" />
-    <ClCompile Include="Features\Blacklist\blacklist.cpp" />
-    <ClCompile Include="Features\Crosshair\crosshair.cpp" />
-    <ClCompile Include="Features\ESP\esp.cpp" />
-    <ClCompile Include="Features\Explosives\explosives.cpp" />
-    <ClCompile Include="Features\Health Bar\health_bar.cpp" />
-    <ClCompile Include="Features\Infantry Alert\infantry_alert.cpp" />
-    <ClCompile Include="Features\Jet Speed\jetspeed.cpp" />
-    <ClCompile Include="Features\Kill Sound\kill_sound.cpp" />
-    <ClCompile Include="Features\main.cpp" />
-    <ClCompile Include="Features\Minimap\minimap.cpp" />
-    <ClCompile Include="Features\Missiles\missiles.cpp" />
-    <ClCompile Include="Features\Name Spoofer\name_spoofer.cpp" />
-    <ClCompile Include="Features\Overheat\overheat.cpp" />
-    <ClCompile Include="Features\Radar\radar.cpp" />
-    <ClCompile Include="Features\Rainbow Mode\rainbow_mode.cpp" />
-    <ClCompile Include="Features\Refresh Hook\refresh_hook.cpp" />
-    <ClCompile Include="Features\Risky\risky.cpp" />
-    <ClCompile Include="Features\Screenshots\screenshots.cpp" />
-    <ClCompile Include="Features\Spectator List\spectators.cpp" />
-    <ClCompile Include="Features\Watermark\watermark.cpp" />
-    <ClCompile Include="Hooks\hooks.cpp" />
-    <ClCompile Include="ImGui\imgui.cpp" />
-    <ClCompile Include="ImGui\imgui_demo.cpp" />
-    <ClCompile Include="ImGui\imgui_draw.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="MinHook\buffer.c" />
-    <ClCompile Include="MinHook\hde\hde32.c" />
-    <ClCompile Include="MinHook\hde\hde64.c" />
-    <ClCompile Include="MinHook\hook.c" />
-    <ClCompile Include="MinHook\trampoline.c" />
-    <ClCompile Include="Rendering\draw-list.cpp" />
-    <ClCompile Include="Rendering\gui.cpp" />
-    <ClCompile Include="Rendering\renderer.cpp" />
-    <ClCompile Include="SDK\class_info.cpp" />
-    <ClCompile Include="SDK\sdk.cpp" />
-    <ClCompile Include="SDK\type_info.cpp" />
-    <ClCompile Include="Utilities\g3log\crashhandler_windows.cpp" />
-    <ClCompile Include="Utilities\g3log\filesink.cpp" />
-    <ClCompile Include="Utilities\g3log\g3log.cpp" />
-    <ClCompile Include="Utilities\g3log\logcapture.cpp" />
-    <ClCompile Include="Utilities\g3log\loglevels.cpp" />
-    <ClCompile Include="Utilities\g3log\logmessage.cpp" />
-    <ClCompile Include="Utilities\g3log\logworker.cpp" />
-    <ClCompile Include="Utilities\g3log\stacktrace_windows.cpp" />
-    <ClCompile Include="Utilities\g3log\time.cpp" />
-    <ClCompile Include="Utilities\math.cpp" />
-    <ClCompile Include="Utilities\other.cpp" />
-    <ClCompile Include="Utilities\path.cpp" />
-    <ClCompile Include="Utilities\quartic.cpp" />
-    <ClCompile Include="Utilities\thread_pool.cpp" />
-    <ClCompile Include="Utilities\vmt_hook.cpp" />
-    <ClCompile Include="Utilities\w2s.cpp" />
+    <ClCompile Include="include\ImGui\imgui.cpp" />
+    <ClCompile Include="include\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="include\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="include\ImGui\imgui_freetype.cpp" />
+    <ClCompile Include="include\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="include\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="include\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\common.cpp" />
+    <ClCompile Include="src\entry.cpp" />
+    <ClCompile Include="src\Features\Aimbot\aimbot.cpp" />
+    <ClCompile Include="src\Features\Anti AFK\anti_afk.cpp" />
+    <ClCompile Include="src\Features\Blacklist\blacklist.cpp" />
+    <ClCompile Include="src\Features\Crosshair\crosshair.cpp" />
+    <ClCompile Include="src\Features\ESP\esp.cpp" />
+    <ClCompile Include="src\Features\Explosives\explosives.cpp" />
+    <ClCompile Include="src\Features\Health Bar\health_bar.cpp" />
+    <ClCompile Include="src\Features\Infantry Alert\infantry_alert.cpp" />
+    <ClCompile Include="src\Features\Jet Speed\jetspeed.cpp" />
+    <ClCompile Include="src\Features\Kill Sound\kill_sound.cpp" />
+    <ClCompile Include="src\Features\main.cpp" />
+    <ClCompile Include="src\Features\Minimap\minimap.cpp" />
+    <ClCompile Include="src\Features\Missiles\missiles.cpp" />
+    <ClCompile Include="src\Features\Name Spoofer\name_spoofer.cpp" />
+    <ClCompile Include="src\Features\Overheat\overheat.cpp" />
+    <ClCompile Include="src\Features\Radar\radar.cpp" />
+    <ClCompile Include="src\Features\Rainbow Mode\rainbow_mode.cpp" />
+    <ClCompile Include="src\Features\Refresh Hook\refresh_hook.cpp" />
+    <ClCompile Include="src\Features\Risky\risky.cpp" />
+    <ClCompile Include="src\Features\Screenshots\screenshots.cpp" />
+    <ClCompile Include="src\Features\Spectator List\spectators.cpp" />
+    <ClCompile Include="src\Features\Watermark\watermark.cpp" />
+    <ClCompile Include="src\Hooks\hooks.cpp" />
+    <ClCompile Include="src\Rendering\draw-list.cpp" />
+    <ClCompile Include="src\Rendering\gui.cpp" />
+    <ClCompile Include="src\Rendering\renderer.cpp" />
+    <ClCompile Include="src\SDK\class_info.cpp" />
+    <ClCompile Include="src\SDK\sdk.cpp" />
+    <ClCompile Include="src\SDK\type_info.cpp" />
+    <ClCompile Include="src\Utilities\math.cpp" />
+    <ClCompile Include="src\Utilities\other.cpp" />
+    <ClCompile Include="src\Utilities\path.cpp" />
+    <ClCompile Include="src\Utilities\quartic.cpp" />
+    <ClCompile Include="src\Utilities\thread_pool.cpp" />
+    <ClCompile Include="src\Utilities\vmt_hook.cpp" />
+    <ClCompile Include="src\Utilities\w2s.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
-    <ClInclude Include="Features\Aimbot\aimbot.h" />
-    <ClInclude Include="Features\Anti AFK\anti_afk.h" />
-    <ClInclude Include="Features\Blacklist\blacklist.h" />
-    <ClInclude Include="Features\Crosshair\crosshair.h" />
-    <ClInclude Include="Features\Health Bar\health_bar.h" />
-    <ClInclude Include="Features\Infantry Alert\infantry_alert.h" />
-    <ClInclude Include="Features\Kill Sound\kill_sound.h" />
-    <ClInclude Include="Features\Missiles\missiles.h" />
-    <ClInclude Include="Features\Name Spoofer\name_spoofer.h" />
-    <ClInclude Include="Features\Overheat\overheat.h" />
-    <ClInclude Include="Features\Radar\radar.h" />
-    <ClInclude Include="Features\Rainbow Mode\rainbow_mode.h" />
-    <ClInclude Include="Features\Refresh Hook\refresh_hook.h" />
-    <ClInclude Include="Features\Risky\risky.h" />
-    <ClInclude Include="Features\Screenshots\screenshots.h" />
-    <ClInclude Include="Features\Watermark\watermark.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="Rendering\Maps\bone_manager.h" />
-    <ClInclude Include="Rendering\font.h" />
-    <ClInclude Include="Rendering\gui.h" />
-    <ClInclude Include="Rendering\Maps\key_map.h" />
-    <ClInclude Include="Rendering\Maps\nicknames.h" />
-    <ClInclude Include="Rendering\renderer.h" />
-    <ClInclude Include="Rendering\Utils\Tooltip.h" />
-    <ClInclude Include="SDK\class_info.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="Features\ESP\esp.h" />
-    <ClInclude Include="Features\Explosives\explosives.h" />
-    <ClInclude Include="Features\Jet Speed\jetspeed.h" />
-    <ClInclude Include="Features\main.h" />
-    <ClInclude Include="Features\Minimap\minimap.h" />
-    <ClInclude Include="Features\Spectator List\spectators.h" />
-    <ClInclude Include="global.h" />
-    <ClInclude Include="Hooks\hooks.h" />
-    <ClInclude Include="ImGui\imconfig.h" />
-    <ClInclude Include="ImGui\imgui.h" />
-    <ClInclude Include="ImGui\imgui_impl_dx11.h" />
-    <ClInclude Include="ImGui\imgui_impl_dx9.h" />
-    <ClInclude Include="ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="ImGui\imgui_internal.h" />
-    <ClInclude Include="ImGui\imstb_rectpack.h" />
-    <ClInclude Include="ImGui\imstb_textedit.h" />
-    <ClInclude Include="ImGui\imstb_truetype.h" />
-    <ClInclude Include="MinHook.h" />
-    <ClInclude Include="MinHook\buffer.h" />
-    <ClInclude Include="MinHook\hde\hde32.h" />
-    <ClInclude Include="MinHook\hde\hde64.h" />
-    <ClInclude Include="MinHook\hde\pstdint.h" />
-    <ClInclude Include="MinHook\hde\table32.h" />
-    <ClInclude Include="MinHook\hde\table64.h" />
-    <ClInclude Include="MinHook\trampoline.h" />
-    <ClInclude Include="Rendering\draw-list.h" />
-    <ClInclude Include="SDK\sdk.h" />
-    <ClInclude Include="SDK\type_info.h" />
-    <ClInclude Include="Utilities\g3log\filesinkhelper.ipp" />
-    <ClInclude Include="Utilities\g3log\g2log.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\active.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\atomicbool.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\crashhandler.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\filesink.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\future.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\g3log.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\generated_definitions.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\logcapture.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\loglevels.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\logmessage.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\logworker.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\moveoncopy.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\shared_queue.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\sink.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\sinkhandle.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\sinkwrapper.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\stacktrace_windows.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\stlpatch_future.hpp" />
-    <ClInclude Include="Utilities\g3log\g3log\time.hpp" />
-    <ClInclude Include="Utilities\math.h" />
-    <ClInclude Include="Utilities\other.h" />
-    <ClInclude Include="Utilities\path.h" />
-    <ClInclude Include="Utilities\quartic.h" />
-    <ClInclude Include="Utilities\thread_pool.h" />
-    <ClInclude Include="Utilities\vmt_hook.h" />
-    <ClInclude Include="Utilities\w2s.h" />
-    <ClInclude Include="Utilities\xorstr.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\Features\Aimbot\aimbot.h" />
+    <ClInclude Include="src\Features\Anti AFK\anti_afk.h" />
+    <ClInclude Include="src\Features\Blacklist\blacklist.h" />
+    <ClInclude Include="src\Features\Crosshair\crosshair.h" />
+    <ClInclude Include="src\Features\ESP\esp.h" />
+    <ClInclude Include="src\Features\Explosives\explosives.h" />
+    <ClInclude Include="src\Features\Health Bar\health_bar.h" />
+    <ClInclude Include="src\Features\Infantry Alert\infantry_alert.h" />
+    <ClInclude Include="src\Features\Jet Speed\jetspeed.h" />
+    <ClInclude Include="src\Features\Kill Sound\kill_sound.h" />
+    <ClInclude Include="src\Features\main.h" />
+    <ClInclude Include="src\Features\Minimap\minimap.h" />
+    <ClInclude Include="src\Features\Missiles\missiles.h" />
+    <ClInclude Include="src\Features\Name Spoofer\name_spoofer.h" />
+    <ClInclude Include="src\Features\Overheat\overheat.h" />
+    <ClInclude Include="src\Features\Radar\radar.h" />
+    <ClInclude Include="src\Features\Rainbow Mode\rainbow_mode.h" />
+    <ClInclude Include="src\Features\Refresh Hook\refresh_hook.h" />
+    <ClInclude Include="src\Features\Risky\risky.h" />
+    <ClInclude Include="src\Features\Screenshots\screenshots.h" />
+    <ClInclude Include="src\Features\Spectator List\spectators.h" />
+    <ClInclude Include="src\Features\Watermark\watermark.h" />
+    <ClInclude Include="src\global.h" />
+    <ClInclude Include="src\Hooks\hooks.h" />
+    <ClInclude Include="src\logger.h" />
+    <ClInclude Include="src\Rendering\draw-list.h" />
+    <ClInclude Include="src\Rendering\font.h" />
+    <ClInclude Include="src\Rendering\gui.h" />
+    <ClInclude Include="src\Rendering\Maps\bone_manager.h" />
+    <ClInclude Include="src\Rendering\Maps\key_map.h" />
+    <ClInclude Include="src\Rendering\Maps\nicknames.h" />
+    <ClInclude Include="src\Rendering\renderer.h" />
+    <ClInclude Include="src\Rendering\Utils\Tooltip.h" />
+    <ClInclude Include="src\SDK\class_info.h" />
+    <ClInclude Include="src\SDK\sdk.h" />
+    <ClInclude Include="src\SDK\type_info.h" />
+    <ClInclude Include="src\settings.h" />
+    <ClInclude Include="src\Utilities\math.h" />
+    <ClInclude Include="src\Utilities\other.h" />
+    <ClInclude Include="src\Utilities\path.h" />
+    <ClInclude Include="src\Utilities\quartic.h" />
+    <ClInclude Include="src\Utilities\thread_pool.h" />
+    <ClInclude Include="src\Utilities\vmt_hook.h" />
+    <ClInclude Include="src\Utilities\w2s.h" />
+    <ClInclude Include="src\Utilities\xorstr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\fmt.7.0.1\build\fmt.targets" Condition="Exists('..\packages\fmt.7.0.1\build\fmt.targets')" />
-    <Import Project="..\packages\directxtk_desktop_win10.2024.6.5.1\build\native\directxtk_desktop_win10.targets" Condition="Exists('..\packages\directxtk_desktop_win10.2024.6.5.1\build\native\directxtk_desktop_win10.targets')" />
-    <Import Project="..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\fmt.7.0.1\build\fmt.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\fmt.7.0.1\build\fmt.targets'))" />
-    <Error Condition="!Exists('..\packages\directxtk_desktop_win10.2024.6.5.1\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_win10.2024.6.5.1\build\native\directxtk_desktop_win10.targets'))" />
-    <Error Condition="!Exists('..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
