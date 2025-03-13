@@ -112,6 +112,20 @@ namespace big
 
 	void renderer::post_reset()
 	{
+		// Update swapchain reference
+		m_dxgi_swapchain = get_swapchain();
+
+		// Get the device again if needed
+		if (!m_d3d_device && m_dxgi_swapchain)
+		{
+			void* d3d_device{};
+			if (SUCCEEDED(m_dxgi_swapchain->GetDevice(__uuidof(ID3D11Device), &d3d_device)))
+			{
+				m_d3d_device.Attach(static_cast<ID3D11Device*>(d3d_device));
+				m_d3d_device->GetImmediateContext(m_d3d_device_context.GetAddressOf());
+			}
+		}
+
 		ImGui_ImplDX11_CreateDeviceObjects();
 	}
 

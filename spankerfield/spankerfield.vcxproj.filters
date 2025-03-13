@@ -443,6 +443,9 @@
     <ClInclude Include="Features\Watermark\watermark.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Utils\Tooltip.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

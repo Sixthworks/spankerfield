@@ -17,18 +17,10 @@ namespace big
 		ClientSoldierEntity* local_entity,
 		ClientControllableEntity* enemy,
 		const Vector3& aim_point,
-		const Matrix& shoot_space,
-		bool is_vehicle)
+		const Matrix& shoot_space)
 	{
 		PredictionResult result;
 		result.predicted_position = aim_point;
-
-		// Для транспорта используем упрощенную логику
-		if (is_vehicle) {
-			Vector3 vDir = aim_point - shoot_space.Translation();
-			result.success = true;
-			return result;
-		}
 
 		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
 			return result;
@@ -71,14 +63,13 @@ namespace big
 		Vector3 enemy_velocity = *enemy->GetVelocity();
 		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
-		// Получаем угол коррекции от базового предикта
-		result.zero_angle = DoPrediction(shoot_space.Translation() + spawn_offset, 
-									   result.predicted_position, 
-									   my_velocity, 
-									   enemy_velocity, 
-									   initial_speed, 
-									   gravity,
-									   WeaponZeroingEntry(-1.0f, -1.0f));
+		result.zero_angle = DoPrediction(shoot_space.Translation() + spawn_offset,
+			result.predicted_position,
+			my_velocity,
+			enemy_velocity,
+			initial_speed,
+			gravity,
+			WeaponZeroingEntry(-1.0f, -1.0f));
 		result.success = true;
 
 		return result;
@@ -95,11 +86,11 @@ namespace big
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
 		Vector3 gravity_vec(0, -fabs(gravity), 0);
-		
+
 		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
-		{
-			return cur_pos + velocity * time + .5f * accel * time * time;
-		};
+			{
+				return cur_pos + velocity * time + .5f * accel * time * time;
+			};
 
 		float shortest_air_time = 0.0f;
 
@@ -119,7 +110,7 @@ namespace big
 
 		if (shortest_air_time <= 0.0f)
 			return 0.0f;
-		
+
 		// extrapolate position based on velocity and account for bullet drop
 		aim_point = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 
@@ -258,7 +249,7 @@ namespace big
 					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
 				}
 			}
-			else 
+			else
 			{
 				if (!g_settings.aim_must_be_visible)
 				{
@@ -309,14 +300,14 @@ namespace big
 				continue;
 
 			float screen_distance = get_screen_distance(screen_vec, screen_size);
-			
+
 			// FOV check anyway
 			if (screen_distance > fov_radius)
 				continue;
 
 			// Target selection based on settings
 			bool should_update_target = false;
-			
+
 			if (g_settings.aim_target_selection == 0) // FOV
 			{
 				should_update_target = screen_distance < closest_distance;
@@ -333,7 +324,7 @@ namespace big
 				float world_distance = (head_vec - transform.Translation()).Length();
 				float fov_weight = 1.0f - (screen_distance / fov_radius); // 0 to 1, where 1 - is the center of the screen
 				float weighted_distance = world_distance * (1.0f - fov_weight * 0.5f); // FOV is 50% in terms of preferability
-				
+
 				should_update_target = weighted_distance < closest_distance;
 				closest_distance = should_update_target ? weighted_distance : closest_distance;
 			}
@@ -383,7 +374,7 @@ namespace plugins
 		// Pressed status
 		auto is_pressed = [=]() {
 			return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
-		};
+			};
 
 		if (!is_pressed())
 			return;
@@ -396,13 +387,6 @@ namespace plugins
 
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!IsValidPtrWithVTable(local_player)) return;
-
-		// Check if player is in vehicle
-		if (local_player->GetVehicle()) 
-		{
-			vehicle_aimbot(delta_time);
-			return;
-		}
 
 		const auto local_soldier = local_player->GetSoldier();
 		if (!IsValidPtrWithVTable(local_soldier)) return;
@@ -456,7 +440,7 @@ namespace plugins
 			prediction_target = target.m_Player->GetSoldier();
 		}
 
-		// Выполняем предикт
+		// ��������� �������
 		auto prediction = m_AimbotPredictor.PredictTarget(
 			local_soldier,
 			prediction_target,
@@ -467,9 +451,9 @@ namespace plugins
 		if (!prediction.success)
 			return;
 
-		// Обновляем целевую позицию
+		// Update
 		target.m_WorldPosition = prediction.predicted_position;
-		
+
 		// Update global prediction point
 		g_globals.g_pred_aim_point = target.m_WorldPosition;
 		g_globals.g_has_pred_aim_point = target.m_HasTarget;
@@ -493,7 +477,7 @@ namespace plugins
 
 		// Fix vertical angle calculation
 		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0)); 
+		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0));
 
 		Vector2 BotAngles = {
 			-atan2(vDir.x, vDir.z),
@@ -503,124 +487,6 @@ namespace plugins
 		BotAngles -= aiming_simulation->m_Sway;
 		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, BotAngles);
 		aim_assist->m_AimAngles = BotAngles;
-		m_PreviousTarget = target;
-	}
-
-	void vehicle_aimbot(float delta_time)
-	{
-		// Controller support
-		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
-
-		// Pressed status
-		auto is_pressed = [=]() {
-			return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
-		};
-
-		if (!is_pressed())
-			return;
-
-		const auto game_context = ClientGameContext::GetInstance();
-		if (!game_context) return;
-
-		const auto player_manager = game_context->m_pPlayerManager;
-		if (!player_manager) return;
-
-		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
-
-		// Get local vehicle
-		const auto local_vehicle = local_player->GetVehicle();
-		if (!IsValidPtrWithVTable(local_vehicle)) return;
-
-		// Получаем компоненты транспорта
-		if (!IsValidPtr(local_vehicle->m_pComponents)) return;
-
-		// Получаем компонент оружия
-		const auto weapon_component = local_vehicle->m_pComponents->GetComponentByClassId<WeaponComponentData>(0x1A);
-		if (!IsValidPtr(weapon_component)) return;
-
-		const auto weapon_firing = weapon_component->m_WeaponFiring;
-		if (!IsValidPtrWithVTable(weapon_firing)) return;
-
-		// Получаем компонент прицеливания
-		const auto aim_assist = weapon_firing->m_Sway;
-		if (!IsValidPtr(aim_assist)) return;
-		if (!IsValidPtr(aim_assist->m_Data)) return;
-
-		// Get shoot space matrix
-		Matrix shoot_space;
-		local_vehicle->GetTransform(&shoot_space);
-
-		// Get closest target
-		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
-		if (!IsValidPtr(target.m_Player)) return;
-		if (!target.m_HasTarget) return;
-
-		// Get correct entity for prediction
-		ClientControllableEntity* prediction_target = nullptr;
-		if (IsValidPtr(target.m_Player->GetVehicle()))
-		{
-			prediction_target = target.m_Player->GetVehicle();
-		}
-		else
-		{
-			prediction_target = target.m_Player->GetSoldier();
-		}
-
-		// Do prediction for vehicle
-		auto prediction = m_AimbotPredictor.PredictTarget(
-			nullptr,
-			prediction_target,
-			target.m_WorldPosition,
-			shoot_space,
-			true // Specify that this is a vehicle
-		);
-
-		if (!prediction.success)
-			return;
-
-		target.m_WorldPosition = prediction.predicted_position;
-		
-		// Update global prediction point
-		g_globals.g_pred_aim_point = target.m_WorldPosition;
-		g_globals.g_has_pred_aim_point = target.m_HasTarget;
-
-		if (g_settings.aim_max_time_to_target <= 0.f) return;
-
-		// Handle target switching and smoothing
-		if (target.m_Player != m_PreviousTarget.m_Player)
-		{
-			Vector2 vec_rand =
-			{
-				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
-				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
-			};
-			m_AimbotSmoother.ResetTimes(vec_rand);
-		}
-
-		m_AimbotSmoother.Update(delta_time);
-
-		// Calculate aim angles
-		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
-		vDir.Normalize();
-
-		// Calculate vertical angle with improved elevation for vehicles
-		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0));
-
-		Vector2 bot_angles = {
-			-atan2(vDir.x, vDir.z),
-			vertical_angle + elevation_adjustment + prediction.zero_angle
-		};
-
-		// Применяем сглаживание к углам прицеливания
-		Vector2 current_angles = { aim_assist->m_Data->m_ShootingRecoilDecreaseScale, weapon_firing->m_RecoilAngleY };
-		m_AimbotSmoother.SmoothAngles(current_angles, bot_angles);
-
-		// Применяем углы прицеливания
-		aim_assist->m_Data->m_ShootingRecoilDecreaseScale = current_angles.x;
-		weapon_firing->m_RecoilAngleY = current_angles.y;
-
 		m_PreviousTarget = target;
 	}
 

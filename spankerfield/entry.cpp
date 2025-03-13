@@ -31,6 +31,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 
 			try
 			{
+				g_config.load();
+				LOG(INFO) << xorstr_("Configuration loaded.");
+
 				renderer_instance = std::make_unique<renderer>();
 				LOG(INFO) << xorstr_("Renderer initialized.");
 
@@ -42,9 +45,6 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 
 				g_hooking->enable();
 				LOG(INFO) << xorstr_("Hooking enabled.");
-
-				g_config.load();
-				LOG(INFO) << xorstr_("Configuration loaded.");
 
 				while (g_globals.g_running)
 				{

@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 
 #include <chrono>
 #include <ctime>

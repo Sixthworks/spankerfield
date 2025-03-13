@@ -8,7 +8,7 @@
 #include "../ImGui/imgui.h"
 #include "../Features/main.h"
 #include "../Utilities/other.h"
-#include "utils/Tooltip.h"
+#include "Utils/Tooltip.h"
 
 namespace big
 {
@@ -831,23 +831,18 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Additional PBSS cleaner (recommended for safety, not mandatory)."));
-
-				ImGui::Checkbox(xorstr_("Extra PBSS cleaner"), &g_settings.screenshots_pb_clean);
+				ImGui::Text(xorstr_("Additional PBSS cleaner (clean frame)"));
 
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Sends a screenshot with no visuals to PunkBuster in addition to just disabling visuals before a screenshot gets taken (may cause flickering)."));
+					ImGui::SetTooltip(xorstr_("Sends a fake texture to the anti-cheat when it requests a screenshot with visuals disabled (may cause flickering)."));
 
-				if (g_settings.screenshots_pb_clean)
-				{
-					ImGui::PushItemWidth(300.f);
+				ImGui::SameLine();
 
-					ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 30000);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Delay between each clean frame update."));
-
-					ImGui::PopItemWidth();
-				}
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Update frame delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Delay between each clean frame update."));
+				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 

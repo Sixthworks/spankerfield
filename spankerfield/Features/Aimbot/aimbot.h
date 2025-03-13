@@ -18,8 +18,8 @@ namespace big
 		PredictionResult PredictTarget(ClientSoldierEntity* local_entity, 
 									 ClientControllableEntity* enemy, 
 									 const Vector3& aim_point, 
-									 const Matrix& shoot_space,
-									 bool is_vehicle = false);
+									 const Matrix& shoot_space
+		);
 
 	private:
 		float DoPrediction(const Vector3& shoot_space, 
@@ -84,6 +84,5 @@ namespace big
 namespace plugins
 {
 	void aimbot(float delta_time);
-	void vehicle_aimbot(float delta_time);
 	void draw_fov();
 }

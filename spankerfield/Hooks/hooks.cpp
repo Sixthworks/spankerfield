@@ -1,7 +1,6 @@
 #include "hooks.h"
 #include "../MinHook.h"
 #include "../Utilities/other.h"
-#include "../Utilities/thread_pool.h"
 #include "../Rendering/renderer.h"
 #include "../Rendering/gui.h"
 #include "../Features/main.h"
@@ -14,9 +13,6 @@ namespace big
 {
 	namespace ScreenshotCleaner
 	{
-
-	#pragma region FFSS
-
 		// FFSS
 		typedef BOOL(WINAPI* tBitBlt)(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
 		tBitBlt oBitBlt = nullptr;
@@ -59,10 +55,6 @@ namespace big
 			ff_screenshot_in_progress.store(false);
 			return result;
 		}
-
-	#pragma endregion
-
-	#pragma region PBSS
 
 		// PBSS disable method
 		using takeScreenshot_t = void(__thiscall*)(void* pThis);
@@ -115,12 +107,12 @@ namespace big
 
 		// PBSS clean method
 		ID3D11Texture2D* pCleanScreenShot = nullptr; // Clean Screenshot Texture for PBSS
-		DWORD pbLastCleanFrame = 0;
+		ULONGLONG pbLastCleanFrame = 0;
 		std::mutex clean_screenshot_mutex;
 
 		void UpdateCleanFrame(IDXGISwapChain* pSwapChain, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 		{
-			auto current_tick_count = GetTickCount();
+			ULONGLONG current_tick_count = GetTickCount64();
 
 			// Update the clean screenshot every 15 seconds (to minimize interruptions)
 			if (current_tick_count > pbLastCleanFrame + g_settings.screenshots_pb_clean_delay)
@@ -135,8 +127,6 @@ namespace big
 						D3D11_TEXTURE2D_DESC td;
 						pBuffer->GetDesc(&td);
 
-						std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
-
 						// Release the previous clean screenshot texture
 						if (pCleanScreenShot)
 						{
@@ -144,11 +134,16 @@ namespace big
 							pCleanScreenShot = nullptr;
 						}
 
-						// Create a new clean screenshot texture
-						pDevice->CreateTexture2D(&td, nullptr, &pCleanScreenShot);
+						// Create texture
+						{
+							std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
 
-						// Copy the current screen buffer to the clean screenshot texture
-						pContext->CopyResource(pCleanScreenShot, pBuffer);
+							// Create a new clean screenshot texture
+							pDevice->CreateTexture2D(&td, nullptr, &pCleanScreenShot);
+
+							// Copy the current screen buffer to the clean screenshot texture
+							pContext->CopyResource(pCleanScreenShot, pBuffer);
+						}
 
 						pBuffer->Release();
 						pbLastCleanFrame = current_tick_count;
@@ -176,24 +171,21 @@ namespace big
 
 				std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
 
+				if (!pCleanScreenShot)
+					return;
+
 				// Replace the source resource with the clean screenshot texture
-				if (g_settings.screenshots_pb_clean && pCleanScreenShot)
-					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
-				else
-					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
+				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
 			}
 			else
-				// Proceed with the original call for non-PunkBuster operations
 				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
 		}
-
-	#pragma endregion
 	}
 
 	namespace Present
 	{
 		using Present_t = HRESULT(*)(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags);
-		Present_t oPresent = nullptr;
+		std::unique_ptr<VMTHook> pPresentHook;
 
 		HRESULT hkPresent(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags)
 		{
@@ -208,27 +200,33 @@ namespace big
 					g_globals.g_height = renderer->m_pScreen->m_Height;
 					g_globals.g_width = renderer->m_pScreen->m_Width;
 					g_globals.g_viewproj = game_renderer->m_pRenderView->m_ViewProjection;
-
+					
 					// Update the clean screenshot texture
-					if (g_settings.screenshots_pb_clean)
-					    ScreenshotCleaner::UpdateCleanFrame(pThis, renderer->m_pDevice, renderer->m_pContext);
+					ScreenshotCleaner::UpdateCleanFrame(pThis, renderer->m_pDevice, renderer->m_pContext);
 
-					g_globals.g_should_draw = !punkbuster_capturing() // Anti-Aliasing flag check
-						&& !g_globals.g_punkbuster // hkTakeScreenshot hook
-						&& (!g_globals.g_punkbuster_alt || !g_settings.screenshots_pb_clean) // hkCopySubresourceRegion hook (only matters if cleaner method is active)
-						&& !g_globals.g_fairfight; // BitBlt hook
+					// Should we render?
+					g_globals.g_should_draw = !punkbuster_capturing() // Anti-Aliasing flag
+						&& !g_globals.g_punkbuster     // hkTakeScreenshot
+						&& !g_globals.g_punkbuster_alt // Disables visuals for 5 frames to capture clean screenshot
+						&& !g_globals.g_fairfight;     // BitBlt
 
-					if (g_globals.g_should_draw)
+					// Render
 					{
-						g_globals.screenshots_clean_frames = 0;
-						g_renderer->on_present();
+						std::lock_guard<std::mutex> lock(ScreenshotCleaner::clean_screenshot_mutex);
+
+						if (g_globals.g_should_draw)
+						{
+							g_globals.screenshots_clean_frames = 0;
+							g_renderer->on_present();
+						}
+						else
+							g_globals.screenshots_clean_frames++;
 					}
-					else
-						g_globals.screenshots_clean_frames++;
 				}
 			}
-
-			return oPresent(pThis, SyncInterval, Flags);
+			static auto oPresent = pPresentHook->GetOriginal<Present_t>(8);
+			auto result = oPresent(pThis, SyncInterval, Flags);
+			return result;
 		}
 	}
 
@@ -240,7 +238,7 @@ namespace big
 		{
 			static auto oPreFrameUpdate = pPreFrameHook->GetOriginal<PreFrameUpdate_t>(3);
 			auto result = oPreFrameUpdate(ecx, edx, delta_time);
-			
+
 			g_features->pre_frame(delta_time);
 
 			return result;
@@ -316,40 +314,41 @@ namespace big
 			WndProc::oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(g_globals.g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc::hkWndProc)));
 			LOG(INFO) << xorstr_("Hooked WndProc.");
 
-			HMODULE hGdi32 = GetModuleHandleA(xorstr_("Gdi32.dll"));
-			if (!hGdi32)
+			HMODULE gdi_32 = GetModuleHandleA(xorstr_("Gdi32.dll"));
+			if (!gdi_32)
 			{
 				LOG(INFO) << xorstr_("Failed to get handle for Gdi32.dll.");
 				return;
 			}
 
-			void* pBitBlt = GetProcAddress(hGdi32, xorstr_("BitBlt"));
-			if (!pBitBlt)
+			void* bit_blt = GetProcAddress(gdi_32, xorstr_("BitBlt"));
+			if (!bit_blt)
 			{
 				LOG(INFO) << xorstr_("Failed to get address of BitBlt.");
 				return;
 			}
 
-			MH_CreateHook(pBitBlt, &ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
-			MH_EnableHook(pBitBlt);
+			MH_CreateHook(bit_blt, ScreenshotCleaner::hkBitBlt, reinterpret_cast<LPVOID*>(&ScreenshotCleaner::oBitBlt));
+			MH_EnableHook(bit_blt);
 			LOG(INFO) << xorstr_("Hooked BitBlt.");
 
-			MH_CreateHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT), &ScreenshotCleaner::hkTakeScreenshot, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oTakeScreenshot));
+			MH_CreateHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT), ScreenshotCleaner::hkTakeScreenshot, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oTakeScreenshot));
 			MH_EnableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
 			LOG(INFO) << xorstr_("Hooked TakeScreenshot.");
 
-			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
-			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8]);
+			Present::pPresentHook = std::make_unique<VMTHook>();
+			Present::pPresentHook->Setup(renderer->m_pScreen->m_pSwapChain);
+			Present::pPresentHook->Hook(8, Present::hkPresent);
 			LOG(INFO) << xorstr_("Hooked Present.");
-
-			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pContext))[46], ScreenshotCleaner::hkCopySubresourceRegion, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oCopySubresourceRegion));
-			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pContext))[46]);
-			LOG(INFO) << xorstr_("Hooked CopySubresourceRegion.");
 
 			PreFrame::pPreFrameHook = std::make_unique<VMTHook>();
 			PreFrame::pPreFrameHook->Setup(border_input_node->m_Vtable);
 			PreFrame::pPreFrameHook->Hook(3, PreFrame::PreFrameUpdate);
 			LOG(INFO) << xorstr_("Hooked PreFrameUpdate.");
+
+			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pContext))[46], ScreenshotCleaner::hkCopySubresourceRegion, reinterpret_cast<PVOID*>(&ScreenshotCleaner::oCopySubresourceRegion));
+			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pContext))[46]);
+			LOG(INFO) << xorstr_("Hooked CopySubresourceRegion.");
 
 			terminate = true;
 		}
@@ -360,7 +359,7 @@ namespace big
 		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pContext))[46]);
 		LOG(INFO) << xorstr_("Disabled CopySubresourceRegion.");
 
-		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
+		Present::pPresentHook->Release();
 		LOG(INFO) << xorstr_("Disabled Present.");
 
 		MH_DisableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));

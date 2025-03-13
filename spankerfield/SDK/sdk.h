@@ -32,7 +32,6 @@
 #define MAX_EXPLOSIVES                        128
 
 #include "type_info.h"
-#include <cstring>
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
 
