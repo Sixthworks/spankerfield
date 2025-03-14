@@ -177,7 +177,7 @@ namespace big
 		bool screenshots{ true };
 		bool screenshots_pb_clean; // Disable old PBSS, false by default
 		bool screenshots_pb_save_to_folder;
-		int screenshots_pb_clean_delay{ 15000 };
+		int screenshots_pb_clean_delay{ 20000 };
 		int screenhots_pb_delay{ 300 };
 		int screenhots_post_pb_delay{ 300 };
 		ImColor screenshots_color{ 255, 255, 255, 255 };

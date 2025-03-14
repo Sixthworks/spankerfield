@@ -440,7 +440,7 @@ namespace plugins
 			prediction_target = target.m_Player->GetSoldier();
 		}
 
-		// Выполняем предикт
+		// Doing predict
 		auto prediction = m_AimbotPredictor.PredictTarget(
 			local_soldier,
 			prediction_target,
