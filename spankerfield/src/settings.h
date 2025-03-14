@@ -176,7 +176,8 @@ namespace big
 
 		bool screenshots{ true };
 		bool screenshots_pb_clean; // Disable old PBSS, false by default
-		int screenshots_pb_clean_delay{ 12500 };
+		bool screenshots_pb_save_to_folder;
+		int screenshots_pb_clean_delay{ 15000 };
 		int screenhots_pb_delay{ 300 };
 		int screenhots_post_pb_delay{ 300 };
 		ImColor screenshots_color{ 255, 255, 255, 255 };
@@ -382,6 +383,7 @@ namespace big
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
 			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
 			g_settings.screenshots_pb_clean = j[xorstr_("settings")][xorstr_("screenshots_pb_clean")];
+			g_settings.screenshots_pb_save_to_folder = j[xorstr_("settings")][xorstr_("screenshots_pb_save_to_folder")];
 			g_settings.screenshots_pb_clean_delay = j[xorstr_("settings")][xorstr_("screenshots_pb_clean_delay")];
 			g_settings.screenhots_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_pb_delay")];
 			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
@@ -535,6 +537,7 @@ namespace big
 						{ xorstr_("screenshots"), g_settings.screenshots },
 						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
 						{ xorstr_("screenshots_pb_clean"), g_settings.screenshots_pb_clean },
+						{ xorstr_("screenshots_pb_save_to_folder"), g_settings.screenshots_pb_save_to_folder },
 						{ xorstr_("screenshots_pb_clean_delay"), g_settings.screenshots_pb_clean_delay },
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },

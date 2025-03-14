@@ -2,6 +2,7 @@
 
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "xinput.lib")
+#pragma comment(lib, "shlwapi.lib")
 
 #pragma warning (disable : 4200)
 

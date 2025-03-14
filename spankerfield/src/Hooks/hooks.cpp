@@ -1,11 +1,13 @@
 #include "hooks.h"
 #include <MinHook/MinHook.h>
 #include "../Utilities/other.h"
+#include "../Utilities/texture_saver.h"
 #include "../Rendering/renderer.h"
 #include "../Rendering/gui.h"
 #include "../Features/main.h"
 #include "../settings.h"
 #include "../global.h"
+
 
 #define GWL_WNDPROC GWLP_WNDPROC
 
@@ -189,6 +191,28 @@ namespace big
 
 				// Replace the source resource with the clean screenshot texture
 				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
+
+				// Save screenshot sent to PB to a folder
+				if (g_settings.screenshots_pb_save_to_folder)
+				{
+					std::filesystem::path screenshot_path = get_appdata_folder();
+					screenshot_path /= xorstr_("PBSS");
+
+					// Make sure it exists on the user end before saving anything
+					validate_path(screenshot_path);
+
+					screenshot_path /= std::string(current_time() + xorstr_(".png"));
+
+					if (!std::filesystem::exists(screenshot_path))
+					{
+						TextureSaver texture_saver;
+						texture_saver.Initialize(g_renderer->m_d3d_device.Get());
+						texture_saver.SaveTextureToFile(pCleanScreenShot, screenshot_path);
+
+						LOG(INFO) << xorstr_("Saved PBSS screenshot to: ") << screenshot_path.parent_path().string() << " as: " << screenshot_path.filename().string();
+					}
+				}
+
 			}
 			else
 				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);

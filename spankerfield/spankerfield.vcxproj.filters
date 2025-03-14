@@ -180,6 +180,9 @@
     <ClCompile Include="include\ImGui\imgui_freetype.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\texture_saver.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Features\Aimbot\aimbot.h">
@@ -318,6 +321,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\font.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\texture_saver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

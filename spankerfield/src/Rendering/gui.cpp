@@ -823,6 +823,12 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This makes the cheat only use the new PBSS cleaning method and ignore the old one."));
 
+				ImGui::SameLine();
+
+				ImGui::Checkbox(xorstr_("Save PBSS to folder"), &g_settings.screenshots_pb_save_to_folder);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Saves captured PB screenshots to a folder. AppData\\Roaming\\Spankerfield\\PB Screenshots\\Timestamp.png."));
+
 				if (ImGui::CollapsingHeader("PBSS bypass settings"))
 				{
 					ImGui::PushItemWidth(300.f);

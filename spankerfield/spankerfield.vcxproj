@@ -186,6 +186,7 @@
     <ClCompile Include="src\Utilities\other.cpp" />
     <ClCompile Include="src\Utilities\path.cpp" />
     <ClCompile Include="src\Utilities\quartic.cpp" />
+    <ClCompile Include="src\Utilities\texture_saver.cpp" />
     <ClCompile Include="src\Utilities\thread_pool.cpp" />
     <ClCompile Include="src\Utilities\vmt_hook.cpp" />
     <ClCompile Include="src\Utilities\w2s.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="src\Utilities\other.h" />
     <ClInclude Include="src\Utilities\path.h" />
     <ClInclude Include="src\Utilities\quartic.h" />
+    <ClInclude Include="src\Utilities\texture_saver.h" />
     <ClInclude Include="src\Utilities\thread_pool.h" />
     <ClInclude Include="src\Utilities\vmt_hook.h" />
     <ClInclude Include="src\Utilities\w2s.h" />
