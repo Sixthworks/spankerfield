@@ -85,7 +85,8 @@ namespace big
 		const WeaponZeroingEntry& zero_entry)
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
-		Vector3 gravity_vec(0, -fabs(gravity), 0);
+		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * relative_pos.Length() / 100.0f);
+		Vector3 gravity_vec(0, -adjusted_gravity, 0);
 
 		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
 			{
@@ -104,8 +105,11 @@ namespace big
 
 		for (int i = 0; i < 4; ++i)
 		{
-			if (roots[i].real() > 0.0f && (shortest_air_time == 0.0f || roots[i].real() < shortest_air_time))
-				shortest_air_time = roots[i].real();
+			if (roots[i].imag() == 0.0 && roots[i].real() > 0.01f)
+			{
+				if (shortest_air_time == 0.0f || roots[i].real() < shortest_air_time)
+					shortest_air_time = static_cast<float>(roots[i].real());
+			}
 		}
 
 		if (shortest_air_time <= 0.0f)
