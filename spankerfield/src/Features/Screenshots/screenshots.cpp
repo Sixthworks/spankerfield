@@ -19,7 +19,7 @@ namespace plugins
 			if (count >= 1)
 			{
 				std::string str = text + std::to_string(count);
-				m_drawing->AddText(12.5f, (float)g_globals.g_height - offset, g_settings.screenshots_color, 25.f, FL_NONE, str.c_str());
+				m_drawing->AddText(12.f, (float)g_globals.g_height - offset, g_settings.screenshots_color, 25.f, FL_NONE, str.c_str());
 				offset += 22.5f;
 			}
 		};

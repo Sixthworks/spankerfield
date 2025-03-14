@@ -61,8 +61,8 @@ namespace big
 		bool infantry_alert_use_default_pos{ true };
 		float infantry_alert_x{ 30.f };
 		float infantry_alert_y{ 400.f };
-		ImColor infantry_alert_color{ 151, 106, 255, 255 };
-		ImColor infantry_alert_indicator_color{ 255, 65, 65, 255 };
+		ImColor infantry_alert_color{ 255, 255, 0, 255 };
+		ImColor infantry_alert_indicator_color{ 255, 0, 0, 255 };
 
 		bool esp{ true };
 		bool esp_draw_teammates;
@@ -101,8 +101,8 @@ namespace big
 		bool esp_draw_name{ false };
 		bool esp_draw_distance{ false };
 		bool esp_draw_vehicle_tag{ true };
-		float esp_text_spacing{ 9.25f };
-		ImColor text_color_occluded{ 255, 255, 0, 255 };
+		float esp_text_spacing{ 10.f };
+		ImColor text_color_occluded{ 255, 255, 255, 255 };
 		ImColor text_color{ 255, 0, 0, 255 };
 
 		bool skeleton{ true };
@@ -134,9 +134,9 @@ namespace big
 		bool health_bar_use_default_color{ true };
 		ImColor health_bar_color{ 138, 107, 255, 255 };
 
-		bool radar;
+		bool radar{ true };
 		bool radar_circular;
-		bool radar_draw_teammates;
+		bool radar_draw_teammates{ true };
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
 		bool radar_outline{ true };

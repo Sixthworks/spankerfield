@@ -100,6 +100,10 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.aim_fov_color);
         g_rainbow_manager.add_color(g_settings.esp_box_color);
         g_rainbow_manager.add_color(g_settings.esp_box_color_occluded);
+        g_rainbow_manager.add_color(g_settings.esp_3d_box_color);
+        g_rainbow_manager.add_color(g_settings.esp_3d_box_color_occluded);
+        g_rainbow_manager.add_color(g_settings.esp_eye_tracer_color);
+        g_rainbow_manager.add_color(g_settings.esp_eye_tracer_color_occluded);
         g_rainbow_manager.add_color(g_settings.esp_line_color);
         g_rainbow_manager.add_color(g_settings.esp_line_color_occluded);
         g_rainbow_manager.add_color(g_settings.esp_teammate_color);

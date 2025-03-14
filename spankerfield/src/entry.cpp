@@ -17,7 +17,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hmod);
-		
+
 		g_globals.g_hmodule = hmod;
 		g_globals.g_main_thread = CreateThread(nullptr, 0, [](PVOID) -> DWORD
 		{

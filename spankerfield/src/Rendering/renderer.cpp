@@ -27,21 +27,19 @@ namespace big
 
 		m_d3d_device->GetImmediateContext(m_d3d_device_context.GetAddressOf());
 
-		auto file_path = get_appdata_folder();
-		file_path /= xorstr_("imgui.ini");
-
 		ImGuiContext* context = ImGui::CreateContext();
 		context->IO.DeltaTime = 1.0f / 60.0f;
 
+		auto file_path = get_appdata_folder();
+		file_path /= xorstr_("imgui.ini");
 		static std::string path = file_path.make_preferred().string();
 		context->IO.IniFilename = path.c_str();
 
-		ImGui_ImplDX11_Init(m_d3d_device.Get(), m_d3d_device_context.Get());
-		ImGui_ImplWin32_Init(g_globals.g_hwnd);
-
 		ImFontConfig font_cfg{};
-		font_cfg.FontDataOwnedByAtlas = false;
+		font_cfg.OversampleH = 2;
 		std::strcpy(font_cfg.Name, xorstr_("Open Sans"));
+
+		const ImWchar font_range[] = { 0x0020, 0x00FF, 0x0400, 0x044F, 0 }; // Basic Latin, Latin Supplement and Cyrillic
 
 		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
 			const_cast<std::uint8_t*>(font_main),
@@ -50,7 +48,12 @@ namespace big
 			&font_cfg);
 
 		context->IO.FontDefault = m_font;
-		
+
+		ImGui::GetIO().Fonts->Build();
+
+		ImGui_ImplDX11_Init(m_d3d_device.Get(), m_d3d_device_context.Get());
+		ImGui_ImplWin32_Init(g_globals.g_hwnd);
+
 		g_gui.dx_init();
 		g_renderer = this;
 	}

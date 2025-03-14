@@ -4,7 +4,7 @@
  *
  *   FreeType validation support (specification).
  *
- * Copyright (C) 2004-2019 by
+ * Copyright (C) 2004-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -19,9 +19,10 @@
 #ifndef FTVALID_H_
 #define FTVALID_H_
 
-#include <ft2build.h>
-#include FT_CONFIG_STANDARD_LIBRARY_H   /* for ft_setjmp and ft_longjmp */
+#include <freetype/ft2build.h>
+#include FT_CONFIG_STANDARD_LIBRARY_H   /* for ft_jmpbuf */
 
+#include "compiler-macros.h"
 
 FT_BEGIN_HEADER
 
