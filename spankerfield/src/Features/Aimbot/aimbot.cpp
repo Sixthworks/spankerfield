@@ -99,8 +99,6 @@ namespace big
 			return atan2(relative_pos.y, sqrt(relative_pos.x * relative_pos.x + relative_pos.z * relative_pos.z));
 		}
 
-		LOG(INFO) << distance;
-
 		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * distance / 100.0f);
 		Vector3 gravity_vec(0, -adjusted_gravity, 0);
 
