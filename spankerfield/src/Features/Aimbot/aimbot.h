@@ -22,6 +22,8 @@ namespace big
 		);
 
 	private:
+		float CalculateZeroAngle(const Vector3& origin, const Vector3& target, float bullet_speed, float gravity);
+
 		float DoPrediction(const Vector3& shoot_space, 
 						  Vector3& aim_point, 
 						  const Vector3& my_velocity, 

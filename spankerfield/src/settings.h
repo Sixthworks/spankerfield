@@ -32,8 +32,9 @@ namespace big
 		float aim_min_time_to_target{ 0.25f };
 		float aim_max_time_to_target{ 0.7f };
 		int aim_key{ VK_LMENU };
-		int aim_bone{ UpdatePoseResultData::BONES::Head };
+		int aim_bone{ UpdatePoseResultData::BONES::Spine1 };
 		int aim_target_selection{ 0 };
+		bool aim_ignore_friends{ true };
 		bool aim_auto_bone{ true };
 		float aim_zeroing_correction{ 0.5f };
 
@@ -65,10 +66,13 @@ namespace big
 		ImColor infantry_alert_indicator_color{ 255, 0, 0, 255 };
 
 		bool esp{ true };
+		bool esp_draw_friends{ true };
 		bool esp_draw_teammates;
 		bool esp_draw_vehicles{ true };
 		float esp_distance{ 10000.f };
+		bool esp_friend_color_to_tag;
 		ImColor esp_teammate_color{ 63, 147, 216, 255 };
+		ImColor esp_friend_color{ 80, 255, 80, 255 };
 		ImColor esp_additional_tags_color{ 228, 213, 106, 255 };
 
 		bool esp_draw_box{ false };
@@ -136,6 +140,7 @@ namespace big
 
 		bool radar{ true };
 		bool radar_circular;
+		bool radar_draw_friends{ true };
 		bool radar_draw_teammates{ true };
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
@@ -149,8 +154,10 @@ namespace big
 		ImColor radar_you_color{ 255, 255, 255, 200 };
 		ImColor radar_outline_color{ 0, 0, 0, 255 };
 		ImColor radar_cross_color{ 55, 55, 55, 175 };
+		ImColor radar_friends_color{ 80, 255, 80, 255 };
 		ImColor radar_teammates_color{ 170, 170, 170, 255 };
 		ImColor radar_enemies_color{ 215, 133, 30, 255 };
+		ImColor radar_friend_vehicles_color{ 65, 255, 65, 255 };
 		ImColor radar_teammate_vehicles_color{ 190, 190, 190, 255 };
 		ImColor radar_enemy_vehicles_color{ 255, 97, 30, 255 };
 
@@ -237,6 +244,7 @@ namespace big
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 			g_settings.aim_target_selection = j[xorstr_("settings")][xorstr_("aim_target_selection")];
+			g_settings.aim_ignore_friends = j[xorstr_("settings")][xorstr_("aim_ignore_friends")];
 			g_settings.aim_auto_bone = j[xorstr_("settings")][xorstr_("aim_auto_bone")];
 			g_settings.aim_zeroing_correction = j[xorstr_("settings")][xorstr_("aim_zeroing_correction")];	
 
@@ -269,10 +277,13 @@ namespace big
 			g_settings.infantry_alert_y = j[xorstr_("settings")][xorstr_("infantry_alert_y")];
 
 			g_settings.esp = j[xorstr_("settings")][xorstr_("esp")];
+			g_settings.esp_draw_friends = j[xorstr_("settings")][xorstr_("esp_draw_friends")];
 			g_settings.esp_draw_teammates = j[xorstr_("settings")][xorstr_("esp_draw_teammates")];
 			g_settings.esp_draw_vehicles = j[xorstr_("settings")][xorstr_("esp_draw_vehicles")];
 			g_settings.esp_distance = j[xorstr_("settings")][xorstr_("esp_distance")];
+			g_settings.esp_friend_color_to_tag = j[xorstr_("settings")][xorstr_("esp_friend_color_to_tag")];
 			g_settings.esp_teammate_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_teammate_color")]);
+			g_settings.esp_friend_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_friend_color")]);
 			g_settings.esp_additional_tags_color = string_to_color(j[xorstr_("settings")][xorstr_("esp_additional_tags_color")]);
 
 			g_settings.esp_draw_box = j[xorstr_("settings")][xorstr_("esp_draw_box")];
@@ -341,6 +352,7 @@ namespace big
 
 			g_settings.radar = j[xorstr_("settings")][xorstr_("radar")];
 			g_settings.radar_circular = j[xorstr_("settings")][xorstr_("radar_circular")];
+			g_settings.radar_draw_friends = j[xorstr_("settings")][xorstr_("radar_draw_friends")];
 			g_settings.radar_draw_teammates = j[xorstr_("settings")][xorstr_("radar_draw_teammates")];
 			g_settings.radar_draw_you = j[xorstr_("settings")][xorstr_("radar_draw_you")];
 			g_settings.radar_cross = j[xorstr_("settings")][xorstr_("radar_cross")];
@@ -354,8 +366,10 @@ namespace big
 			g_settings.radar_you_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_you_color")]);
 			g_settings.radar_outline_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_outline_color")]);
 			g_settings.radar_cross_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_cross_color")]);
+			g_settings.radar_friends_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_friends_color")]);
 			g_settings.radar_teammates_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_teammates_color")]);
 			g_settings.radar_enemies_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_enemies_color")]);
+			g_settings.radar_friend_vehicles_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_friend_vehicles_color")]);
 			g_settings.radar_teammate_vehicles_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_teammate_vehicles_color")]);
 			g_settings.radar_enemy_vehicles_color = string_to_color(j[xorstr_("settings")][xorstr_("radar_enemy_vehicles_color")]);
 
@@ -404,10 +418,13 @@ namespace big
 						{ xorstr_("rainbow_mode"), g_settings.rainbow_mode },
 						{ xorstr_("rainbow_speed"), g_settings.rainbow_speed },
 						{ xorstr_("esp"), g_settings.esp },
+						{ xorstr_("esp_draw_friends"), g_settings.esp_draw_friends },
 						{ xorstr_("esp_draw_teammates"), g_settings.esp_draw_teammates },
 						{ xorstr_("esp_draw_vehicles"), g_settings.esp_draw_vehicles },
 						{ xorstr_("esp_distance"), g_settings.esp_distance },
+						{ xorstr_("esp_friend_color_to_tag"), g_settings.esp_friend_color_to_tag },
 						{ xorstr_("esp_teammate_color"), color_to_string(g_settings.esp_teammate_color) },
+						{ xorstr_("esp_friend_color"), color_to_string(g_settings.esp_friend_color) },
 						{ xorstr_("esp_additional_tags_color"), color_to_string(g_settings.esp_additional_tags_color) },
 						{ xorstr_("esp_draw_box"), g_settings.esp_draw_box },
 						{ xorstr_("esp_box_style"), g_settings.esp_box_style },
@@ -477,6 +494,7 @@ namespace big
 						{ xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
 						{ xorstr_("aim_target_selection"), g_settings.aim_target_selection },
+						{ xorstr_("aim_ignore_friends"), g_settings.aim_ignore_friends },
 						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
 						{ xorstr_("aim_zeroing_correction"), g_settings.aim_zeroing_correction },
 						
@@ -503,6 +521,7 @@ namespace big
 						{ xorstr_("infantry_alert_y"), g_settings.infantry_alert_y },
 						{ xorstr_("radar"), g_settings.radar },
 						{ xorstr_("radar_circular"), g_settings.radar_circular },
+						{ xorstr_("radar_draw_friends"), g_settings.radar_draw_friends },
 						{ xorstr_("radar_draw_teammates"), g_settings.radar_draw_teammates },
 						{ xorstr_("radar_draw_you"), g_settings.radar_draw_you },
 						{ xorstr_("radar_cross"), g_settings.radar_cross },
@@ -516,8 +535,10 @@ namespace big
 						{ xorstr_("radar_you_color"), color_to_string(g_settings.radar_you_color) },
 						{ xorstr_("radar_outline_color"), color_to_string(g_settings.radar_outline_color) },
 						{ xorstr_("radar_cross_color"), color_to_string(g_settings.radar_cross_color) },
+						{ xorstr_("radar_friends_color"), color_to_string(g_settings.radar_friends_color) },
 						{ xorstr_("radar_teammates_color"), color_to_string(g_settings.radar_teammates_color) },
 						{ xorstr_("radar_enemies_color"), color_to_string(g_settings.radar_enemies_color) },
+						{ xorstr_("radar_friend_vehicles_color"), color_to_string(g_settings.radar_friend_vehicles_color) },
 						{ xorstr_("radar_teammate_vehicles_color"), color_to_string(g_settings.radar_teammate_vehicles_color) },
 						{ xorstr_("radar_enemy_vehicles_color"), color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ xorstr_("explosives"), g_settings.explosives },

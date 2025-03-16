@@ -107,6 +107,9 @@ namespace big
 				ImGui::Checkbox(xorstr_("Don't aim while reloading"), &g_settings.aim_must_not_reload);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
+				ImGui::Checkbox(xorstr_("Ignore friends"), &g_settings.aim_ignore_friends);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Will not aim at players that are in your friends list."));
 
 				ImGui::Separator();
 
@@ -375,6 +378,15 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw vehicles##ESP"), &g_settings.esp_draw_vehicles);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw friends##ESP"), &g_settings.esp_draw_friends);
+
+				ImGui::Text(xorstr_("Friends color"));
+				ImGui::Checkbox(xorstr_("Use tag instead of friendly colors##ESP"), &g_settings.esp_friend_color_to_tag);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make the cheat not change any of the colors in the ESP, and only use the FRND friend tag."));
+
+				color_wrapper(xorstr_("Friend##ESP"), &g_settings.esp_friend_color);
 
 				ImGui::Text(xorstr_("Teammates color"));
 
@@ -570,6 +582,10 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Makes the radar have a circle shape instead of the default square one."));
 				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Draw friends##RDR"), &g_settings.radar_draw_friends);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws your friends on the radar if enabled."));
+				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw teammates##RDR"), &g_settings.radar_draw_teammates);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw self##RDR"), &g_settings.radar_draw_you);
@@ -627,8 +643,10 @@ namespace big
 					color_wrapper(xorstr_("Self##RDR"), &g_settings.radar_you_color);
 
 				color_wrapper(xorstr_("Background##RDR"), &g_settings.radar_background_color);
+				color_wrapper(xorstr_("Friends##RDR"), &g_settings.radar_friends_color);
 				color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
 				color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
+				color_wrapper(xorstr_("Friend vehicles##RDR"), &g_settings.radar_friend_vehicles_color);
 				color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
 				color_wrapper(xorstr_("Ememy vehicles##RDR"), &g_settings.radar_enemy_vehicles_color);
 
@@ -749,6 +767,41 @@ namespace big
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
 				ImGui::Text(xorstr_("Make sure the file exists, has roman/latin characters only in the name, and is a WAVE audio file"));
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem(xorstr_("Friends")))
+			{
+				if (ImGui::TreeNode(xorstr_("Friends list")))
+				{
+					int i = 0;
+					for (const auto& rs : plugins::friends_list)
+					{
+						if (ImGui::Selectable(rs.name.c_str(), false))
+							plugins::selected_friend = i;
+						i++;
+					}
+					ImGui::TreePop();
+				}
+
+				if (ImGui::Button(xorstr_("Delete friend")))
+				{
+					if (!plugins::friends_list.empty() && plugins::selected_friend < plugins::friends_list.size())
+					{
+						std::string nickname = plugins::friends_list.at(plugins::selected_friend).name;
+						if (!nickname.empty())
+							plugins::delete_from_friends(nickname);
+					}
+				}
+
+				ImGui::Separator();
+				static char friend_nick[50]{};
+				ImGui::PushItemWidth(300.f);
+				ImGui::InputText(xorstr_("Friend Nickname"), friend_nick, IM_ARRAYSIZE(friend_nick));
+				ImGui::PopItemWidth();
+				if (ImGui::Button(xorstr_("Add friend")))
+					plugins::add_to_friends(friend_nick);
 
 				ImGui::EndTabItem();
 			}

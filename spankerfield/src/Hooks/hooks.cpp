@@ -1,6 +1,7 @@
 #include "hooks.h"
 #include <MinHook/MinHook.h>
 #include "../Utilities/other.h"
+#include "../Utilities/auto_yield.h"
 #include "../Utilities/texture_saver.h"
 #include "../Rendering/renderer.h"
 #include "../Rendering/gui.h"
@@ -44,13 +45,7 @@ namespace big
 			ff_screenshot_in_progress.store(true);
 			scoped_ff_reset reset_fairfight;
 
-			// Create a separate thread for the delay instead of blocking
-			auto delay_start_time = std::chrono::high_resolution_clock::now();
-			while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - delay_start_time).count() < 50)
-			{
-				// Allow the game to continue running by yielding instead of sleeping
-				std::this_thread::yield();
-			}
+			auto_yield(std::chrono::milliseconds(50));
 
 			BOOL result = FALSE;
 			if (oBitBlt)
@@ -77,49 +72,17 @@ namespace big
 			}
 		};
 
-		// This function will handle the non-blocking delay
-		void process_screenshot_async(void* pThis)
-		{
-			// When this class gets created, g_punkbuster sets to true
-			scoped_pb_reset reset_punkbuster;
-
-			// Use a non-blocking delay approach
-			auto start_time = std::chrono::high_resolution_clock::now();
-			while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count() < g_settings.screenhots_pb_delay)
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-			// Take the screenshot
-			if (oTakeScreenshot)
-				oTakeScreenshot(pThis);
-
-			// Post-screenshot delay
-			start_time = std::chrono::high_resolution_clock::now();
-			while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count() < g_settings.screenhots_post_pb_delay)
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-			// Screenshot is complete
-			pb_screenshot_in_progress.store(false);
-		}
-
-		// For visual screenshot timer
-		ULONGLONG last_screenshot_time = 0;
-
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
+			// Add to the counter anyway, since hkTakeScreenshot is ran before the hkCopySubresourceRegion
+			g_globals.screenshots_pb++;
+
 			// If we're not using the new method
 			if (!g_settings.screenshots_pb_clean)
 			{
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot] (using a delay of ")
 					<< g_settings.screenhots_pb_delay << xorstr_("+")
 					<< static_cast<int>(g_settings.screenhots_post_pb_delay) << xorstr_("ms)");
-
-				// Only increment counter for unique screenshot requests
-				ULONGLONG current_timer = GetTickCount64();
-				if (current_timer - last_screenshot_time > 100) // 100ms threshold to consider it a new screenshot
-				{
-					g_globals.screenshots_pb++;
-					last_screenshot_time = current_timer;
-				}
 
 				std::lock_guard<std::mutex> lock(pb_screenshot_mutex);
 
@@ -130,11 +93,22 @@ namespace big
 				// Screenshot is in progress
 				pb_screenshot_in_progress.store(true);
 
-				// Start a separate thread to handle the delay and screenshot
-				std::thread screenshot_thread(process_screenshot_async, pThis);
-				screenshot_thread.detach(); // Let it run independently
+				// When this class gets created, g_punkbuster sets to true, and when this class dies after the function ends, g_punkbuster is set to false
+				scoped_pb_reset reset_punkbuster;
 
-				// The main thread returns immediately without waiting
+				// Pre-screenshot delay with yield
+				auto_yield(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
+
+				// Original
+				if (oTakeScreenshot)
+					oTakeScreenshot(pThis);
+
+				// PBSS uses hkCopySubresourceRegion Direct3D API call which is synchronous, and the oTakeScreenshot call has ended.
+				// ...so that means we can re-draw our visuals back? Well, we shouldn't - just to be extra safe. Default timer for the screenshot is 250ms.
+				auto_yield(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
+
+				// Screenshot is complete
+				pb_screenshot_in_progress.store(false);
 			}
 			else
 			{
@@ -205,13 +179,6 @@ namespace big
 			if (reinterpret_cast<DWORD_PTR>(return_address) == OFFSET_PBSSRETURN)
 			{
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkCopySubresourceRegion]");
-
-				ULONGLONG current_timer = GetTickCount64();
-				if (current_timer - last_screenshot_time > 100)
-				{
-					g_globals.screenshots_pb++;
-					last_screenshot_time = current_timer;
-				}
 
 				std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
 

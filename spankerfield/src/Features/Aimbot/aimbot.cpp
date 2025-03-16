@@ -6,6 +6,7 @@
 #include "../../Utilities/quartic.h"
 #include "../../Utilities/other.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Features/Friend List/friend_list.h"
 
 #pragma warning( disable : 4244 )
 
@@ -85,7 +86,8 @@ namespace big
 		const WeaponZeroingEntry& zero_entry)
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
-		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * relative_pos.Length() / 100.0f);
+		float distance = relative_pos.Length();
+		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * distance / 100.0f);
 		Vector3 gravity_vec(0, -adjusted_gravity, 0);
 
 		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
@@ -95,6 +97,7 @@ namespace big
 
 		float shortest_air_time = 0.0f;
 
+		// Use quartic equation to find time of impact, accounting for full 3D motion
 		const double a = 0.25 * gravity * gravity;
 		const double b = enemy_velocity.y * gravity;
 		const double c = (relative_pos.y * gravity) + enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
@@ -115,10 +118,71 @@ namespace big
 		if (shortest_air_time <= 0.0f)
 			return 0.0f;
 
-		// extrapolate position based on velocity and account for bullet drop
-		aim_point = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
+		// Future target position
+		Vector3 future_target_pos = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
 
-		return 0.0f;
+		// Calculate direction to future position
+		Vector3 dir_to_target = future_target_pos - shoot_space;
+		float horizontal_dist = sqrt(dir_to_target.x * dir_to_target.x + dir_to_target.z * dir_to_target.z);
+
+		// Calculate vertical angle with bullet drop compensation
+		float bullet_speed_mag = bullet_speed.Length();
+
+		// Use projectile motion equations to solve for proper angle
+		// For vertical component we need to solve: y = v0y*t + 0.5*g*t^2
+		// Where we know y (height difference), t (time of flight), and g (gravity)
+
+		// Calculate required initial vertical velocity component
+		float required_v0y = (dir_to_target.y - 0.5f * -adjusted_gravity * shortest_air_time * shortest_air_time) / shortest_air_time;
+
+		// Calculate horizontal velocity needed
+		float required_v0_horiz = horizontal_dist / shortest_air_time;
+
+		// Calculate total required initial velocity and check if it's within weapon capabilities
+		float required_v0 = sqrt(required_v0y * required_v0y + required_v0_horiz * required_v0_horiz);
+
+		if (required_v0 > bullet_speed_mag * 1.05f) // Allow slight buffer for numerical errors
+		{
+			// Target is too far for weapon capabilities at this angle
+			// Aim at best possible angle instead
+			float theta = atan2(required_v0y, required_v0_horiz);
+			float max_theta = asin(required_v0 * sin(theta) / bullet_speed_mag);
+
+			// Recalculate target position using best possible angle
+			float max_v0y = bullet_speed_mag * sin(max_theta);
+			float t_flight = (max_v0y + sqrt(max_v0y * max_v0y + 2 * adjusted_gravity * dir_to_target.y)) / adjusted_gravity;
+
+			// Update aim point with adjusted prediction
+			future_target_pos = aim_point + enemy_velocity * t_flight + Vector3(0, 0.5f * -adjusted_gravity * t_flight * t_flight, 0);
+		}
+
+		// Update aim point with our calculated future position
+		aim_point = future_target_pos;
+
+		// Calculate zero angle adjustment
+		return CalculateZeroAngle(shoot_space, aim_point, bullet_speed_mag, adjusted_gravity);
+	}
+
+	// New helper function to calculate zero angle
+	float AimbotPredictor::CalculateZeroAngle(const Vector3& origin, const Vector3& target, float bullet_speed, float gravity)
+	{
+		Vector3 dir = target - origin;
+		float dist_horiz = sqrt(dir.x * dir.x + dir.z * dir.z);
+		float dist_vert = dir.y;
+
+		// Calculate angle needed to hit target with bullet drop
+		float g = fabs(gravity);
+		float v = bullet_speed;
+
+		// Quadratic formula to solve for angle: tan(theta) = (v^2 ± sqrt(v^4 - g(g*x^2 + 2y*v^2)))/gx
+		float discriminant = powf(v, 4) - g * (g * dist_horiz * dist_horiz + 2 * dist_vert * v * v);
+
+		if (discriminant < 0)
+			return 0.0f; // No solution possible
+
+		// We want the lower angle solution (usually)
+		float tan_theta = (v * v - sqrt(discriminant)) / (g * dist_horiz);
+		return atan(tan_theta);
 	}
 
 	AimbotSmoother::AimbotSmoother()
@@ -433,6 +497,17 @@ namespace plugins
 		if (!IsValidPtr(target.m_Player)) return;
 		if (!target.m_HasTarget) return;
 
+		// Friends list support
+		if (g_settings.aim_ignore_friends)
+		{
+			uint64_t persona_id = target.m_Player->m_onlineId.m_personaid;
+			bool is_friend = plugins::is_friend(persona_id);
+
+			// Quit if friend
+			if (is_friend)
+				return;
+		}
+		
 		// Get correct entity for prediction
 		ClientControllableEntity* prediction_target = nullptr;
 		if (IsValidPtr(target.m_Player->GetVehicle()))
@@ -479,13 +554,16 @@ namespace plugins
 		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
 		vDir.Normalize();
 
-		// Fix vertical angle calculation
+		float horizontal_angle = -atan2(vDir.x, vDir.z);
 		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
-		float elevation_adjustment = vertical_angle * (1.0f - exp(-vDir.Length() / 175.0));
+
+		// Use zero angle from prediction if available
+		if (prediction.zero_angle != 0.0f)
+			vertical_angle = prediction.zero_angle;
 
 		Vector2 BotAngles = {
-			-atan2(vDir.x, vDir.z),
-			vertical_angle + elevation_adjustment
+			horizontal_angle,
+			vertical_angle
 		};
 
 		BotAngles -= aiming_simulation->m_Sway;

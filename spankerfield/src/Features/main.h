@@ -20,6 +20,7 @@
 #include "Refresh Hook/refresh_hook.h"
 #include "Rainbow Mode/rainbow_mode.h"
 #include "Watermark/watermark.h"
+#include "Friend List/friend_list.h"
 
 namespace big
 {

@@ -6,6 +6,7 @@
 #include "../../Rendering/Maps/nicknames.h"
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/other.h"
+#include "../../Features/Friend List/friend_list.h"
 
 using namespace big;
 namespace plugins
@@ -146,8 +147,16 @@ namespace plugins
             if (!IsValidPtrWithVTable(player) || player == local_player)
                 continue;
 
-            bool teammate = IsValidPtrWithVTable(player) && player->m_TeamId == local_player->m_TeamId;
-            if (teammate && !g_settings.esp_draw_teammates)
+            // Player status
+            uint64_t persona_id = player->m_onlineId.m_personaid;
+            bool is_friend = plugins::is_friend(persona_id);
+            bool teammate = player->m_TeamId == local_player->m_TeamId;
+
+            // Don't question such logic
+            if (teammate && !g_settings.esp_draw_teammates && !(is_friend && g_settings.esp_draw_friends))
+                continue;
+
+            if (is_friend && !g_settings.esp_draw_friends && !(teammate && g_settings.esp_draw_teammates))
                 continue;
 
             const auto soldier = player->GetSoldier();
@@ -165,8 +174,6 @@ namespace plugins
             // Streamer mode
             if (g_settings.streamer_mode)
             {
-                uint64_t persona_id = player->m_onlineId.m_personaid;
-
                 if (persona_id != 0)
                 {
                     if (streamer_personas.count(persona_id) <= 0)
@@ -176,6 +183,7 @@ namespace plugins
                 }
             }
 
+            // Data
             float distance = get_distance(pos, local_pos);
 
             ClientVehicleEntity* vehicle = player->GetVehicle();
@@ -210,13 +218,27 @@ namespace plugins
 
                 if (g_settings.esp_draw_3d_box)
                 {
-                    ImColor box_color = teammate ? g_settings.esp_teammate_color : (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
+                    ImColor box_color;
+                    if (is_friend && !g_settings.esp_friend_color_to_tag)
+                        box_color = g_settings.esp_friend_color;
+                    else if (teammate)
+                        box_color = g_settings.esp_teammate_color;
+                    else
+                        box_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
+                    
                     draw_3d_box(transform, box_color, g_settings.esp_3d_box_thickness);
                 }
                 
                 if (g_settings.esp_draw_eye_tracer && IsValidPtrWithVTable(soldier))
                 {
-                    ImColor tracer_color = teammate ? g_settings.esp_teammate_color : soldier->m_Occluded ? g_settings.esp_eye_tracer_color_occluded : g_settings.esp_eye_tracer_color;
+                    ImColor tracer_color;
+                    if (is_friend && !g_settings.esp_friend_color_to_tag)
+                        tracer_color = g_settings.esp_friend_color;
+                    else if (teammate)
+                        tracer_color = g_settings.esp_teammate_color;
+                    else
+                        tracer_color = soldier->m_Occluded ? g_settings.esp_eye_tracer_color_occluded : g_settings.esp_eye_tracer_color;
+
                     draw_eye_tracer(soldier, tracer_color, g_settings.esp_eye_tracer_distance, g_settings.esp_eye_tracer_thickness);
                 }
 
@@ -225,7 +247,14 @@ namespace plugins
                     if (g_settings.esp_box_fill)
                         m_drawing->DrawFillArea(box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, g_settings.esp_box_fill_color, 0.0f);
 
-                    ImColor box_color = teammate ? g_settings.esp_teammate_color : (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
+                    ImColor box_color;
+                    if (is_friend && !g_settings.esp_friend_color_to_tag)
+                        box_color = g_settings.esp_friend_color;
+                    else if (teammate)
+                        box_color = g_settings.esp_teammate_color;
+                    else
+                        box_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
+
                     m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
                 }
 
@@ -319,7 +348,13 @@ namespace plugins
                     };
 
                     // Drawing part
-                    ImColor text_color = teammate ? g_settings.esp_teammate_color : (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
+                    ImColor text_color;
+                    if (is_friend && !g_settings.esp_friend_color_to_tag)
+                        text_color = g_settings.esp_friend_color;
+                    else if (teammate)
+                        text_color = g_settings.esp_teammate_color;
+                    else
+                        text_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
 
                     float x = box_coords[1].x + 3.5f;
                     float y = box_coords[0].y - 3.f;
@@ -330,7 +365,8 @@ namespace plugins
 
                     draw_esp_text(x, y, nickname, text_color, g_settings.esp_draw_name);
                     draw_esp_text(x, y, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color, g_settings.esp_draw_distance);
-                    draw_esp_text(x, y, xorstr_("VEHICLE"), g_settings.esp_additional_tags_color, g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle));
+                    draw_esp_text(x, y, xorstr_("FRND"), g_settings.esp_friend_color, is_friend && g_settings.esp_friend_color_to_tag);
+                    draw_esp_text(x, y, xorstr_("VEH"), g_settings.esp_additional_tags_color, g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle));
                 }
 
                 // Aim Point, credit VincentVega
@@ -392,7 +428,13 @@ namespace plugins
                     RagdollComponent* ragdoll_component = soldier->m_pRagdollComponent;
                     if (IsValidPtr(ragdoll_component))
                     {
-                        ImColor skeleton_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
+                        ImColor skeleton_color;
+                        if (is_friend && !g_settings.esp_friend_color_to_tag)
+                            skeleton_color = g_settings.esp_friend_color;
+                        else if (teammate)
+                            skeleton_color = g_settings.esp_teammate_color;
+                        else
+                            skeleton_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
 
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);

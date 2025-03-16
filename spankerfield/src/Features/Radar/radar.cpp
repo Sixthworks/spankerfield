@@ -3,6 +3,7 @@
 #include "../../Utilities/other.h"
 #include "../../Utilities/math.h"
 #include "../../Rendering/draw-list.h"
+#include "../../Features/Friend List/friend_list.h"
 
 #pragma warning( disable : 4244 )
 
@@ -93,8 +94,17 @@ namespace plugins
 			if (player == local_player)
 				continue;
 
+			uint64_t persona_id = player->m_onlineId.m_personaid;
+			bool is_friend = plugins::is_friend(persona_id);
+
 			bool teammate = player->m_TeamId == local_player->m_TeamId;
-			if (teammate && !g_settings.radar_draw_teammates)
+
+			// Skip drawing teammates if the setting is disabled, unless they are also friends and the friend setting is enabled
+			if (teammate && !g_settings.radar_draw_teammates && !(is_friend && g_settings.radar_draw_friends))
+				continue;
+
+			// Skip drawing friends if the setting is disabled, unless they are also teammates and the teammate setting is enabled
+			if (is_friend && !g_settings.radar_draw_friends && !(teammate && g_settings.radar_draw_teammates))
 				continue;
 
 			TransformAABBStruct transform = get_transform(player);
@@ -147,14 +157,29 @@ namespace plugins
 						const auto name = data->m_NameID;
 						if (IsValidPtr(name))
 						{
-							ImColor color = teammate ? g_settings.radar_teammate_vehicles_color : g_settings.radar_enemy_vehicles_color;
+							// Determine color based on friend status
+							ImColor color;
+							if (is_friend)
+								color = g_settings.radar_friend_vehicles_color;
+							else if (teammate)
+								color = g_settings.radar_teammate_vehicles_color;
+							else
+								color = g_settings.radar_enemy_vehicles_color;
+
 							m_drawing->AddText(x, y - 3.f * icon_scale_factor, color, 15.f * icon_scale_factor, FL_CENTER_X, format_vehicle(name).c_str());
 						}
 					}
 				}
 				else
 				{
-					ImColor color = teammate ? g_settings.radar_teammates_color : g_settings.radar_enemies_color;
+					ImColor color;
+					if (is_friend)
+						color = g_settings.radar_friends_color;
+					else if (teammate)
+						color = g_settings.radar_teammates_color;
+					else
+						color = g_settings.radar_enemies_color;
+
 					m_drawing->AddCircleFilled(ImVec2(x, y), 3.5f * icon_scale_factor, color);
 				}
 			}

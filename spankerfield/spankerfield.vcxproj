@@ -159,6 +159,7 @@
     <ClCompile Include="src\Features\Crosshair\crosshair.cpp" />
     <ClCompile Include="src\Features\ESP\esp.cpp" />
     <ClCompile Include="src\Features\Explosives\explosives.cpp" />
+    <ClCompile Include="src\Features\Friend List\friend_list.cpp" />
     <ClCompile Include="src\Features\Health Bar\health_bar.cpp" />
     <ClCompile Include="src\Features\Infantry Alert\infantry_alert.cpp" />
     <ClCompile Include="src\Features\Jet Speed\jetspeed.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="src\Features\Crosshair\crosshair.h" />
     <ClInclude Include="src\Features\ESP\esp.h" />
     <ClInclude Include="src\Features\Explosives\explosives.h" />
+    <ClInclude Include="src\Features\Friend List\friend_list.h" />
     <ClInclude Include="src\Features\Health Bar\health_bar.h" />
     <ClInclude Include="src\Features\Infantry Alert\infantry_alert.h" />
     <ClInclude Include="src\Features\Jet Speed\jetspeed.h" />
@@ -230,6 +232,7 @@
     <ClInclude Include="src\SDK\sdk.h" />
     <ClInclude Include="src\SDK\type_info.h" />
     <ClInclude Include="src\settings.h" />
+    <ClInclude Include="src\Utilities\auto_yield.h" />
     <ClInclude Include="src\Utilities\math.h" />
     <ClInclude Include="src\Utilities\other.h" />
     <ClInclude Include="src\Utilities\path.h" />
