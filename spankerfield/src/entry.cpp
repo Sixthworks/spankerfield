@@ -9,8 +9,8 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 {
 	using namespace big;
 
-	// Wait for that before proceeding, after it's up everything else should be too
-	while (!GetModuleHandleW(L"ntdll.dll"))
+	// Wait for D3D11 before proceeding, after it's up everything else should be too
+	while (!GetModuleHandleW(L"d3d11.dll"))
 		std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	switch (reason)
