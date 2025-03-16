@@ -258,8 +258,7 @@ namespace big
 				}
 			}
 			static auto oPresent = pPresentHook->GetOriginal<Present_t>(8);
-			auto result = oPresent(pThis, SyncInterval, Flags);
-			return result;
+			return oPresent(pThis, SyncInterval, Flags);
 		}
 	}
 

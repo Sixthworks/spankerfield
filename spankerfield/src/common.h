@@ -5,6 +5,7 @@
 #pragma comment(lib, "shlwapi.lib")
 
 #pragma warning (disable : 4200)
+#pragma warning (disable : 4099)
 
 // Made this for myself, disables string encryption so I can upload the .dll on UnknownCheats
 // I don't really use the xorstr_ anymore so it stays always defined. Just use VMP

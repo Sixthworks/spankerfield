@@ -38,10 +38,13 @@ namespace big
 		ImFontConfig font_cfg{};
 		font_cfg.OversampleH = 2;
 		std::strcpy(font_cfg.Name, xorstr_("Open Sans"));
-
+		
+		ImFontAtlas* atlas = ImGui::GetIO().Fonts;
+		atlas->FontBuilderIO = ImGuiFreeType::GetBuilderForFreeType();
+		atlas->FontBuilderFlags = ImGuiFreeTypeBuilderFlags_NoHinting;
 		const ImWchar font_range[] = { 0x0020, 0x00FF, 0x0400, 0x044F, 0 }; // Basic Latin, Latin Supplement and Cyrillic
 
-		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
+		m_font = atlas->AddFontFromMemoryTTF(
 			const_cast<std::uint8_t*>(font_main),
 			sizeof(font_main),
 			MAIN_FONT_SIZE, // See font.h to edit
@@ -49,7 +52,7 @@ namespace big
 
 		context->IO.FontDefault = m_font;
 
-		ImGui::GetIO().Fonts->Build();
+		atlas->Build();
 
 		ImGui_ImplDX11_Init(m_d3d_device.Get(), m_d3d_device_context.Get());
 		ImGui_ImplWin32_Init(g_globals.g_hwnd);
@@ -85,7 +88,50 @@ namespace big
 
 	void renderer::on_present()
 	{
-		// Renewed
+		// Store original render target and its state
+		ID3D11RenderTargetView* ppRenderTargetViews[1] = { nullptr };
+		m_d3d_device_context->OMGetRenderTargets(1, ppRenderTargetViews, nullptr);
+
+		// Get the resource from render target view
+		ID3D11Resource* pResource = nullptr;
+		ID3D11RenderTargetView* pNonSRGBRTV = nullptr;
+
+		if (ppRenderTargetViews[0])
+		{
+			ppRenderTargetViews[0]->GetResource(&pResource);
+
+			// Create a new render target view with SRGB disabled
+			if (pResource)
+			{
+				// Get texture description
+				ID3D11Texture2D* pTexture = nullptr;
+				HRESULT hr = pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTexture);
+				if (SUCCEEDED(hr) && pTexture)
+				{
+					D3D11_TEXTURE2D_DESC textureDesc;
+					pTexture->GetDesc(&textureDesc);
+
+					// Create render target view desc to disable SRGB
+					D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+					ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+					rtvDesc.Format = make_srgb_unaware_format(textureDesc.Format);
+					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+					// Create non-sRGB render target view
+					hr = m_d3d_device->CreateRenderTargetView(pResource, &rtvDesc, &pNonSRGBRTV);
+					if (SUCCEEDED(hr))
+					{
+						// Set the non-sRGB render target
+						m_d3d_device_context->OMSetRenderTargets(1, &pNonSRGBRTV, nullptr);
+					}
+
+					pTexture->Release();
+				}
+
+				pResource->Release();
+			}
+		}
+
 		ImGuiIO& io = ImGui::GetIO();
 		io.MouseDrawCursor = g_gui.m_opened;
 		io.ConfigFlags = g_gui.m_opened ? (io.ConfigFlags & ~ImGuiConfigFlags_NoMouse) : (io.ConfigFlags | ImGuiConfigFlags_NoMouse);
@@ -102,6 +148,32 @@ namespace big
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+		// Restore original render target if we changed it
+		if (pNonSRGBRTV)
+		{
+			m_d3d_device_context->OMSetRenderTargets(1, ppRenderTargetViews, nullptr);
+			pNonSRGBRTV->Release();
+		}
+
+		// Release the original render target view
+		if (ppRenderTargetViews[0])
+			ppRenderTargetViews[0]->Release();
+	}
+
+	DXGI_FORMAT renderer::make_srgb_unaware_format(DXGI_FORMAT format)
+	{
+		switch (format)
+		{
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+			return DXGI_FORMAT_B8G8R8A8_UNORM;
+		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+			return DXGI_FORMAT_B8G8R8X8_UNORM;
+		default:
+			return format;
+		}
 	}
 
 	void renderer::pre_reset()

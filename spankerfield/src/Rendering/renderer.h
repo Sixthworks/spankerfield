@@ -31,6 +31,7 @@ namespace big
 		ImFont *m_font;
 	private:
 		void mouse_act();
+		DXGI_FORMAT make_srgb_unaware_format(DXGI_FORMAT format);
 	};
 
 	inline renderer *g_renderer{};

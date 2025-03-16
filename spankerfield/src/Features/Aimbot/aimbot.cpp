@@ -10,6 +10,10 @@
 
 #pragma warning( disable : 4244 )
 
+// For some reason, prediction math on close targets that are exactly <=6.55f distance far than you works really badly
+// This float was manually tuned
+#define CLOSE_TARGET_DIST_FLOAT 6.55f
+
 using namespace big;
 
 namespace big
@@ -87,6 +91,16 @@ namespace big
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
 		float distance = relative_pos.Length();
+
+		// Skip complex prediction for close targets
+		if (distance <= CLOSE_TARGET_DIST_FLOAT)
+		{
+			// For close targets, just aim directly without adjusting the aim point
+			return atan2(relative_pos.y, sqrt(relative_pos.x * relative_pos.x + relative_pos.z * relative_pos.z));
+		}
+
+		LOG(INFO) << distance;
+
 		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * distance / 100.0f);
 		Vector3 gravity_vec(0, -adjusted_gravity, 0);
 
@@ -170,6 +184,13 @@ namespace big
 		float dist_horiz = sqrt(dir.x * dir.x + dir.z * dir.z);
 		float dist_vert = dir.y;
 
+		// Add minimum distance check to prevent calculation issues at close range
+		if (dist_horiz <= CLOSE_TARGET_DIST_FLOAT)
+		{
+			// For close targets, just aim directly at them
+			return atan2(dist_vert, dist_horiz);
+		}
+
 		// Calculate angle needed to hit target with bullet drop
 		float g = fabs(gravity);
 		float v = bullet_speed;
@@ -178,7 +199,7 @@ namespace big
 		float discriminant = powf(v, 4) - g * (g * dist_horiz * dist_horiz + 2 * dist_vert * v * v);
 
 		if (discriminant < 0)
-			return 0.0f; // No solution possible
+			return atan2(dist_vert, dist_horiz); // No solution possible, just aim directly
 
 		// We want the lower angle solution (usually)
 		float tan_theta = (v * v - sqrt(discriminant)) / (g * dist_horiz);
