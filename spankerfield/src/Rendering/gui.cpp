@@ -660,6 +660,21 @@ namespace big
 				ImGui::Checkbox(xorstr_("Raw drawing"), &g_settings.spectator_raw_drawing);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Uses the traditional drawing for the spectator list, and not a window."));
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Warn about new spectators"), &g_settings.spectator_warn_new);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("When a new spectator joins the server, you will get a warning on your screen."));
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Stealth mode when spectated"), &g_settings.spectator_disable_esp_aim);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("When a spectator is on the server, it will disable the aimbot and visuals so that you don't risk getting caught."));
+
+				if (g_settings.spectator_warn_new || g_settings.spectator_disable_esp_aim)
+				{
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("Warning text size##SP"), &g_settings.spectator_warnings_size, 1.f, 100.f);
+					ImGui::PopItemWidth();
+				}
 
 				ImGui::Separator();
 
@@ -678,6 +693,9 @@ namespace big
 				ImGui::Text(xorstr_("Colors"));
 
 				color_wrapper(xorstr_("Text##SPC"), &g_settings.spectator_color);
+
+				if (g_settings.spectator_warn_new || g_settings.spectator_disable_esp_aim)
+					color_wrapper(xorstr_("Warning text##SPC"), &g_settings.spectator_warnings_color);
 
 				ImGui::EndTabItem();
 			}
@@ -953,7 +971,10 @@ namespace big
 
 					static bool debug_watermark;
 					if (ImGui::Checkbox(xorstr_("Debug watermark"), &debug_watermark))
+					{
 						plugins::toggle_watermark_debug(debug_watermark);
+					}
+						
 
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("Lets you debug the watermark, mostly developer only."));

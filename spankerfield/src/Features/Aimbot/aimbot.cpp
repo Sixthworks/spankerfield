@@ -526,7 +526,7 @@ namespace plugins
 			if (is_friend)
 				return;
 		}
-		
+
 		// Get correct entity for prediction
 		ClientControllableEntity* prediction_target = nullptr;
 		if (IsValidPtr(target.m_Player->GetVehicle()))

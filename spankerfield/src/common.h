@@ -52,6 +52,7 @@
 
 #include <stack>
 #include <vector>
+#include <unordered_set>
 
 #include <typeinfo>
 #include <type_traits>

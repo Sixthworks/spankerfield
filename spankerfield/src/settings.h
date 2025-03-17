@@ -171,9 +171,13 @@ namespace big
 
 		bool spectator_list{ true };
 		bool spectator_raw_drawing;
+		bool spectator_disable_esp_aim;
+		bool spectator_warn_new{ true };
 		float spectator_x{ 23.5f };
 		float spectator_y{ 565.f };
+		float spectator_warnings_size{ 28.f };
 		ImColor spectator_color{ 255, 255, 255, 255 };
+		ImColor spectator_warnings_color{ 255, 0, 0, 255 };
 
 		bool kill_sound;
 		char kill_sound_path[MAX_PATH];
@@ -383,9 +387,13 @@ namespace big
 
 			g_settings.spectator_list = j[xorstr_("settings")][xorstr_("spectator_list")];
 			g_settings.spectator_raw_drawing = j[xorstr_("settings")][xorstr_("spectator_raw_drawing")];
+			g_settings.spectator_disable_esp_aim = j[xorstr_("settings")][xorstr_("spectator_disable_esp_aim")];
+			g_settings.spectator_warn_new = j[xorstr_("settings")][xorstr_("spectator_warn_new")];
 			g_settings.spectator_x = j[xorstr_("settings")][xorstr_("spectator_x")];
 			g_settings.spectator_y = j[xorstr_("settings")][xorstr_("spectator_y")];
+			g_settings.spectator_warnings_size = j[xorstr_("settings")][xorstr_("spectator_warnings_size")];
 			g_settings.spectator_color = string_to_color(j[xorstr_("settings")][xorstr_("spectator_color")]);
+			g_settings.spectator_warnings_color = string_to_color(j[xorstr_("settings")][xorstr_("spectator_warnings_color")]);
 
 			g_settings.kill_sound = j[xorstr_("settings")][xorstr_("kill_sound")];
 			std::string sound_path_str = j["settings"]["kill_sound_path"].get<std::string>();
@@ -548,9 +556,13 @@ namespace big
 						{ xorstr_("jet_speed"), g_settings.jet_speed },
 						{ xorstr_("spectator_list"), g_settings.spectator_list },
 						{ xorstr_("spectator_raw_drawing"), g_settings.spectator_raw_drawing },
+						{ xorstr_("spectator_disable_esp_aim"), g_settings.spectator_disable_esp_aim },
+						{ xorstr_("spectator_warn_new"), g_settings.spectator_warn_new },
 						{ xorstr_("spectator_x"), g_settings.spectator_x },
 						{ xorstr_("spectator_y"), g_settings.spectator_y },
+						{ xorstr_("spectator_warnings_size"), g_settings.spectator_warnings_size },
 						{ xorstr_("spectator_color"), color_to_string(g_settings.spectator_color) },
+						{ xorstr_("spectator_warnings_color"), color_to_string(g_settings.spectator_warnings_color) },
 						{ xorstr_("kill_sound"), g_settings.kill_sound },
 						{ xorstr_("kill_sound_path"), g_settings.kill_sound_path },
 						{ xorstr_("minimap"), g_settings.minimap },

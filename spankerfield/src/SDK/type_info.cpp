@@ -38,13 +38,11 @@ void DumpClassPointers()
 	static bool doOnce = true;
 	if (!doOnce) return;
 
-	std::stringstream ss;
 	std::vector<ClassDumpInfos_s> classes;
 
 	auto* CurrentTypeInfo = TypeInfo::GetFirst();
 	if (CurrentTypeInfo)
 	{
-		std::ofstream file(xorstr_("Classes.txt"));
 		do
 		{
 			if (CurrentTypeInfo->GetTypeCode() != BasicTypesEnum::kTypeCode_Class)
@@ -67,10 +65,7 @@ void DumpClassPointers()
 		std::sort(classes.begin(), classes.end(), cmpFun);
 
 		for (const auto& it : classes)
-			ss << "\n" << it.className << xorstr_(" = 0x") << it.classPtr;
-
-		file << ss.str() << std::endl;
-		file.close();
+			LOG(INFO) << it.className << xorstr_(" = 0x") << it.classPtr;
 	}
 
 	doOnce = false;
