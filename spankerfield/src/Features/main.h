@@ -21,6 +21,7 @@
 #include "Rainbow Mode/rainbow_mode.h"
 #include "Watermark/watermark.h"
 #include "Friend List/friend_list.h"
+#include "C4 Bot/c4_bot.h"
 
 namespace big
 {

@@ -13,6 +13,7 @@ namespace big
 
 		Matrix g_viewproj{};
 		bool g_running{ true };
+		int open_key{ VK_INSERT };
 		int g_width{ 1920 };
 		int g_height{ 1080 };
 		

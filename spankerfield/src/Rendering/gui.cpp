@@ -236,128 +236,208 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Weapons")))
 			{
-				ImGui::Checkbox(xorstr_("No recoil (BF4DB risk)"), &g_settings.no_recoil);
-				if (g_settings.no_recoil)
+				if (ImGui::CollapsingHeader(xorstr_("C4 Bot"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::Indent();
-					ImGui::PushItemWidth(200.f);
+					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script"));
 
-					ImGui::SliderFloat(xorstr_("Recoil decrease scale##RC"), &g_settings.recoil_decrease_scale, 0.0f, 100.0f, "%.2f");
+					ImGui::Checkbox(xorstr_("Enable C4 Bot"), &g_settings.c4_bot_enabled);
+					ImGui::Checkbox(xorstr_("Always active"), &g_settings.c4_bot_always_active);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Controls up-down recoil (100 = full no recoil)"));
-						
-					ImGui::SliderFloat(xorstr_("Recoil multiplier##RC"), &g_settings.recoil_multiplier, 0.0f, 100.0f, "%.2f");
+						ImGui::SetTooltip(xorstr_("This will make the C4 Bot always active, even when not using a C4"));
+
+					// Auto-detonate settings
+					ImGui::Checkbox(xorstr_("Auto detonate"), &g_settings.c4_bot_auto_detonate);
+					if (g_settings.c4_bot_auto_detonate)
+						ImGui::Checkbox(xorstr_("No key required (BF4DB risk)"), &g_settings.c4_bot_auto_detonate_independently);
+
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderFloat(xorstr_("Enemy detection radius"), &g_settings.c4_bot_radius, 0.f, 7.f);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Controls side-to-side recoil (should be 0)"));
-						
+						ImGui::SetTooltip(xorstr_("This is the base enemy detection radius, not recommended to change"));
+
+					ImGui::SliderFloat(xorstr_("Minimum amount of damage dealt"), &g_settings.c4_bot_min_damage_to_enemy, 0.f, 95.f);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("How much damage is going to be dealt, configure for normal mode, will be adjusted to hardcore automatically."));
+					
+					ImGui::SliderFloat(xorstr_("Damage radius"), &g_settings.c4_bot_damage_radius, 0.f, 5.f);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Radius where the player is starting to take even a little bit of damage, recommended to leave at default."));
+
+					ImGui::SliderFloat(xorstr_("Lethal radius"), &g_settings.c4_bot_lethal_radius, 0.f, 3.f);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Radius where the player is guaranteed to die, recommended to leave at default."));
+
 					ImGui::PopItemWidth();
-					ImGui::Unindent();
+
+					// Hotkey dropdown
+					ImGui::Text(xorstr_("Detonate hotkey:"));
+
+					ImGui::PushItemWidth(300.f);
+
+					const char* current_item = xorstr_("Select a key");
+					auto it = key_map.find(g_settings.c4_bot_key);
+					if (it != key_map.end())
+						current_item = it->second.c_str();
+
+					if (ImGui::BeginCombo(xorstr_("##C4DetonateKey"), current_item))
+					{
+						for (const auto& [key, name] : key_map)
+						{
+							bool is_selected = (g_settings.c4_bot_key == key);
+							if (ImGui::Selectable(name.c_str(), is_selected))
+								g_settings.c4_bot_key = key;
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					ImGui::PopItemWidth();
+
+					ImGui::Spacing();
+
+					// Self-damage prevention settings
+					ImGui::Checkbox(xorstr_("Prevent self damage"), &g_settings.c4_bot_prevent_self_damage);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Will prevent self damage despite all conditions"));
+					if (g_settings.c4_bot_prevent_self_damage)
+					{
+						ImGui::Checkbox(xorstr_("Smart self damage"), &g_settings.c4_bot_smart_self_damage);
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("This will try to kill the player near you while trying to avoid your death"));
+						if (g_settings.c4_bot_smart_self_damage)
+						{
+							ImGui::PushItemWidth(200.f);
+							ImGui::SliderFloat(xorstr_("Health Buffer"), &g_settings.c4_bot_health_buffer, 0.f, 50.f);
+							ImGui::PopItemWidth();
+						}
+					}
+
+					// Add ignore friends checkbox
+					ImGui::Checkbox(xorstr_("Ignore friends"), &g_settings.c4_bot_ignore_friends);
 				}
 
 				ImGui::Separator();
-				
-				ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
-				if (g_settings.no_spread)
+
+				if (ImGui::CollapsingHeader(xorstr_("Weapon sway"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::Indent();
-					ImGui::PushItemWidth(200.f);
-					ImGui::SliderFloat(xorstr_("Spread control##SP"), &g_settings.spread_control, 0.0f, 1.0f, "%.2f");
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("0 = no spread)"));
-						
-					ImGui::PopItemWidth();
-					ImGui::Unindent();
+					ImGui::Checkbox(xorstr_("No recoil (BF4DB risk)"), &g_settings.no_recoil);
+					if (g_settings.no_recoil)
+					{
+						ImGui::PushItemWidth(200.f);
+
+						ImGui::SliderFloat(xorstr_("Recoil decrease scale##RC"), &g_settings.recoil_decrease_scale, 0.0f, 100.0f, xorstr_("%.2f"));
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("Controls up-down recoil (100 = full no recoil)"));
+
+						ImGui::SliderFloat(xorstr_("Recoil multiplier##RC"), &g_settings.recoil_multiplier, 0.0f, 100.0f, xorstr_("%.2f"));
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("Controls side-to-side recoil (should be 0)"));
+
+						ImGui::PopItemWidth();
+					}
+
+					ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
+					if (g_settings.no_spread)
+					{
+						ImGui::PushItemWidth(200.f);
+						ImGui::SliderFloat(xorstr_("Spread control##SP"), &g_settings.spread_control, 0.0f, 1.0f, xorstr_("%.2f"));
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(xorstr_("0 = no spread)"));
+
+						ImGui::PopItemWidth();
+					}
 				}
 
 				ImGui::Separator();
-
 
 				// Not the best way
-				ImGui::Text(xorstr_("Weapon editor"));
-
-				static bool enable_editor = false;
-				ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
-
-				// This is for current weapon only, and made for debugging, you can make all of these as standalone plugins
-				if (enable_editor)
+				if (ImGui::CollapsingHeader(xorstr_("Weapon editor")))
 				{
-					const auto weapon_firing = get_weapon_firing();
-					if (!IsValidPtrWithVTable(weapon_firing))
+					static bool enable_editor = false;
+					ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
+
+					// This is for current weapon only, and made for debugging, you can make all of these as standalone plugins
+					if (enable_editor)
 					{
-						ImGui::Text("Weapon firing not found - you are not in world or address is invalid");
-					}
-					else
-					{
-						const auto primary_fire = weapon_firing->m_pPrimaryFire;
-						if (!IsValidPtrWithVTable(primary_fire))
+						const auto weapon_firing = get_weapon_firing();
+						if (!IsValidPtrWithVTable(weapon_firing))
 						{
-							ImGui::Text("Primary fire not found - you are not in world or address is invalid");
+							ImGui::Text("Weapon firing not found - you are not in world or address is invalid");
 						}
 						else
 						{
-							const auto data = primary_fire->m_FiringData;
-							if (!IsValidPtrWithVTable(data))
+							const auto primary_fire = weapon_firing->m_pPrimaryFire;
+							if (!IsValidPtrWithVTable(primary_fire))
 							{
-								ImGui::Text("Firing data not found - you are not in world or address is invalid");
+								ImGui::Text("Primary fire not found - you are not in world or address is invalid");
 							}
-							else if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
+							else
 							{
-								ImGui::Text(xorstr_("Bullet count"));
-								ImGui::PushItemWidth(300.f);
-								ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 100);
-								ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
-								ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
-								ImGui::PopItemWidth();
-
-								ImGui::Text(xorstr_("Overheat"));
-								ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
-								ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
-
-								static bool is_overheated = false;
-								if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
-									weapon_firing->m_IsOverheated = is_overheated;
-
-								ImGui::Text(xorstr_("Bullet speed"));
-								ImGui::PushItemWidth(300.f);
-								ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.0f, 10000.f);
-								ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.0f, 10000.f);
-								ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
-								ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
-								ImGui::PopItemWidth();
-
-								ImGui::Text(xorstr_("Recoil"));
-
-								ImGui::InputFloat(xorstr_("Recoil time multiplier##WP"), &weapon_firing->m_RecoilTimeMultiplier, 0.0f, 10000.f);
-								ImGui::InputFloat(xorstr_("Recoil angle X##WP"), &weapon_firing->m_RecoilAngleX, 0.0f, 1000.f);
-								ImGui::InputFloat(xorstr_("Recoil angle Y##WP"), &weapon_firing->m_RecoilAngleY, 0.0f, 1000.f);
-								ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
-
-								ImGui::Text(xorstr_("Other"));
-
-								if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
+								const auto data = primary_fire->m_FiringData;
+								if (!IsValidPtrWithVTable(data))
 								{
-									static bool instant_hit = false;
-									if (ImGui::Checkbox(xorstr_("Instant Hit"), &instant_hit))
-										data->m_ShotConfigData.m_ProjectileData->m_InstantHit = instant_hit;
-
-									ImGui::PushItemWidth(300.f);
-									ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.0f, 10.f);
-									ImGui::InputFloat(xorstr_("Time to live##WP"), &data->m_ShotConfigData.m_ProjectileData->m_TimeToLive, 0.0f, 10.f);
-									ImGui::InputFloat(xorstr_("End damage##WP"), &data->m_ShotConfigData.m_ProjectileData->m_EndDamage, 0.0f, 10.f);
-									ImGui::PopItemWidth();
+									ImGui::Text("Firing data not found - you are not in world or address is invalid");
 								}
+								else if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
+								{
+									ImGui::Text(xorstr_("Bullet count"));
+									ImGui::PushItemWidth(300.f);
+									ImGui::InputInt(xorstr_("Bullets per shot##WP"), &data->m_ShotConfigData.m_BulletsPerShot, 1, 100);
+									ImGui::InputInt(xorstr_("Bullets per burst##WP"), &data->m_ShotConfigData.m_BulletsPerBurst, 1, 100);
+									ImGui::InputInt(xorstr_("Bullets per shell##WP"), &data->m_ShotConfigData.m_BulletsPerShell, 1, 100);
+									ImGui::PopItemWidth();
 
-								ImGui::Separator();
+									ImGui::Text(xorstr_("Overheat"));
+									ImGui::InputFloat(xorstr_("Overheat drop multiplier##WP"), &data->m_OverHeatData.m_HeatDropPerSecond, 0.0f, 1000.f);
+									ImGui::InputFloat(xorstr_("Overheat per bullet##WP"), &data->m_OverHeatData.m_HeatPerBullet, 0.0f, 100.f);
 
-								ImGui::Text(xorstr_("I dont know what this is"));
-								ImGui::WarningTooltip(xorstr_("You can test what it is at your own risk."));
+									static bool is_overheated = false;
+									if (ImGui::Checkbox(xorstr_("Overheated"), &is_overheated))
+										weapon_firing->m_IsOverheated = is_overheated;
 
-								ImGui::Checkbox(xorstr_("Relative target aiming"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_RelativeTargetAiming));
-								ImGui::Checkbox(xorstr_("Force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ForceSpawnToCamera));
-								ImGui::Checkbox(xorstr_("Spawn visual at weapon bone"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_SpawnVisualAtWeaponBone));
-								ImGui::Checkbox(xorstr_("Active force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ActiveForceSpawnToCamera));
+									ImGui::Text(xorstr_("Bullet speed"));
+									ImGui::PushItemWidth(300.f);
+									ImGui::InputFloat(xorstr_("X##WP"), &data->m_ShotConfigData.m_Speed.x, 0.0f, 10000.f);
+									ImGui::InputFloat(xorstr_("Y##WP"), &data->m_ShotConfigData.m_Speed.y, 0.0f, 10000.f);
+									ImGui::InputFloat(xorstr_("Z##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
+									ImGui::InputFloat(xorstr_("W##WP"), &data->m_ShotConfigData.m_Speed.w, 0.0f, 10000.f);
+									ImGui::PopItemWidth();
+
+									ImGui::Text(xorstr_("Recoil"));
+
+									ImGui::InputFloat(xorstr_("Recoil time multiplier##WP"), &weapon_firing->m_RecoilTimeMultiplier, 0.0f, 10000.f);
+									ImGui::InputFloat(xorstr_("Recoil angle X##WP"), &weapon_firing->m_RecoilAngleX, 0.0f, 1000.f);
+									ImGui::InputFloat(xorstr_("Recoil angle Y##WP"), &weapon_firing->m_RecoilAngleY, 0.0f, 1000.f);
+									ImGui::InputFloat(xorstr_("Recoil angle Z##WP"), &weapon_firing->m_RecoilAngleZ, 0.0f, 1000.f);
+
+									ImGui::Text(xorstr_("Other"));
+
+									if (IsValidPtrWithVTable(data->m_ShotConfigData.m_ProjectileData))
+									{
+										static bool instant_hit = false;
+										if (ImGui::Checkbox(xorstr_("Instant Hit"), &instant_hit))
+											data->m_ShotConfigData.m_ProjectileData->m_InstantHit = instant_hit;
+
+										ImGui::PushItemWidth(300.f);
+										ImGui::InputFloat(xorstr_("Gravity##WP"), &data->m_ShotConfigData.m_ProjectileData->m_Gravity, 0.0f, 10.f);
+										ImGui::InputFloat(xorstr_("Time to live##WP"), &data->m_ShotConfigData.m_ProjectileData->m_TimeToLive, 0.0f, 10.f);
+										ImGui::InputFloat(xorstr_("End damage##WP"), &data->m_ShotConfigData.m_ProjectileData->m_EndDamage, 0.0f, 10.f);
+										ImGui::PopItemWidth();
+									}
+
+									ImGui::Separator();
+
+									ImGui::Text(xorstr_("I dont know what this is"));
+									ImGui::WarningTooltip(xorstr_("You can test what it is at your own risk."));
+
+									ImGui::Checkbox(xorstr_("Relative target aiming"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_RelativeTargetAiming));
+									ImGui::Checkbox(xorstr_("Force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ForceSpawnToCamera));
+									ImGui::Checkbox(xorstr_("Spawn visual at weapon bone"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_SpawnVisualAtWeaponBone));
+									ImGui::Checkbox(xorstr_("Active force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ActiveForceSpawnToCamera));
+								}
 							}
 						}
 					}
@@ -631,24 +711,25 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Colors"));
+				if (ImGui::CollapsingHeader(xorstr_("Colors"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					if (g_settings.radar_cross)
+						color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
 
-				if (g_settings.radar_cross)
-					color_wrapper(xorstr_("Cross##RDR"), &g_settings.radar_cross_color);
+					if (g_settings.radar_outline)
+						color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
 
-				if (g_settings.radar_outline)
-					color_wrapper(xorstr_("Outline##RDR"), &g_settings.radar_outline_color);
+					if (g_settings.radar_draw_you)
+						color_wrapper(xorstr_("Self##RDR"), &g_settings.radar_you_color);
 
-				if (g_settings.radar_draw_you)
-					color_wrapper(xorstr_("Self##RDR"), &g_settings.radar_you_color);
-
-				color_wrapper(xorstr_("Background##RDR"), &g_settings.radar_background_color);
-				color_wrapper(xorstr_("Friends##RDR"), &g_settings.radar_friends_color);
-				color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
-				color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
-				color_wrapper(xorstr_("Friend vehicles##RDR"), &g_settings.radar_friend_vehicles_color);
-				color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
-				color_wrapper(xorstr_("Ememy vehicles##RDR"), &g_settings.radar_enemy_vehicles_color);
+					color_wrapper(xorstr_("Background##RDR"), &g_settings.radar_background_color);
+					color_wrapper(xorstr_("Friends##RDR"), &g_settings.radar_friends_color);
+					color_wrapper(xorstr_("Teammates##RDR"), &g_settings.radar_teammates_color);
+					color_wrapper(xorstr_("Ememies##RDR"), &g_settings.radar_enemies_color);
+					color_wrapper(xorstr_("Friend vehicles##RDR"), &g_settings.radar_friend_vehicles_color);
+					color_wrapper(xorstr_("Teammate vehicles##RDR"), &g_settings.radar_teammate_vehicles_color);
+					color_wrapper(xorstr_("Ememy vehicles##RDR"), &g_settings.radar_enemy_vehicles_color);
+				}
 
 				ImGui::EndTabItem();
 			}
@@ -779,12 +860,12 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Kill sound (FFSS risk)"), &g_settings.kill_sound);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it."));
+					ImGui::SetTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it, but it's safe."));
 
 				ImGui::PushItemWidth(550.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
 				ImGui::PopItemWidth();
-				ImGui::Text(xorstr_("Make sure the file exists, has roman/latin characters only in the name, and is a WAVE audio file"));
+				ImGui::WarningTooltip(xorstr_("Make sure the file exists, has roman/latin characters only in the name, and is a WAVE audio file"));
 
 				ImGui::EndTabItem();
 			}
@@ -993,6 +1074,32 @@ namespace big
 					g_config.attempt_save();
 
 				ImGui::Separator();
+
+				ImGui::Text(xorstr_("Open menu key"));
+
+				ImGui::PushItemWidth(200.f);
+
+				const char* current_item = xorstr_("Select a key");
+				auto it = open_key_map.find(g_globals.open_key);
+				if (it != open_key_map.end())
+					current_item = it->second.c_str();
+
+				if (ImGui::BeginCombo(xorstr_("##OpenKey"), current_item))
+				{
+					for (const auto& [key, name] : open_key_map)
+					{
+						bool is_selected = (g_globals.open_key == key);
+						if (ImGui::Selectable(name.c_str(), is_selected))
+							g_globals.open_key = key;
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				ImGui::PopItemWidth();
+
+				ImGui::SameLine();
 
 				if (ImGui::Button(xorstr_("Unload")))
 					g_globals.g_running = false;

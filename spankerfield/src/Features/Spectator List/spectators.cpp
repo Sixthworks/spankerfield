@@ -185,7 +185,7 @@ namespace plugins
 				{
 					std::string alert_text = xorstr_("NEW SPECTATOR: ") + it->first;
 					ImVec2 text_size = ImGui::CalcTextSize(alert_text.c_str());
-					m_drawing->AddText((float)g_globals.g_width / 2.f, y_pos, g_settings.spectator_warnings_color, FL_CENTER_X, g_settings.spectator_warnings_size, alert_text.c_str());
+					m_drawing->AddText((float)g_globals.g_width / 2, y_pos, g_settings.spectator_warnings_color, g_settings.spectator_warnings_size, FL_CENTER_X, alert_text.c_str());
 
 					y_pos += g_settings.spectator_warnings_size * 1.25f;
 				}

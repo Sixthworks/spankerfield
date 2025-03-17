@@ -34,8 +34,6 @@ namespace plugins
 
 		// Variables
 		float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
-		const float STANDARD_MAX_HEALTH = 100.0f;
-		const float HARDCORE_MAX_HEALTH = 60.0f;
 		bool is_hardcore = false;
 
 		// Player
@@ -44,7 +42,7 @@ namespace plugins
 			health_player = local_soldier->m_pHealthComp->m_Health;
 			max_health_player = local_soldier->m_pHealthComp->m_MaxHealth;
 
-			if (abs(max_health_player - HARDCORE_MAX_HEALTH) < 0.1f)
+			if (abs(max_health_player - 60.0f) < 0.1f)
 				is_hardcore = true;
 		}
 
@@ -92,7 +90,7 @@ namespace plugins
 				if (is_hardcore)
 				{
 					// Scale hardcore health to match standard health color range
-					normalized_health = (health / max_health) * (STANDARD_MAX_HEALTH / HARDCORE_MAX_HEALTH);
+					normalized_health = (health / max_health) * (100.0f / 60.f);
 
 					// Clamp normalized health to valid range
 					normalized_health = fmaxf(0.0f, fminf(1.0f, normalized_health));

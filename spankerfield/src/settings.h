@@ -1,5 +1,6 @@
-#include "Utilities/path.h"
+#include "global.h"
 #include "SDK/sdk.h"
+#include "Utilities/path.h"
 #include <ImGui/imgui.h>
 
 namespace big
@@ -163,6 +164,20 @@ namespace big
 
 		bool explosives{ true };
 		ImColor explosives_color{ 255, 77, 77, 255 };
+
+		bool c4_bot_enabled;
+		bool c4_bot_auto_detonate{ true };
+		bool c4_bot_auto_detonate_independently;
+		bool c4_bot_always_active;
+		int c4_bot_key{ VK_XBUTTON1 };
+		bool c4_bot_ignore_friends{ true };
+		float c4_bot_radius{ 5.0f };
+		float c4_bot_damage_radius{ 4.35f };
+		float c4_bot_lethal_radius{ 2.5f };
+		float c4_bot_min_damage_to_enemy{ 70.f };
+		bool c4_bot_prevent_self_damage{ true };
+		bool c4_bot_smart_self_damage{ true };
+		float c4_bot_health_buffer{ 40.0f };
 
 		bool missiles_own{ true };
 		ImColor missiles_color{ 14, 231, 231, 255 };
@@ -380,6 +395,20 @@ namespace big
 			g_settings.explosives = j[xorstr_("settings")][xorstr_("explosives")];
 			g_settings.explosives_color = string_to_color(j[xorstr_("settings")][xorstr_("explosives_color")]);
 
+			g_settings.c4_bot_enabled = j[xorstr_("settings")][xorstr_("c4_bot_enabled")];
+			g_settings.c4_bot_auto_detonate = j[xorstr_("settings")][xorstr_("c4_bot_auto_detonate")];
+			g_settings.c4_bot_auto_detonate_independently = j[xorstr_("settings")][xorstr_("c4_bot_auto_detonate_independently")];
+			g_settings.c4_bot_always_active = j[xorstr_("settings")][xorstr_("c4_bot_always_active")];
+			g_settings.c4_bot_key = j[xorstr_("settings")][xorstr_("c4_bot_key")];
+			g_settings.c4_bot_ignore_friends = j[xorstr_("settings")][xorstr_("c4_bot_ignore_friends")];
+			g_settings.c4_bot_radius = j[xorstr_("settings")][xorstr_("c4_bot_radius")];
+			g_settings.c4_bot_damage_radius = j[xorstr_("settings")][xorstr_("c4_bot_damage_radius")];
+			g_settings.c4_bot_lethal_radius = j[xorstr_("settings")][xorstr_("c4_bot_lethal_radius")];
+			g_settings.c4_bot_min_damage_to_enemy = j[xorstr_("settings")][xorstr_("c4_bot_min_damage_to_enemy")];
+			g_settings.c4_bot_prevent_self_damage = j[xorstr_("settings")][xorstr_("c4_bot_prevent_self_damage")];
+			g_settings.c4_bot_smart_self_damage = j[xorstr_("settings")][xorstr_("c4_bot_smart_self_damage")];
+			g_settings.c4_bot_health_buffer = j[xorstr_("settings")][xorstr_("c4_bot_health_buffer")];
+
 			g_settings.missiles_own = j[xorstr_("settings")][xorstr_("missiles_own")];
 			g_settings.missiles_color = string_to_color(j[xorstr_("settings")][xorstr_("missiles_color")]);
 
@@ -411,6 +440,7 @@ namespace big
 			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
 
 			g_settings.disable_watermark = j[xorstr_("settings")][xorstr_("disable_watermark")];
+			g_globals.open_key = j[xorstr_("settings")][xorstr_("open_key")];
 		}
 
 		nlohmann::json to_json()
@@ -551,6 +581,19 @@ namespace big
 						{ xorstr_("radar_enemy_vehicles_color"), color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ xorstr_("explosives"), g_settings.explosives },
 						{ xorstr_("explosives_color"), color_to_string(g_settings.explosives_color) },
+						{ xorstr_("c4_bot_enabled"), g_settings.c4_bot_enabled },
+						{ xorstr_("c4_bot_auto_detonate"), g_settings.c4_bot_auto_detonate },
+						{ xorstr_("c4_bot_auto_detonate_independently"), g_settings.c4_bot_auto_detonate_independently },
+						{ xorstr_("c4_bot_always_active"), g_settings.c4_bot_always_active },
+						{ xorstr_("c4_bot_key"), g_settings.c4_bot_key },
+						{ xorstr_("c4_bot_ignore_friends"), g_settings.c4_bot_ignore_friends },
+						{ xorstr_("c4_bot_radius"), g_settings.c4_bot_radius },
+						{ xorstr_("c4_bot_damage_radius"), g_settings.c4_bot_damage_radius },
+						{ xorstr_("c4_bot_lethal_radius"), g_settings.c4_bot_lethal_radius },
+						{ xorstr_("c4_bot_min_damage_to_enemy"), g_settings.c4_bot_min_damage_to_enemy },
+						{ xorstr_("c4_bot_prevent_self_damage"), g_settings.c4_bot_prevent_self_damage },
+						{ xorstr_("c4_bot_smart_self_damage"), g_settings.c4_bot_smart_self_damage },
+						{ xorstr_("c4_bot_health_buffer"), g_settings.c4_bot_health_buffer },
 						{ xorstr_("missiles_own"), g_settings.missiles_own },
 						{ xorstr_("missiles_color"), color_to_string(g_settings.missiles_color) },
 						{ xorstr_("jet_speed"), g_settings.jet_speed },
@@ -575,6 +618,7 @@ namespace big
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },
 						{ xorstr_("disable_watermark"), g_settings.disable_watermark },
+						{ xorstr_("open_key"), g_globals.open_key },
 					},
 				},
 

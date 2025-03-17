@@ -30,3 +30,16 @@ std::map<int, std::string> key_map =
     { VK_F2, xorstr_("F2") },
     { VK_F3, xorstr_("F3") }
 };
+
+std::map<int, std::string> open_key_map =
+{
+    { VK_INSERT, xorstr_("Insert") },
+    { VK_DELETE, xorstr_("Delete") },
+    { VK_HOME, xorstr_("Home") },
+    { VK_END, xorstr_("End") },
+    { VK_PRIOR, xorstr_("Page Up") },
+    { VK_NEXT, xorstr_("Page Down") },
+    { VK_F1, xorstr_("F1") },
+    { VK_F2, xorstr_("F2") },
+    { VK_F3, xorstr_("F3") }
+};

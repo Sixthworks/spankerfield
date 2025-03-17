@@ -156,6 +156,7 @@
     <ClCompile Include="src\Features\Aimbot\aimbot.cpp" />
     <ClCompile Include="src\Features\Anti AFK\anti_afk.cpp" />
     <ClCompile Include="src\Features\Blacklist\blacklist.cpp" />
+    <ClCompile Include="src\Features\C4 Bot\c4_bot.cpp" />
     <ClCompile Include="src\Features\Crosshair\crosshair.cpp" />
     <ClCompile Include="src\Features\ESP\esp.cpp" />
     <ClCompile Include="src\Features\Explosives\explosives.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\Features\Aimbot\aimbot.h" />
     <ClInclude Include="src\Features\Anti AFK\anti_afk.h" />
     <ClInclude Include="src\Features\Blacklist\blacklist.h" />
+    <ClInclude Include="src\Features\C4 Bot\c4_bot.h" />
     <ClInclude Include="src\Features\Crosshair\crosshair.h" />
     <ClInclude Include="src\Features\ESP\esp.h" />
     <ClInclude Include="src\Features\Explosives\explosives.h" />

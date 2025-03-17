@@ -31,6 +31,7 @@ namespace big
         plugins::spoof_name();
         plugins::unlock_all();
         plugins::anti_afk();
+        plugins::c4_bot();
         plugins::no_hc_restrictions();
         plugins::sway_modify();
         plugins::overheat_control();

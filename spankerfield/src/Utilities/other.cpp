@@ -66,6 +66,16 @@ namespace big
 		return placeholder;
 	}
 
+	TransformAABBStruct get_transform(ClientControllableEntity* entity)
+	{
+		TransformAABBStruct placeholder;
+
+		if (IsValidPtrWithVTable(entity))
+			entity->GetAABB(&placeholder);
+
+		return placeholder;
+	}
+
 	float get_distance(const Vector3& point1, const Vector3& point2)
 	{
 		float distance = sqrt((point1.x - point2.x) * (point1.x - point2.x) +

@@ -3233,6 +3233,10 @@ public:
 	virtual void unkn20();
 	virtual void GetAABB(TransformAABBStruct* mataabb); //22
 	virtual void GetTransform(Matrix* mTransform); //23
+
+	char _0x008[0x238 - 0x8];
+	WeakPtr<ClientPlayer> m_pOwner; //0x238
+	void* m_pUnknown; //0x240
 };
 
 class ClientPlayerScore

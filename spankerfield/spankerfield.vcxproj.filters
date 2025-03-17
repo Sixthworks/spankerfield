@@ -186,6 +186,9 @@
     <ClCompile Include="src\Features\Friend List\friend_list.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\Features\C4 Bot\c4_bot.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Features\Aimbot\aimbot.h">
@@ -333,6 +336,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\auto_yield.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Features\C4 Bot\c4_bot.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
