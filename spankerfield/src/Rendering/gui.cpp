@@ -242,7 +242,7 @@ namespace big
 				{
 					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script."));
 
-					ImGui::Checkbox(xorstr_("Enable C4 Bot"), &g_settings.c4_bot_enabled);
+					ImGui::Checkbox(xorstr_("C4 Bot"), &g_settings.c4_bot);
 					ImGui::Checkbox(xorstr_("Always active"), &g_settings.c4_bot_always_active);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("This will make the C4 Bot always active, even when not using a C4"));

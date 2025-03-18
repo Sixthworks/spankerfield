@@ -166,7 +166,7 @@ namespace big
 		bool explosives{ true };
 		ImColor explosives_color{ 255, 77, 77, 255 };
 
-		bool c4_bot_enabled;
+		bool c4_bot;
 		bool c4_bot_auto_detonate{ true };
 		bool c4_bot_auto_detonate_independently;
 		bool c4_bot_always_active;
@@ -398,7 +398,7 @@ namespace big
 			g_settings.explosives = j[xorstr_("settings")][xorstr_("explosives")];
 			g_settings.explosives_color = string_to_color(j[xorstr_("settings")][xorstr_("explosives_color")]);
 
-			g_settings.c4_bot_enabled = j[xorstr_("settings")][xorstr_("c4_bot_enabled")];
+			g_settings.c4_bot = j[xorstr_("settings")][xorstr_("c4_bot")];
 			g_settings.c4_bot_auto_detonate = j[xorstr_("settings")][xorstr_("c4_bot_auto_detonate")];
 			g_settings.c4_bot_auto_detonate_independently = j[xorstr_("settings")][xorstr_("c4_bot_auto_detonate_independently")];
 			g_settings.c4_bot_always_active = j[xorstr_("settings")][xorstr_("c4_bot_always_active")];
@@ -584,7 +584,7 @@ namespace big
 						{ xorstr_("radar_enemy_vehicles_color"), color_to_string(g_settings.radar_enemy_vehicles_color) },
 						{ xorstr_("explosives"), g_settings.explosives },
 						{ xorstr_("explosives_color"), color_to_string(g_settings.explosives_color) },
-						{ xorstr_("c4_bot_enabled"), g_settings.c4_bot_enabled },
+						{ xorstr_("c4_bot"), g_settings.c4_bot },
 						{ xorstr_("c4_bot_auto_detonate"), g_settings.c4_bot_auto_detonate },
 						{ xorstr_("c4_bot_auto_detonate_independently"), g_settings.c4_bot_auto_detonate_independently },
 						{ xorstr_("c4_bot_always_active"), g_settings.c4_bot_always_active },

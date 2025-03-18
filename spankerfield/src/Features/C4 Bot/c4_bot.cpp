@@ -92,7 +92,7 @@ namespace plugins
 
     void c4_bot()
     {
-        if (!g_settings.c4_bot_enabled) return;
+        if (!g_settings.c4_bot) return;
 
         const auto game_context = ClientGameContext::GetInstance();
         if (!game_context) return;
