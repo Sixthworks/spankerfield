@@ -530,13 +530,9 @@ namespace plugins
 		// Get correct entity for prediction
 		ClientControllableEntity* prediction_target = nullptr;
 		if (IsValidPtr(target.m_Player->GetVehicle()))
-		{
 			prediction_target = target.m_Player->GetVehicle();
-		}
 		else
-		{
 			prediction_target = target.m_Player->GetSoldier();
-		}
 
 		// Doing predict
 		auto prediction = m_AimbotPredictor.PredictTarget(

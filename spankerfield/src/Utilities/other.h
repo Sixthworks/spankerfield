@@ -27,4 +27,9 @@ namespace big
 
 	bool is_controller_connected();
 	bool is_left_trigger_pressed(float threshold = 0.5f);
+
+	bool is_any_recording_software_running();
+
+	bool is_rivatuner_running();
+	bool has_rivatuner_hooking_zero(const std::filesystem::path& config_path);
 }

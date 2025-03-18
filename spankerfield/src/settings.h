@@ -26,7 +26,7 @@ namespace big
 		bool aim_must_be_visible{ true };
 		bool aim_must_not_reload{ true };
 		bool aim_fov_method{ true };
-		bool aim_bone_priority{ true };
+		bool aim_bone_priority;
 		bool aim_draw_fov;
 		float aim_fov{ 35.f };
 		ImColor aim_fov_color{ 255, 255, 255, 200 };
@@ -34,7 +34,7 @@ namespace big
 		float aim_max_time_to_target{ 0.7f };
 		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Spine1 };
-		int aim_target_selection{ 0 };
+		int aim_target_selection{ 1 };
 		bool aim_ignore_friends{ true };
 		bool aim_auto_bone{ true };
 		float aim_zeroing_correction{ 0.5f };
@@ -47,7 +47,7 @@ namespace big
 		float spread_control{ 0.0f };
 
 		bool anti_afk{ true };
-		int anti_afk_timer{ 150000 };
+		int anti_afk_timer{ 200000 };
 
 		bool unlock_all;
 		bool no_hc_restrictions;
@@ -122,6 +122,7 @@ namespace big
 
 		bool draw_crosshair{ true };
 		bool crosshair_in_vehicles{ true };
+		int crosshair_type{ 0 };
 		bool crosshair_shadow{ true };
 		float crosshair_size{ 20.f };
 		float crosshair_thickness{ 1.f };
@@ -177,7 +178,7 @@ namespace big
 		float c4_bot_min_damage_to_enemy{ 70.f };
 		bool c4_bot_prevent_self_damage{ true };
 		bool c4_bot_smart_self_damage{ true };
-		float c4_bot_health_buffer{ 40.0f };
+		float c4_bot_health_buffer{ 35.0f };
 
 		bool missiles_own{ true };
 		ImColor missiles_color{ 14, 231, 231, 255 };
@@ -200,8 +201,9 @@ namespace big
 		bool minimap{ true };
 		bool obs_check{ true };
 
-		bool screenshots{ true };
-		bool screenshots_pb_clean; // Disable old PBSS, false by default
+		bool screenshots;
+		bool screenshots_warn{ true };
+		bool screenshots_pb_clean; // Disable old PBSS screenshot cleaner, false by default
 		bool screenshots_pb_save_to_folder;
 		int screenshots_pb_clean_delay{ 20000 };
 		int screenhots_pb_delay{ 300 };
@@ -352,6 +354,7 @@ namespace big
 
 			g_settings.draw_crosshair = j[xorstr_("settings")][xorstr_("draw_crosshair")];
 			g_settings.crosshair_in_vehicles = j[xorstr_("settings")][xorstr_("crosshair_in_vehicles")];
+			g_settings.crosshair_type = j[xorstr_("settings")][xorstr_("crosshair_type")];
 			g_settings.crosshair_shadow = j[xorstr_("settings")][xorstr_("crosshair_shadow")];
 			g_settings.crosshair_size = j[xorstr_("settings")][xorstr_("crosshair_size")];
 			g_settings.crosshair_thickness = j[xorstr_("settings")][xorstr_("crosshair_thickness")];
@@ -432,6 +435,7 @@ namespace big
 			g_settings.minimap = j[xorstr_("settings")][xorstr_("minimap")];
 			g_settings.obs_check = j[xorstr_("settings")][xorstr_("obs_check")];
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
+			g_settings.screenshots_warn = j[xorstr_("settings")][xorstr_("screenshots_warn")];
 			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
 			g_settings.screenshots_pb_clean = j[xorstr_("settings")][xorstr_("screenshots_pb_clean")];
 			g_settings.screenshots_pb_save_to_folder = j[xorstr_("settings")][xorstr_("screenshots_pb_save_to_folder")];
@@ -502,6 +506,7 @@ namespace big
 						{ xorstr_("esp_aim_point_color"), color_to_string(g_settings.esp_aim_point_color) },
 						{ xorstr_("draw_crosshair"), g_settings.draw_crosshair },
 						{ xorstr_("crosshair_in_vehicles"), g_settings.crosshair_in_vehicles },
+						{ xorstr_("crosshair_type"), g_settings.crosshair_type },
 						{ xorstr_("crosshair_shadow"), g_settings.crosshair_shadow },
 						{ xorstr_("crosshair_size"), g_settings.crosshair_size },
 						{ xorstr_("crosshair_thickness"), g_settings.crosshair_thickness },
@@ -517,7 +522,6 @@ namespace big
 						{ xorstr_("health_bar_spacing"), g_settings.health_bar_spacing },
 						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
 						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
-
 						{ xorstr_("aimbot"), g_settings.aimbot },
 						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
@@ -535,7 +539,6 @@ namespace big
 						{ xorstr_("aim_ignore_friends"), g_settings.aim_ignore_friends },
 						{ xorstr_("aim_auto_bone"), g_settings.aim_auto_bone },
 						{ xorstr_("aim_zeroing_correction"), g_settings.aim_zeroing_correction },
-						
 						{ xorstr_("no_recoil"), g_settings.no_recoil },
 						{ xorstr_("no_spread"), g_settings.no_spread },
 						{ xorstr_("recoil_multiplier"), g_settings.recoil_multiplier },
@@ -611,6 +614,7 @@ namespace big
 						{ xorstr_("minimap"), g_settings.minimap },
 						{ xorstr_("obs_check"), g_settings.obs_check },
 						{ xorstr_("screenshots"), g_settings.screenshots },
+						{ xorstr_("screenshots_warn"), g_settings.screenshots_warn },
 						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
 						{ xorstr_("screenshots_pb_clean"), g_settings.screenshots_pb_clean },
 						{ xorstr_("screenshots_pb_save_to_folder"), g_settings.screenshots_pb_save_to_folder },

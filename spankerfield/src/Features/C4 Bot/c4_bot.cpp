@@ -153,8 +153,8 @@ namespace plugins
         // Maximum vertical difference for wall detection
         const float max_vertical_diff = 1.5f;
 
-        // The detonation delay in seconds
-        const float detonation_delay = 0.53f; // 530ms
+        // The detonation delay after the click animation begings in seconds
+        const float detonation_delay = 0.53f; // 530ms, this was manually tested by me with recording software
 
         // Cache for player velocity tracking (for acceleration-based prediction)
         static std::unordered_map<int, Vector3> last_enemy_velocities;
@@ -182,7 +182,12 @@ namespace plugins
 
             // Check if it's the player's C4
             auto explosive_owner = explosive->m_pOwner;
-            if (explosive_owner.GetData() != local_player) continue;
+            auto explosive_owner_data = explosive_owner.GetData();
+
+            if (!IsValidPtrWithVTable(explosive_owner_data))
+                continue;
+
+            if (explosive_owner_data != local_player) continue;
 
             // Get C4 position
             TransformAABBStruct explosive_transform = get_transform(explosive_controllable);

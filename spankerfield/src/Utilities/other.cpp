@@ -243,4 +243,79 @@ namespace big
 
 		return false;
 	}
+
+	bool is_any_recording_software_running()
+	{
+		const std::vector<std::wstring> recording_software =
+		{
+			L"obs64.exe",
+			L"obs32.exe",
+			L"obs.exe",
+			L"bandicam.exe",
+			L"bdcam.exe",
+			L"action.exe", // Mirillis Action
+			L"Action_x64.exe", // Mirillis Action 64-bit
+			L"fraps.exe", // Fraps
+			L"xsplit.core.exe", // XSplit
+			L"xsplit.exe",
+			L"camtasia.exe", // Camtasia
+			L"camtasiastudio.exe",
+			L"screencastomatic.exe", // Screencast-O-Matic
+			L"dxtory.exe", // Dxtory
+			L"wmcap.exe", // Windows Media Encoder
+			L"atomicsoftwarestudio.exe", // Debut Video Capture
+			L"streamlabs.exe", // Streamlabs OBS
+		    L"streamlabsobs.exe"
+		};
+
+		for (const auto& process_name : recording_software)
+		{
+			if (is_process_running(xorstr_(process_name.c_str())))
+				return true;
+		}
+
+		return false;
+	}
+
+	bool is_rivatuner_running()
+	{
+		const std::vector<std::wstring> rtss_names =
+		{
+			L"RTSS.exe",
+			L"RTSSHooksLoader64.exe",
+			L"RTSSHooksLoader.exe",
+			L"EncoderServer.exe",
+		};
+
+		for (const auto& process_name : rtss_names)
+		{
+			if (is_process_running(xorstr_(process_name.c_str())))
+			{
+				if (is_process_running(xorstr_(process_name.c_str())))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool has_rivatuner_hooking_zero(const std::filesystem::path& config_path)
+	{
+		if (!std::filesystem::exists(config_path))
+			return false;
+
+		std::ifstream file(config_path);
+		if (!file.is_open())
+			return false;
+
+		std::string line;
+		constexpr std::string_view target = xorstr_("EnableHooking=0");
+		while (std::getline(file, line))
+		{
+			if (line == target)
+				return true;
+		}
+
+		return false;
+	}
 }

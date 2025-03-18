@@ -104,6 +104,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Locks on targets without them being fully visible to you."));
+				ImGui::WarningTooltip(xorstr_("There is a PBSS/BF4DB risk while using this, play clean if you are using this"));
 				ImGui::Checkbox(xorstr_("Don't aim while reloading"), &g_settings.aim_must_not_reload);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
@@ -134,6 +135,9 @@ namespace big
 					ImGui::SliderFloat(xorstr_("FOV##Aimbot"), &g_settings.aim_fov, 0.f, 180.f);
 					ImGui::PopItemWidth();
 
+					if (g_settings.aim_fov >= 80.f)
+						ImGui::WarningTooltip(xorstr_("Having FOV this high might get you banned."));
+
 					color_wrapper(xorstr_("FOV color##FOV"), &g_settings.aim_fov_color);
 
 					ImGui::Separator();
@@ -153,36 +157,26 @@ namespace big
 
 				ImGui::PushItemWidth(300.f);
 
-				static bool custom_aim_key = false;
-				if (custom_aim_key)
-					ImGui::InputInt(xorstr_("Key##Aimbot"), &g_settings.aim_key);
-				else
+				const char* current_item = xorstr_("Select a key");
+				auto it = key_map.find(g_settings.aim_key);
+				if (it != key_map.end())
+					current_item = it->second.c_str();
+
+				if (ImGui::BeginCombo(xorstr_("##Aimbot"), current_item))
 				{
-					const char* current_item = xorstr_("Select a key");
-					auto it = key_map.find(g_settings.aim_key);
-					if (it != key_map.end())
-						current_item = it->second.c_str();
-
-					if (ImGui::BeginCombo(xorstr_("##Aimbot"), current_item))
+					for (const auto& [key, name] : key_map)
 					{
-						for (const auto& [key, name] : key_map)
-						{
-							bool is_selected = (g_settings.aim_key == key);
-							if (ImGui::Selectable(name.c_str(), is_selected))
-								g_settings.aim_key = key;
+						bool is_selected = (g_settings.aim_key == key);
+						if (ImGui::Selectable(name.c_str(), is_selected))
+							g_settings.aim_key = key;
 
-							if (is_selected)
-								ImGui::SetItemDefaultFocus();
-						}
-						ImGui::EndCombo();
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
 					}
+					ImGui::EndCombo();
 				}
 
 				ImGui::PopItemWidth();
-
-				ImGui::Checkbox(xorstr_("Use old aim key selector (legacy)"), &custom_aim_key);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Allows you to use the key selection from legacy versions of spankerfield."));
 
 				ImGui::Separator();
 				
@@ -225,8 +219,16 @@ namespace big
 				ImGui::Text(xorstr_("Smoothing"));
 
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Minimum time to target (seconds)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
-				ImGui::SliderFloat(xorstr_("Maximum time to target (seconds)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
+				ImGui::SliderFloat(xorstr_("Minimum time to target (sec)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
+
+				if (g_settings.aim_min_time_to_target < 0.15f)
+					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+
+				ImGui::SliderFloat(xorstr_("Maximum time to target (sec)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
+
+				if (g_settings.aim_max_time_to_target < 0.2f)
+					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
@@ -238,7 +240,7 @@ namespace big
 			{
 				if (ImGui::CollapsingHeader(xorstr_("C4 Bot"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script"));
+					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script."));
 
 					ImGui::Checkbox(xorstr_("Enable C4 Bot"), &g_settings.c4_bot_enabled);
 					ImGui::Checkbox(xorstr_("Always active"), &g_settings.c4_bot_always_active);
@@ -248,7 +250,8 @@ namespace big
 					// Auto-detonate settings
 					ImGui::Checkbox(xorstr_("Auto detonate"), &g_settings.c4_bot_auto_detonate);
 					if (g_settings.c4_bot_auto_detonate)
-						ImGui::Checkbox(xorstr_("No key required (BF4DB risk)"), &g_settings.c4_bot_auto_detonate_independently);
+						ImGui::Checkbox(xorstr_("No key required"), &g_settings.c4_bot_auto_detonate_independently);
+					ImGui::WarningTooltip(xorstr_("This will make the auto detonate work without the key, which means it can get obvious that you're cheating."));
 
 					ImGui::PushItemWidth(300.f);
 					ImGui::SliderFloat(xorstr_("Enemy detection radius"), &g_settings.c4_bot_radius, 0.f, 7.f);
@@ -321,7 +324,9 @@ namespace big
 
 				if (ImGui::CollapsingHeader(xorstr_("Weapon sway"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::Checkbox(xorstr_("No recoil (BF4DB risk)"), &g_settings.no_recoil);
+					ImGui::Checkbox(xorstr_("No recoil"), &g_settings.no_recoil);
+					ImGui::WarningTooltip(xorstr_("If you are being spectated, the spectator will immediately notice the recoil and report you to BF4DB."));
+
 					if (g_settings.no_recoil)
 					{
 						ImGui::PushItemWidth(200.f);
@@ -337,7 +342,9 @@ namespace big
 						ImGui::PopItemWidth();
 					}
 
-					ImGui::Checkbox(xorstr_("No spread (BF4DB risk)"), &g_settings.no_spread);
+					ImGui::Checkbox(xorstr_("No spread"), &g_settings.no_spread);
+					ImGui::WarningTooltip(xorstr_("If you are being spectated, the spectator will immediately notice the weapon spread and report you to BF4DB."));
+
 					if (g_settings.no_spread)
 					{
 						ImGui::PushItemWidth(200.f);
@@ -355,9 +362,8 @@ namespace big
 				if (ImGui::CollapsingHeader(xorstr_("Weapon editor")))
 				{
 					static bool enable_editor = false;
-					ImGui::Checkbox(xorstr_("Enable weapon editor (Risky)"), &enable_editor);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
+					ImGui::Checkbox(xorstr_("Enable weapon editor"), &enable_editor);
+					ImGui::WarningTooltip(xorstr_("Highly do not recommend this while playing on servers, it was made for testing purposes only."));
 
 					// This is for current weapon only, and made for debugging, you can make all of these as standalone plugins
 					if (enable_editor)
@@ -365,21 +371,21 @@ namespace big
 						const auto weapon_firing = get_weapon_firing();
 						if (!IsValidPtrWithVTable(weapon_firing))
 						{
-							ImGui::Text("Weapon firing not found - you are not in world or address is invalid");
+							ImGui::Text(xorstr_("Weapon firing not found - you are not in world or address is invalid."));
 						}
 						else
 						{
 							const auto primary_fire = weapon_firing->m_pPrimaryFire;
 							if (!IsValidPtrWithVTable(primary_fire))
 							{
-								ImGui::Text("Primary fire not found - you are not in world or address is invalid");
+								ImGui::Text(xorstr_("Primary fire not found - you are not in world or address is invalid."));
 							}
 							else
 							{
 								const auto data = primary_fire->m_FiringData;
 								if (!IsValidPtrWithVTable(data))
 								{
-									ImGui::Text("Firing data not found - you are not in world or address is invalid");
+									ImGui::Text(xorstr_("Firing data not found - you are not in world or address is invalid."));
 								}
 								else if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
 								{
@@ -478,7 +484,9 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Checkbox(xorstr_("Draw box"), &g_settings.esp_draw_box);
+				ImGui::Checkbox(xorstr_("Draw 2D box"), &g_settings.esp_draw_box);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws a simple 2D box around the player/vehicle model."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Fill box"), &g_settings.esp_box_fill);
 				if (ImGui::IsItemHovered())
@@ -494,7 +502,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Draw 3D box"), &g_settings.esp_draw_3d_box);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws a 3D box around the player/vehicle"));
+					ImGui::SetTooltip(xorstr_("Draws a 3D box fully showing the player/vehicle model."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("3D box thickness"), &g_settings.esp_3d_box_thickness, 0.5f, 3.0f);
 				ImGui::PopItemWidth();
@@ -505,7 +513,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Draw eye tracer"), &g_settings.esp_draw_eye_tracer);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws a line showing where the player is looking"));
+					ImGui::SetTooltip(xorstr_("Draws a line showing where the enemy is facing forward right now."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Eye tracer distance"), &g_settings.esp_eye_tracer_distance, 1.0f, 30.0f);
 				ImGui::SliderFloat(xorstr_("Eye tracer thickness"), &g_settings.esp_eye_tracer_thickness, 0.5f, 3.0f);
@@ -517,7 +525,7 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Draw line"), &g_settings.esp_draw_line);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws a line from the selected location to an enemy."));
+					ImGui::SetTooltip(xorstr_("Draws a line from the selected location on the screen to an enemy position."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderInt(xorstr_("Line point location"), &g_settings.esp_draw_line_from, 0, 8);
 				ImGui::SliderFloat(xorstr_("Line thickness"), &g_settings.esp_line_thickness, 0.1f, 10.f);
@@ -564,7 +572,7 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw laser guided missiles"), &g_settings.missiles_own);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws boxes for TOW/SRAW missiles."));
+					ImGui::SetTooltip(xorstr_("Draws boxes for TOW/SRAW/Laser guided missiles."));
 
 				ImGui::Text(xorstr_("Colors"));
 
@@ -579,8 +587,13 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw in vehicles"), &g_settings.crosshair_in_vehicles);
 				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Crosshair type"), &g_settings.crosshair_type, 0, 5);
 				ImGui::SliderFloat(xorstr_("Crosshair size"), &g_settings.crosshair_size, 0.1f, 100.f);
-				ImGui::SliderFloat(xorstr_("Crosshair thickness"), &g_settings.crosshair_thickness, 1.f, 100.f);
+
+				// There is no thickness implemented for dot and circle
+				if (g_settings.crosshair_type != 1 && g_settings.crosshair_type != 2)
+				    ImGui::SliderFloat(xorstr_("Crosshair thickness"), &g_settings.crosshair_thickness, 1.f, 100.f);
+
 				ImGui::PopItemWidth();
 
 				ImGui::Text(xorstr_("Colors"));
@@ -592,7 +605,7 @@ namespace big
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Use skeleton dots"), &g_settings.skeleton_use_dots);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws little dots on locations where bones end."));
+					ImGui::SetTooltip(xorstr_("Draws little dots on locations where 2 connected skeleton bones end."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Dots distance"), &g_settings.skeleton_dots_distance, 1.f, 5000.f);
 				ImGui::PopItemWidth();
@@ -638,6 +651,9 @@ namespace big
 				ImGui::Text(xorstr_("Specifics"));
 
 				ImGui::Checkbox(xorstr_("Use health based color"), &g_settings.health_bar_use_default_color);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make the health bar use the traditional red (being lowest) -> green (being highest) system for coloring."));
+				
 				if (!g_settings.health_bar_use_default_color)
 					color_wrapper(xorstr_("Bar##HB"), &g_settings.health_bar_color);
 
@@ -786,8 +802,12 @@ namespace big
 				ImGui::Checkbox(xorstr_("Nearby enemies"), &g_settings.infantry_alert);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Infantry vehicles"), &g_settings.infantry_alert_light_tech);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will also check for transport helicopters, jeeps, transport boats... etc."));
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Draw indicators"), &g_settings.infantry_alert_indicators);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will show indicators like height and distance below the main enemy nearby text."));
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Alert distance"), &g_settings.infantry_alert_distance, 1.f, 500.f);
@@ -825,6 +845,8 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Misc")))
 			{
 				ImGui::Checkbox(xorstr_("Overheat control"), &g_settings.overheat_control);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Allows you to keep firing even if your vehicle turret/gun overheats."));
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Critical overheat value"), &g_settings.overheat_control_critical, 0.f, 1.f);
 				ImGui::PopItemWidth();
@@ -833,34 +855,40 @@ namespace big
 
 				ImGui::Checkbox(xorstr_("Auto-spot"), &g_settings.minimap);
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Unspot when using OBS"), &g_settings.obs_check);
+				ImGui::Checkbox(xorstr_("Unspot when using recording software"), &g_settings.obs_check);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS is running."));
+					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS, Streamlabs, Bandicam, Action... etc. is running."));
 
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Automatically turns the jet to achieve the best possible speed."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Unlock everything (BF4DB risk)"), &g_settings.unlock_all);
+				ImGui::Checkbox(xorstr_("Unlock everything"), &g_settings.unlock_all);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Unlocks everything but works for attachments only, do not recommend using it though."));
+					ImGui::SetTooltip(xorstr_("Unlocks everything, but works for attachments only."));
+				ImGui::WarningTooltip(xorstr_("A BF4DB risk is present, because your account doesn't actually have those attachments, risk of a manual check."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("No hardcore restrictions (PBSS risk)"), &g_settings.no_hc_restrictions);
+				ImGui::Checkbox(xorstr_("No hardcore restrictions"), &g_settings.no_hc_restrictions);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("The risk is small, although you can get screenshotted with your crosshair visible while playing HC."));
+				ImGui::WarningTooltip(xorstr_("You can get screenshotted by PB with your crosshair visible while playing HC."));
 
 				ImGui::Separator();
 
 				ImGui::Checkbox(xorstr_("Anti-AFK"), &g_settings.anti_afk);
+				ImGui::WarningTooltip(xorstr_("This option may not work when you are away from game window."));
 				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("Timer"), &g_settings.anti_afk_timer, 0, 180000);
+				ImGui::SliderInt(xorstr_("Timer (ms)"), &g_settings.anti_afk_timer, 0, 210000);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Cooldown before the script executes another Anti-AFK move."));
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
-				ImGui::Checkbox(xorstr_("Kill sound (FFSS risk)"), &g_settings.kill_sound);
+				ImGui::Checkbox(xorstr_("Kill sound"), &g_settings.kill_sound);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it, but it's safe."));
+					ImGui::SetTooltip(xorstr_("This plays a custom sound of your choice when you kill an enemy."));
+				ImGui::WarningTooltip(xorstr_("This triggers a screenshot by FairFight the first time you use it, but it's safe."));
 
 				ImGui::PushItemWidth(550.f);
 				ImGui::InputText(xorstr_("Path to file (.wav)"), g_settings.kill_sound_path, MAX_PATH);
@@ -959,6 +987,10 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw PB & FF screenshots amount"), &g_settings.screenshots);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Shows the total amount of times you've been screenshotted by FF or PB."));
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Warn about new screenshots"), &g_settings.screenshots_warn);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Shows a warning message if you got screenshotted recently."));
 
 				ImGui::SameLine();
 
@@ -974,6 +1006,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Disable old PBSS bypass"), &g_settings.screenshots_pb_clean);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This makes the cheat only use the new PBSS cleaning method and ignore the old one."));
+				ImGui::WarningTooltip(xorstr_("It's recommended to not disable it, the old cleaner does not conflict with the new one."));
 
 				ImGui::SameLine();
 
@@ -988,16 +1021,19 @@ namespace big
 					ImGui::SliderInt(xorstr_("update frame delay"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("Delay between each clean frame update for the new method."));
+					ImGui::WarningTooltip(xorstr_("Setting it too low will cause a lot of flickering in the cheat, setting it too high will increase the chance of you getting banned."));
 
 					if (!g_settings.screenshots_pb_clean)
 					{
 						ImGui::SliderInt(xorstr_("before taking screenshot (old method)"), &g_settings.screenhots_pb_delay, 50, 1000);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts. Recommended: 300ms."));
+							ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts."));
+						ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
 
 						ImGui::SliderInt(xorstr_("after taking screenshot (old method)"), &g_settings.screenhots_post_pb_delay, 0, 500);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals. Recommended: 200ms."));
+							ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals."));
+						ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
 					}
 
 					ImGui::PopItemWidth();

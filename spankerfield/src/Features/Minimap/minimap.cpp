@@ -8,6 +8,7 @@ using namespace big;
 namespace plugins
 {
 	static ULONGLONG last_check = 0;
+
 	void spot_minimap()
 	{
 		if (!g_settings.minimap) return;
@@ -18,8 +19,8 @@ namespace plugins
 			{
 				g_thread_pool->push([&]
 				{
-				    // There is no way the executable is in any other name, you must be running 64-bit...
-                    g_globals.g_obs = is_process_running(xorstr_(L"obs64.exe"));
+				    // Check if any recording software is running
+                    g_globals.g_obs = is_any_recording_software_running();
 				});
 
 				last_check = GetTickCount64();

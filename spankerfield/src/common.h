@@ -4,11 +4,13 @@
 #pragma comment(lib, "xinput.lib")
 #pragma comment(lib, "shlwapi.lib")
 
-#pragma warning (disable : 4200)
-#pragma warning (disable : 4099)
+#pragma warning (disable : 4200) // Zero-size array
+#pragma warning (disable : 4099) // Freetype PDB not found
+#pragma warning (disable : 4311) // VMT Hook
+#pragma warning (disable : 4302) // VMT Hook
 
 // Made this for myself, disables string encryption so I can upload the .dll on UnknownCheats
-// I don't really use the xorstr_ anymore so it stays always defined. Just use VMP
+// I don't really use the xorstr_ anymore so it stays always defined. Just pack the dll with VMP, it will automatically do it
 #define BUILD_FOR_UC
 
 // Fix the 'Unicode support requires compiling with /utf-8'

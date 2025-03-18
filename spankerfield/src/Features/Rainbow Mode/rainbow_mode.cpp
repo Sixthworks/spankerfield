@@ -109,11 +109,15 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.esp_teammate_color);
         g_rainbow_manager.add_color(g_settings.text_color_occluded);
         g_rainbow_manager.add_color(g_settings.text_color);
+        g_rainbow_manager.add_color(g_settings.esp_additional_tags_color);
         g_rainbow_manager.add_color(g_settings.skeleton_color);
+        g_rainbow_manager.add_color(g_settings.skeleton_color_occluded);
         g_rainbow_manager.add_color(g_settings.crosshair_color);
         g_rainbow_manager.add_color(g_settings.radar_outline_color);
         g_rainbow_manager.add_color(g_settings.radar_cross_color);
         g_rainbow_manager.add_color(g_settings.radar_you_color);
+        g_rainbow_manager.add_color(g_settings.radar_teammates_color);
+        g_rainbow_manager.add_color(g_settings.radar_teammate_vehicles_color);
         g_rainbow_manager.add_color(g_settings.radar_enemies_color);
         g_rainbow_manager.add_color(g_settings.radar_enemy_vehicles_color);
         g_rainbow_manager.add_color(g_settings.blacklist_color);
@@ -122,6 +126,7 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.explosives_color);
         g_rainbow_manager.add_color(g_settings.missiles_color);
         g_rainbow_manager.add_color(g_settings.spectator_color);
+        g_rainbow_manager.add_color(g_settings.spectator_warnings_color);
         g_rainbow_manager.add_color(g_settings.screenshots_color);
     }
 

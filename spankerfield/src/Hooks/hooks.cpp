@@ -9,7 +9,6 @@
 #include "../settings.h"
 #include "../global.h"
 
-
 #define GWL_WNDPROC GWLP_WNDPROC
 
 namespace big
@@ -218,7 +217,7 @@ namespace big
 	namespace Present
 	{
 		using Present_t = HRESULT(*)(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags);
-		std::unique_ptr<VMTHook> pPresentHook;
+		Present_t oPresent = nullptr;
 
 		HRESULT hkPresent(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags)
 		{
@@ -257,7 +256,7 @@ namespace big
 					}
 				}
 			}
-			static auto oPresent = pPresentHook->GetOriginal<Present_t>(8);
+
 			return oPresent(pThis, SyncInterval, Flags);
 		}
 	}
@@ -368,10 +367,20 @@ namespace big
 			MH_EnableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
 			LOG(INFO) << xorstr_("Hooked TakeScreenshot.");
 
-			Present::pPresentHook = std::make_unique<VMTHook>();
-			Present::pPresentHook->Setup(renderer->m_pScreen->m_pSwapChain);
-			Present::pPresentHook->Hook(8, Present::hkPresent);
+			MH_CreateHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8], Present::hkPresent, reinterpret_cast<PVOID*>(&Present::oPresent));
+			MH_EnableHook((*reinterpret_cast<void***>(renderer->m_pScreen->m_pSwapChain))[8]);
 			LOG(INFO) << xorstr_("Hooked Present.");
+
+			// RTSS support
+			std::filesystem::path riva_path = xorstr_("C:\\Program Files (x86)\\RivaTuner Statistics Server\\Profiles\\bf4.exe.cfg");
+			bool rtss_disabled = has_rivatuner_hooking_zero(riva_path);
+
+			if (is_rivatuner_running() && !rtss_disabled)
+			{
+				LOG(RAW_RED) << xorstr_("[RTSS] RivaTuner detected - rendering compatibility issue detected.\n"
+					"       Manual fix required: In 'RivaTuner Statistics Server', hold SHIFT while clicking the '+' button.\n"
+					"       Select bf4.exe, add it, and set application detection level to 'None'.");
+			}
 
 			PreFrame::pPreFrameHook = std::make_unique<VMTHook>();
 			PreFrame::pPreFrameHook->Setup(border_input_node->m_Vtable);
@@ -391,7 +400,10 @@ namespace big
 		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pContext))[46]);
 		LOG(INFO) << xorstr_("Disabled CopySubresourceRegion.");
 
-		Present::pPresentHook->Release();
+		PreFrame::pPreFrameHook->Release();
+		LOG(INFO) << xorstr_("Disabled PreFrameUpdate.");
+
+		MH_DisableHook((*reinterpret_cast<void***>(DxRenderer::GetInstance()->m_pScreen->m_pSwapChain))[8]);
 		LOG(INFO) << xorstr_("Disabled Present.");
 
 		MH_DisableHook(reinterpret_cast<void*>(OFFSET_TAKESCREENSHOT));
@@ -399,9 +411,6 @@ namespace big
 
 		MH_DisableHook(&BitBlt);
 		LOG(INFO) << xorstr_("Disabled BitBlt.");
-
-		PreFrame::pPreFrameHook->Release();
-		LOG(INFO) << xorstr_("Disabled PreFrameUpdate.");
 
 		if (WndProc::oWndProc)
 		{
