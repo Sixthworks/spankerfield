@@ -18,10 +18,10 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtrWithVTable(local_player)) return;
+        if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtrWithVTable(local_soldier) || !local_soldier->IsAlive()) return;
+        if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
 
         if (!class_info.ExplosionEntity)
         {
@@ -41,10 +41,10 @@ namespace plugins
         do
         {
             ClientExplosionEntity* explosive = explosives.front()->getObject();
-            if (!IsValidPtrWithVTable(explosive)) continue;
+            if (!IsValidPtr(explosive)) continue;
 
             ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
-            if (!IsValidPtrWithVTable(explosive_controllable)) continue;
+            if (!IsValidPtr(explosive_controllable)) continue;
 
             TransformAABBStruct transform;
             explosive_controllable->GetAABB(&transform);

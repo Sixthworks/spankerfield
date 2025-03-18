@@ -70,7 +70,7 @@ namespace plugins
 			return;
 
 		const auto player = get_player_by_name(name);
-		if (IsValidPtrWithVTable(player))
+		if (IsValidPtr(player))
 		{
 			const auto id = player->m_onlineId.m_personaid;
 			if (!id) return;
@@ -91,7 +91,7 @@ namespace plugins
 			return;
 
 		const auto player = get_player_by_name(name);
-		if (IsValidPtrWithVTable(player))
+		if (IsValidPtr(player))
 		{
 			const auto nickname = player->m_Name;
 			if (!nickname) return;
@@ -114,7 +114,7 @@ namespace plugins
 			return;
 
 		const auto player = get_player_by_name(name);
-		const auto val = IsValidPtrWithVTable(player) ? player->m_onlineId.m_personaid : exclusive;
+		const auto val = IsValidPtr(player) ? player->m_onlineId.m_personaid : exclusive;
 
 		players[name][xorstr_("Persona ID")] = val;
 		players[name][xorstr_("Time added")] = current_time();
@@ -168,13 +168,13 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		float offset = 0.f;
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			if (player == local_player)

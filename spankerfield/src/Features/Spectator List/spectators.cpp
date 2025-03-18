@@ -32,7 +32,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		// Vector for storing spectator names
 		std::vector<std::string> spectators{};
@@ -43,7 +43,7 @@ namespace plugins
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			if (player->m_IsSpectator)
@@ -167,7 +167,7 @@ namespace plugins
 					for (int i = 0; i < MAX_PLAYERS; i++)
 					{
 						const auto player = player_manager->m_ppPlayers[i];
-						if (IsValidPtrWithVTable(player) && player != local_player &&
+						if (IsValidPtr(player) && player != local_player &&
 							player->m_onlineId.m_personaid == bl.persona_id)
 						{
 							// Adjust the offset based on warning size

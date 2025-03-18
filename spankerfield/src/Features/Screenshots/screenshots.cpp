@@ -18,6 +18,9 @@ namespace plugins
 
     void draw_screenshots()
     {
+        if (!g_settings.screenshots && !g_settings.screenshots_warn)
+            return;
+
         // Check if screenshot counts have changed
         if (g_globals.screenshots_ff > s_screenshot_state.last_ff_count || g_globals.screenshots_pb > s_screenshot_state.last_pb_count)
         {
@@ -47,10 +50,10 @@ namespace plugins
                     const auto game_context = ClientGameContext::GetInstance();
                     if (game_context)
                     {
-                        if (game_context->m_pPlayerManager && IsValidPtrWithVTable(game_context->m_pPlayerManager->m_pLocalPlayer))
+                        if (game_context->m_pPlayerManager && IsValidPtr(game_context->m_pPlayerManager->m_pLocalPlayer))
                         {
                             const auto local_soldier = game_context->m_pPlayerManager->m_pLocalPlayer->GetSoldier();
-                            if (IsValidPtrWithVTable(local_soldier))
+                            if (IsValidPtr(local_soldier))
                                 is_alive = local_soldier->IsAlive();
                         }
                     }

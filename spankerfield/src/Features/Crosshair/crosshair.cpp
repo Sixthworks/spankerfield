@@ -160,16 +160,16 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
 		// Vehicle check
 		ClientVehicleEntity* vehicle = local_player->GetVehicle();
-		if (IsValidPtrWithVTable(vehicle) && !g_settings.crosshair_in_vehicles) return;
+		if (IsValidPtr(vehicle) && !g_settings.crosshair_in_vehicles) return;
 
 		// Positions
 		ImVec2 screen_center = ImVec2(g_globals.g_width / 2.0f, g_globals.g_height / 2.0f);

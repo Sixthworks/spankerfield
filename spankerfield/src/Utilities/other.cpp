@@ -13,12 +13,12 @@ namespace big
 		if (!player_manager) return nullptr;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return nullptr;
+		if (!IsValidPtr(local_player)) return nullptr;
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player)) continue;
+			if (!IsValidPtr(player)) continue;
 
 			const auto name = player->m_Name;
 			if (!name) continue;
@@ -61,7 +61,7 @@ namespace big
 		if (!soldier) return placeholder;
 
 		const auto vehicle = player->GetVehicle();
-		IsValidPtrWithVTable(vehicle) ? vehicle->GetAABB(&placeholder) : soldier->GetAABB(&placeholder);
+		IsValidPtr(vehicle) ? vehicle->GetAABB(&placeholder) : soldier->GetAABB(&placeholder);
 
 		return placeholder;
 	}
@@ -70,7 +70,7 @@ namespace big
 	{
 		TransformAABBStruct placeholder;
 
-		if (IsValidPtrWithVTable(entity))
+		if (IsValidPtr(entity))
 			entity->GetAABB(&placeholder);
 
 		return placeholder;

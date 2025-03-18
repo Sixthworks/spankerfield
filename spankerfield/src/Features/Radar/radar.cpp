@@ -23,10 +23,10 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -88,7 +88,7 @@ namespace plugins
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			if (player == local_player)
@@ -149,7 +149,7 @@ namespace plugins
 			if (in_bounds && distance >= 0.f)
 			{
 				const auto vehicle = player->GetVehicle();
-				if (IsValidPtrWithVTable(vehicle))
+				if (IsValidPtr(vehicle))
 				{
 					const auto data = get_vehicle_data(vehicle);
 					if (IsValidPtrWithVTable(data))
@@ -157,6 +157,12 @@ namespace plugins
 						const auto name = data->m_NameID;
 						if (IsValidPtr(name))
 						{
+							// Check length
+							size_t length = strnlen(name, 256);
+
+							if (length <= 0 || length > 256)
+								return;
+
 							// Determine color based on friend status
 							ImColor color;
 							if (is_friend)
@@ -166,7 +172,9 @@ namespace plugins
 							else
 								color = g_settings.radar_enemy_vehicles_color;
 
-							m_drawing->AddText(x, y - 3.f * icon_scale_factor, color, 15.f * icon_scale_factor, FL_CENTER_X, format_vehicle(name).c_str());
+							// Draw formatted vehicle name
+							std::string vehicle_name = format_vehicle(name);
+							m_drawing->AddText(x, y - 3.f * icon_scale_factor, color, 15.f * icon_scale_factor, FL_CENTER_X, vehicle_name.c_str());
 						}
 					}
 				}

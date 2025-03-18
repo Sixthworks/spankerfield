@@ -369,14 +369,14 @@ namespace big
 					if (enable_editor)
 					{
 						const auto weapon_firing = get_weapon_firing();
-						if (!IsValidPtrWithVTable(weapon_firing))
+						if (!IsValidPtr(weapon_firing))
 						{
 							ImGui::Text(xorstr_("Weapon firing not found - you are not in world or address is invalid."));
 						}
 						else
 						{
 							const auto primary_fire = weapon_firing->m_pPrimaryFire;
-							if (!IsValidPtrWithVTable(primary_fire))
+							if (!IsValidPtr(primary_fire))
 							{
 								ImGui::Text(xorstr_("Primary fire not found - you are not in world or address is invalid."));
 							}
@@ -387,7 +387,7 @@ namespace big
 								{
 									ImGui::Text(xorstr_("Firing data not found - you are not in world or address is invalid."));
 								}
-								else if (IsValidPtrWithVTable(weapon_firing) && IsValidPtrWithVTable(primary_fire) && IsValidPtrWithVTable(data))
+								else if (IsValidPtr(weapon_firing) && IsValidPtr(primary_fire) && IsValidPtrWithVTable(data))
 								{
 									ImGui::Text(xorstr_("Bullet count"));
 									ImGui::PushItemWidth(300.f);

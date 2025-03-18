@@ -52,6 +52,17 @@ constexpr bool IsValidPtrWithVTable(PVOID p)
 	return false;
 }
 
+constexpr bool IsValidMemory(PVOID p, size_t size = sizeof(void*))
+{
+	if (!p) return false;
+
+	MEMORY_BASIC_INFORMATION mbi;
+	if (VirtualQuery(p, &mbi, sizeof(mbi)) == 0) return false;
+	if (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) return false;
+
+	return true;
+}
+
 using namespace DirectX::SimpleMath;
 
 class GameEntity;
@@ -1363,7 +1374,13 @@ public:
 	inline ClientVehicleEntity* GetVehicle()
 	{
 		if (this->IsInVehicle())
+		{
+			// Hope this prevents crashes before we cast it to a vehicle entity
+			if (!IsValidPtr(m_pAttachedControllable))
+				return nullptr;
+
 			return reinterpret_cast<ClientVehicleEntity*>(m_pAttachedControllable);
+		}
 
 		return nullptr;
 	}

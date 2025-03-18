@@ -26,6 +26,7 @@ namespace plugins
         // Without proper ray tracing, we can use a simpler approach
         // Check vertical difference with intermediate points
         const int check_points = 3; // Number of intermediate points to check
+
         for (int i = 1; i < check_points; i++)
         {
             float t = static_cast<float>(i) / check_points;
@@ -100,10 +101,10 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtrWithVTable(local_player)) return;
+        if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtrWithVTable(local_soldier) || !local_soldier->IsAlive()) return;
+        if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
 
         // Check if player has C4 equipped
         const auto weapon = WeaponFiring::GetInstance();
@@ -168,10 +169,10 @@ namespace plugins
         do
         {
             ClientExplosionEntity* explosive = explosives.front()->getObject();
-            if (!IsValidPtrWithVTable(explosive)) continue;
+            if (!IsValidPtr(explosive)) continue;
 
             ClientControllableEntity* explosive_controllable = (ClientControllableEntity*)explosive;
-            if (!IsValidPtrWithVTable(explosive_controllable)) continue;
+            if (!IsValidPtr(explosive_controllable)) continue;
 
             // Check if data is valid
             if (!IsValidPtrWithVTable(explosive_controllable->m_Data)) continue;
@@ -223,7 +224,7 @@ namespace plugins
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             ClientPlayer* player = player_manager->GetPlayerById(i);
-            if (!IsValidPtrWithVTable(player) || player == local_player) continue;
+            if (!IsValidPtr(player) || player == local_player) continue;
 
             // Check team (skip teammates)
             if (player->m_TeamId == local_player->m_TeamId) continue;
@@ -237,7 +238,7 @@ namespace plugins
             }
 
             ClientSoldierEntity* soldier = player->GetSoldier();
-            if (!IsValidPtrWithVTable(soldier) || !soldier->IsAlive()) continue;
+            if (!IsValidPtr(soldier) || !soldier->IsAlive()) continue;
 
             // Get enemy position
             TransformAABBStruct enemy_transform = get_transform(soldier);

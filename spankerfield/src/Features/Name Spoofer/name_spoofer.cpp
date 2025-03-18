@@ -14,7 +14,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		// Backup original name (one-time)
 		if (backup && local_player->m_Name[0] != '\0')
@@ -24,7 +24,7 @@ namespace plugins
 		}
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		// Restore name logic
 		if (g_settings.spoof_restore)

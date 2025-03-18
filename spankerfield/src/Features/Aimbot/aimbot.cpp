@@ -43,11 +43,11 @@ namespace big
 			return result;
 
 		const auto weapon_firing = WeaponFiring::GetInstance();
-		if (!IsValidPtrWithVTable(weapon_firing))
+		if (!IsValidPtr(weapon_firing))
 			return result;
 
 		const auto firing = weapon_firing->m_pPrimaryFire;
-		if (!IsValidPtrWithVTable(firing))
+		if (!IsValidPtr(firing))
 			return result;
 
 		const auto firing_data = firing->m_FiringData;
@@ -193,7 +193,7 @@ namespace big
 		float g = fabs(gravity);
 		float v = bullet_speed;
 
-		// Quadratic formula to solve for angle: tan(theta) = (v^2 ± sqrt(v^4 - g(g*x^2 + 2y*v^2)))/gx
+		// Quadratic formula to solve for angle: tan(theta) = (v^2 ï¿½ sqrt(v^4 - g(g*x^2 + 2y*v^2)))/gx
 		float discriminant = powf(v, 4) - g * (g * dist_horiz * dist_horiz + 2 * dist_vert * v * v);
 
 		if (discriminant < 0)
@@ -254,7 +254,7 @@ namespace big
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			m_PlayerList.push_back(player);
@@ -276,20 +276,20 @@ namespace big
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
 
 		for (const auto player : m_PlayerList)
 		{
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			if (player->m_TeamId == local_player->m_TeamId)
 				continue;
 
 			const auto soldier = player->GetSoldier();
-			if (!IsValidPtrWithVTable(soldier))
+			if (!IsValidPtr(soldier))
 				continue;
 
 			if (!soldier->IsAlive())
@@ -402,7 +402,7 @@ namespace big
 			else if (g_settings.aim_target_selection == 1) // FOV + Distance
 			{
 				const auto local_soldier = local_player->GetSoldier();
-				if (!IsValidPtrWithVTable(local_soldier))
+				if (!IsValidPtr(local_soldier))
 					continue;
 
 				Matrix transform;
@@ -473,10 +473,10 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
@@ -598,12 +598,12 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		if (local_player->GetVehicle()) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 

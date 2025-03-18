@@ -196,7 +196,7 @@ namespace big
 					// Make sure it exists on the user end before saving anything
 					validate_path(screenshot_path);
 
-					screenshot_path /= std::string(current_time() + xorstr_(".png"));
+					screenshot_path /= std::string(current_time() + xorstr_(".jpg"));
 
 					if (!std::filesystem::exists(screenshot_path))
 					{

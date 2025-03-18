@@ -25,18 +25,18 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtrWithVTable(local_soldier)) return;
+		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
 
 		const auto local_vehicle = local_player->GetVehicle();
-		if (!IsValidPtrWithVTable(local_vehicle)) return;
+		if (!IsValidPtr(local_vehicle)) return;
 
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
-		if (!IsValidPtrWithVTable(vehicle_data)) return;
+		if (!IsValidPtr(vehicle_data)) return;
 
 		if (vehicle_data->IsInJet())
 		{

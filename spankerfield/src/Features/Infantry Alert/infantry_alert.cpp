@@ -22,10 +22,10 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtrWithVTable(local_player)) return;
+        if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtrWithVTable(local_soldier)) return;
+        if (!IsValidPtr(local_soldier)) return;
 
         if (!local_soldier->IsAlive()) return;
 
@@ -51,7 +51,7 @@ namespace plugins
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             const auto player = player_manager->m_ppPlayers[i];
-            if (!IsValidPtrWithVTable(player))
+            if (!IsValidPtr(player))
                 continue;
 
             if (player == local_player)
@@ -61,7 +61,7 @@ namespace plugins
                 continue;
 
             const auto vehicle = player->GetVehicle();
-            if (IsValidPtrWithVTable(vehicle))
+            if (IsValidPtr(vehicle))
             {
                 if (g_settings.infantry_alert_light_tech)
                 {

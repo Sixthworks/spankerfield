@@ -88,7 +88,7 @@ namespace plugins
 
     void draw_eye_tracer(ClientSoldierEntity* soldier, const ImColor& color, float distance, float thickness = 1.0f)
     {
-        if (!IsValidPtrWithVTable(soldier))
+        if (!IsValidPtr(soldier))
             return;
             
         // Get position of the head
@@ -136,15 +136,15 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtrWithVTable(local_player)) return;
+        if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtrWithVTable(local_soldier)) return;
+        if (!IsValidPtr(local_soldier)) return;
 
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             const auto player = player_manager->m_ppPlayers[i];
-            if (!IsValidPtrWithVTable(player) || player == local_player)
+            if (!IsValidPtr(player) || player == local_player)
                 continue;
 
             // Player status
@@ -160,7 +160,7 @@ namespace plugins
                 continue;
 
             const auto soldier = player->GetSoldier();
-            if (!IsValidPtrWithVTable(soldier) || !soldier->IsAlive()) continue;
+            if (!IsValidPtr(soldier) || !soldier->IsAlive()) continue;
 
             TransformAABBStruct transform = get_transform(player);
             TransformAABBStruct local_transform = get_transform(local_player);
@@ -187,13 +187,13 @@ namespace plugins
             float distance = get_distance(pos, local_pos);
 
             ClientVehicleEntity* vehicle = player->GetVehicle();
-            if (IsValidPtrWithVTable(vehicle) && !g_settings.esp_draw_vehicles)
+            if (IsValidPtr(vehicle) && !g_settings.esp_draw_vehicles)
                 continue;
 
             float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
-            if (IsValidPtrWithVTable(vehicle))
+            if (IsValidPtr(vehicle))
             {
-                if (IsValidPtrWithVTable(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
+                if (IsValidPtr(vehicle->m_pHealthComp) && vehicle->m_pHealthComp->m_VehicleHealth)
                     health_vehicle = vehicle->m_pHealthComp->m_VehicleHealth;
 
                 const auto data = get_vehicle_data(vehicle);
@@ -213,8 +213,8 @@ namespace plugins
             {
                 float box_width = box_coords[1].x - box_coords[0].x;
                 float box_height = box_coords[1].y - box_coords[0].y;
-                float health = IsValidPtrWithVTable(vehicle) ? health_vehicle : health_player;
-                float max_health = IsValidPtrWithVTable(vehicle) ? max_health_vehicle : max_health_player;
+                float health = IsValidPtr(vehicle) ? health_vehicle : health_player;
+                float max_health = IsValidPtr(vehicle) ? max_health_vehicle : max_health_player;
 
                 if (g_settings.esp_draw_3d_box)
                 {
@@ -224,12 +224,12 @@ namespace plugins
                     else if (teammate)
                         box_color = g_settings.esp_teammate_color;
                     else
-                        box_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
+                        box_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
                     
                     draw_3d_box(transform, box_color, g_settings.esp_3d_box_thickness);
                 }
                 
-                if (g_settings.esp_draw_eye_tracer && IsValidPtrWithVTable(soldier))
+                if (g_settings.esp_draw_eye_tracer && IsValidPtr(soldier))
                 {
                     ImColor tracer_color;
                     if (is_friend && !g_settings.esp_friend_color_to_tag)
@@ -253,14 +253,14 @@ namespace plugins
                     else if (teammate)
                         box_color = g_settings.esp_teammate_color;
                     else
-                        box_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
+                        box_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
 
                     m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
                 }
 
                 if (g_settings.esp_draw_line)
                 {
-                    ImColor line_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
+                    ImColor line_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
                     ImVec2 box_center = ImVec2(box_coords[0].x + box_width / 2.0f, box_coords[0].y + box_height / 2.0f);
                     ImVec2 drawing_from = ImVec2((float)g_globals.g_width / 2.0f, (float)g_globals.g_height / 2.0f);
 
@@ -333,7 +333,7 @@ namespace plugins
                     }
                 }
 
-                bool allow_text = !IsValidPtrWithVTable(vehicle) || player->m_AttachedEntryId == 0;
+                bool allow_text = !IsValidPtr(vehicle) || player->m_AttachedEntryId == 0;
 
                 if (allow_text)
                 {
@@ -354,7 +354,7 @@ namespace plugins
                     else if (teammate)
                         text_color = g_settings.esp_teammate_color;
                     else
-                        text_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
+                        text_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
 
                     float x = box_coords[1].x + 3.5f;
                     float y = box_coords[0].y - 3.f;
@@ -434,7 +434,7 @@ namespace plugins
                         else if (teammate)
                             skeleton_color = g_settings.esp_teammate_color;
                         else
-                            skeleton_color = (IsValidPtrWithVTable(soldier) && soldier->m_Occluded) ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
+                            skeleton_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
 
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);

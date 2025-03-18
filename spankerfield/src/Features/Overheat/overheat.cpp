@@ -16,13 +16,13 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		const auto vehicle = local_player->GetVehicle();
-		if (!IsValidPtrWithVTable(vehicle)) return;
+		if (!IsValidPtr(vehicle)) return;
 
 		const auto weapon = WeaponFiring::GetInstance();
-		if (!IsValidPtrWithVTable(weapon)) return;
+		if (!IsValidPtr(weapon)) return;
 
 		if (weapon->m_FirstSlotBullets != -1) return;
 

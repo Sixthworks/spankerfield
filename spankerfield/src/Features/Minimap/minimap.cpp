@@ -8,6 +8,7 @@ using namespace big;
 namespace plugins
 {
 	static ULONGLONG last_check = 0;
+	static bool is_running = false;
 
 	void spot_minimap()
 	{
@@ -20,7 +21,7 @@ namespace plugins
 				g_thread_pool->push([&]
 				{
 				    // Check if any recording software is running
-                    g_globals.g_obs = is_any_recording_software_running();
+					is_running = is_any_recording_software_running();
 				});
 
 				last_check = GetTickCount64();
@@ -34,7 +35,7 @@ namespace plugins
 		if (!player_manager) return;
 
 		const auto local_player = player_manager->m_pLocalPlayer;
-		if (!IsValidPtrWithVTable(local_player)) return;
+		if (!IsValidPtr(local_player)) return;
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -42,11 +43,11 @@ namespace plugins
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (g_globals.g_obs && dis(gen) < 0.7)
+			if (is_running && dis(gen) < 0.7)
 				continue;
 
 			const auto player = player_manager->m_ppPlayers[i];
-			if (!IsValidPtrWithVTable(player))
+			if (!IsValidPtr(player))
 				continue;
 
 			if (player == local_player)
@@ -56,7 +57,7 @@ namespace plugins
 				continue;
 
 			const auto vehicle = player->GetVehicle();
-			if (IsValidPtrWithVTable(vehicle))
+			if (IsValidPtr(vehicle))
 			{
 				const auto components = vehicle->m_pComponents;
 				if (!IsValidPtr(components)) continue;
@@ -68,7 +69,7 @@ namespace plugins
 			else
 			{
 				const auto soldier = player->GetSoldier();
-				if (!IsValidPtrWithVTable(soldier)) continue;
+				if (!IsValidPtr(soldier)) continue;
 
 				if (!soldier->IsAlive()) continue;
 

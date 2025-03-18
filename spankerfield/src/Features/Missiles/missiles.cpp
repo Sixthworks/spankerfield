@@ -18,10 +18,10 @@ namespace plugins
         if (!player_manager) return;
 
         const auto local_player = player_manager->m_pLocalPlayer;
-        if (!IsValidPtrWithVTable(local_player)) return;
+        if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtrWithVTable(local_soldier) || !local_soldier->IsAlive()) return;
+        if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
 
         if (!class_info.MissileEntity)
         {
@@ -42,7 +42,7 @@ namespace plugins
         do
         {
             auto* missile = missiles.front()->getObject();
-            if (!IsValidPtrWithVTable(missile)) continue;
+            if (!IsValidPtr(missile)) continue;
 
             if (missile->m_pOwner.GetData() == local_player)
             {
@@ -51,7 +51,7 @@ namespace plugins
             }
         } while (missiles.next());
 
-        if (!IsValidPtrWithVTable(local_missile)) return;
+        if (!IsValidPtr(local_missile)) return;
 
         const auto data = local_missile->m_pMissileEntityData;
         if (!IsValidPtrWithVTable(data)) return;
@@ -61,7 +61,7 @@ namespace plugins
         if (!data->IsLaserGuided()) return;
 
         ClientControllableEntity* missile_controllable = (ClientControllableEntity*)local_missile;
-        if (!IsValidPtrWithVTable(missile_controllable)) return;
+        if (!IsValidPtr(missile_controllable)) return;
 
         TransformAABBStruct transform;
         missile_controllable->GetAABB(&transform);
