@@ -290,10 +290,7 @@ namespace big
 		for (const auto& process_name : rtss_names)
 		{
 			if (is_process_running(xorstr_(process_name.c_str())))
-			{
-				if (is_process_running(xorstr_(process_name.c_str())))
-					return true;
-			}
+				return true;
 		}
 
 		return false;
