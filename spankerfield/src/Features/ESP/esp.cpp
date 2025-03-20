@@ -187,12 +187,12 @@ namespace plugins
             float distance = get_distance(pos, local_pos);
 
             ClientVehicleEntity* vehicle = player->GetVehicle();
-            if (IsValidPtr(vehicle) && !g_settings.esp_draw_vehicles)
+            if (vehicle && !g_settings.esp_draw_vehicles)
                 continue;
 
             // https://www.unknowncheats.me/forum/battlefield-4-a/296540-vehicle-visibility-checks.html
             // You can do vehicle occlusion yourself, I will not be implementing it
-            bool occluded = IsValidPtr(soldier) && !vehicle && soldier->m_Occluded;
+            bool occluded = vehicle || (IsValidPtr(soldier) && soldier->m_Occluded);
 
             float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
             if (IsValidPtr(vehicle))
