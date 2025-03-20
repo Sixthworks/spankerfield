@@ -316,11 +316,11 @@ namespace big
 		return false;
 	}
 
-	void render_hotkey_selector(const char* name, int* pkey, float width, bool restricted)
+	void render_hotkey_selector(const char* title, int* pkey, float width, bool restricted)
 	{
 		const std::map<int, std::string>& key_source = restricted ? open_key_map : key_map;
 
-		ImGui::Text(xorstr_("%s"), name);
+		ImGui::Text(xorstr_("%s"), title);
 
 		ImGui::PushItemWidth(width);
 
@@ -329,7 +329,7 @@ namespace big
 		if (it != key_source.end())
 			current_item = it->second.c_str();
 
-		if (ImGui::BeginCombo(name, current_item))
+		if (ImGui::BeginCombo(fmt::format(xorstr_("Key##{}"), title).c_str(), current_item))
 		{
 			for (const auto& [key, name] : key_source)
 			{
