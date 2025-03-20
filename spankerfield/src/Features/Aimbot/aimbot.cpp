@@ -45,11 +45,11 @@ namespace big
 			return result;
 
 		const auto firing = weapon_firing->m_pPrimaryFire;
-		if (!IsValidPtr(firing))
+		if (!IsValidPtr(firing) || (uintptr_t)firing == 0x10F00000030)
 			return result;
 
 		const auto firing_data = firing->m_FiringData;
-		if (!IsValidPtrWithVTable(firing_data))
+		if (!IsValidPtrWithVTable(firing_data) || (uintptr_t)(firing_data) == 0x3893E06)
 			return result;
 
 		Vector4 spawn_offset_4 = firing_data->m_ShotConfigData.m_PositionOffset;
@@ -58,7 +58,7 @@ namespace big
 		Vector3 initial_speed = Vector3(initial_speed_4.x, initial_speed_4.y, initial_speed_4.z);
 
 		const auto bullet = firing_data->m_ShotConfigData.m_ProjectileData;
-		if (!IsValidPtr(bullet))
+		if (!IsValidPtrWithVTable(bullet))
 			return result;
 
 		float gravity = bullet->m_Gravity;
@@ -330,9 +330,7 @@ namespace big
 					}
 				}
 				else
-				{
 					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
-				}
 			}
 			else
 			{
@@ -368,9 +366,7 @@ namespace big
 					}
 				}
 				else
-				{
 					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
-				}
 			}
 
 			if (!got_bone)
@@ -481,13 +477,16 @@ namespace plugins
 		if (!local_soldier->IsAlive()) return;
 
 		const auto weapon_component = local_soldier->m_pWeaponComponent;
-		if (!weapon_component) return;
+		if (!IsValidPtr(weapon_component)) return;
 
 		const auto weapon = weapon_component->GetActiveSoldierWeapon();
-		if (!weapon) return;
+		if (!IsValidPtr(weapon)) return;
+
+		const auto client_weapon = weapon->m_pWeapon;
+		if (!IsValidPtr(client_weapon)) return;
 
 		const auto primary_fire = weapon->m_pPrimary;
-		if (!primary_fire) return;
+		if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030) return;
 
 		if (g_settings.aim_must_not_reload)
 		{
@@ -505,12 +504,12 @@ namespace plugins
 		}
 
 		const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
-		if (!aiming_simulation) return;
+		if (!IsValidPtr(aiming_simulation)) return;
 
 		const auto aim_assist = aiming_simulation->m_pFPSAimer;
-		if (!aim_assist) return;
+		if (!IsValidPtr(aim_assist)) return;
 
-		Matrix shoot_space = weapon->m_pWeapon->m_ShootSpace;
+		Matrix shoot_space = client_weapon->m_ShootSpace;
 
 		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
 		if (!IsValidPtr(target.m_Player)) return;

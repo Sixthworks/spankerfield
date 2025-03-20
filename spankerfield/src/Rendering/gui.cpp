@@ -330,14 +330,14 @@ namespace big
 						else
 						{
 							const auto primary_fire = weapon_firing->m_pPrimaryFire;
-							if (!IsValidPtr(primary_fire))
+							if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030)
 							{
 								ImGui::Text(xorstr_("Primary fire not found - you are not in world or address is invalid."));
 							}
 							else
 							{
 								const auto data = primary_fire->m_FiringData;
-								if (!IsValidPtrWithVTable(data))
+								if (!IsValidPtrWithVTable(data)  || (uintptr_t)(data) == 0x3893E06)
 								{
 									ImGui::Text(xorstr_("Firing data not found - you are not in world or address is invalid."));
 								}

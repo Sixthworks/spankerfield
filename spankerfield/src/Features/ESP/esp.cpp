@@ -190,6 +190,10 @@ namespace plugins
             if (IsValidPtr(vehicle) && !g_settings.esp_draw_vehicles)
                 continue;
 
+            // https://www.unknowncheats.me/forum/battlefield-4-a/296540-vehicle-visibility-checks.html
+            // You can do vehicle occlusion yourself, I will not be implementing it
+            bool occluded = IsValidPtr(soldier) && !vehicle && soldier->m_Occluded;
+
             float health_player = 0.f, max_health_player = 0.f, health_vehicle = 0.f, max_health_vehicle = 0.f;
             if (IsValidPtr(vehicle))
             {
@@ -224,7 +228,7 @@ namespace plugins
                     else if (teammate)
                         box_color = g_settings.esp_teammate_color;
                     else
-                        box_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
+                        box_color = occluded ? g_settings.esp_3d_box_color_occluded : g_settings.esp_3d_box_color;
                     
                     draw_3d_box(transform, box_color, g_settings.esp_3d_box_thickness);
                 }
@@ -237,7 +241,7 @@ namespace plugins
                     else if (teammate)
                         tracer_color = g_settings.esp_teammate_color;
                     else
-                        tracer_color = soldier->m_Occluded ? g_settings.esp_eye_tracer_color_occluded : g_settings.esp_eye_tracer_color;
+                        tracer_color = occluded ? g_settings.esp_eye_tracer_color_occluded : g_settings.esp_eye_tracer_color;
 
                     draw_eye_tracer(soldier, tracer_color, g_settings.esp_eye_tracer_distance, g_settings.esp_eye_tracer_thickness);
                 }
@@ -253,14 +257,14 @@ namespace plugins
                     else if (teammate)
                         box_color = g_settings.esp_teammate_color;
                     else
-                        box_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
+                        box_color = occluded ? g_settings.esp_box_color_occluded : g_settings.esp_box_color;
 
                     m_drawing->DrawEspBox(g_settings.esp_box_style, box_coords[0].x, box_coords[0].y, box_coords[1].x - box_coords[0].x, box_coords[1].y - box_coords[0].y, box_color.Value.x, box_color.Value.y, box_color.Value.z, box_color.Value.w);
                 }
 
                 if (g_settings.esp_draw_line)
                 {
-                    ImColor line_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
+                    ImColor line_color = occluded ? g_settings.esp_line_color_occluded : g_settings.esp_line_color;
                     ImVec2 box_center = ImVec2(box_coords[0].x + box_width / 2.0f, box_coords[0].y + box_height / 2.0f);
                     ImVec2 drawing_from = ImVec2((float)g_globals.g_width / 2.0f, (float)g_globals.g_height / 2.0f);
 
@@ -354,7 +358,7 @@ namespace plugins
                     else if (teammate)
                         text_color = g_settings.esp_teammate_color;
                     else
-                        text_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.text_color_occluded : g_settings.text_color;
+                        text_color = occluded ? g_settings.text_color_occluded : g_settings.text_color;
 
                     float x = box_coords[1].x + 3.5f;
                     float y = box_coords[0].y - 3.f;
@@ -434,7 +438,7 @@ namespace plugins
                         else if (teammate)
                             skeleton_color = g_settings.esp_teammate_color;
                         else
-                            skeleton_color = (IsValidPtr(soldier) && soldier->m_Occluded) ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
+                            skeleton_color = occluded ? g_settings.skeleton_color_occluded : g_settings.skeleton_color;
 
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Head, UpdatePoseResultData::Neck, dots);
                         draw_bone(skeleton_color, ragdoll_component, UpdatePoseResultData::Neck, UpdatePoseResultData::Spine2, dots);

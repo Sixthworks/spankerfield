@@ -104,7 +104,7 @@ namespace big
 
 				// PBSS uses hkCopySubresourceRegion Direct3D API call which is synchronous, and the oTakeScreenshot call has ended.
 				// ...so that means we can re-draw our visuals back? Well, we shouldn't - just to be extra safe. Default timer for the screenshot is 250ms.
-				auto_yield(std::chrono::milliseconds(g_settings.screenhots_pb_delay));
+				auto_yield(std::chrono::milliseconds(g_settings.screenhots_post_pb_delay));
 
 				// Screenshot is complete
 				pb_screenshot_in_progress.store(false);

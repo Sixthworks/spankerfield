@@ -2,7 +2,14 @@
 
 VehicleData::VehicleType VehicleData::GetVehicleType()
 {
-	return *reinterpret_cast<VehicleData::VehicleType*>((uintptr_t)this + 0xE8);
+	VehicleData::VehicleType placeholder{};
+
+	if (!IsValidPtr(this))
+		return placeholder;
+
+	placeholder = *reinterpret_cast<VehicleData::VehicleType*>((uintptr_t)this + 0xE8);
+
+	return placeholder;
 }
 
 VehicleData::VehicleCategory VehicleData::GetVehicleCategory()
@@ -103,9 +110,12 @@ bool ClientControllableEntity::IsAlive()
 
 WeaponClass WeaponFiring::GetWeaponClass()
 {
-	auto data = reinterpret_cast<WeaponEntityData*>(this->m_weaponComponentData);
-	if (IsValidPtr(data))
-		return data->m_WeaponClass;
+	if (IsValidPtr(this))
+	{
+		auto data = reinterpret_cast<WeaponEntityData*>(this->m_weaponComponentData);
+		if (IsValidPtr(data))
+			return data->m_WeaponClass;
+	}
 
 	return WeaponClass::None;
 }

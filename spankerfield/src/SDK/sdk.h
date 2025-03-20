@@ -2748,6 +2748,9 @@ public:
 	// The original author included a crashing one so I decided to rewrite it
 	bool GetBone(const UpdatePoseResultData::BONES BoneId, Vector3& BoneOut)
 	{
+		if (!IsValidPtr(this))
+			return false;
+
 		__try
 		{
 			AnimationSkeleton* pSkeleton = this->m_AnimationSkeleton;
@@ -2758,6 +2761,7 @@ public:
 				return false;
 
 			UpdatePoseResultData PoseResult = this->m_PoseResultData;
+
 			if (PoseResult.m_ValidTransforms)
 			{
 				QuatTransform* pQuat = PoseResult.m_ActiveWorldTransforms;
@@ -2769,9 +2773,7 @@ public:
 				return true;
 			}
 			else
-			{
 				return false;
-			}
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
