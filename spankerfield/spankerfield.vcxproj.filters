@@ -263,13 +263,13 @@
     <ClInclude Include="src\Rendering\Maps\bone_manager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Maps\key_map.h">
+    <ClInclude Include="src\Utilities\key_map.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\Maps\nicknames.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Utils\Tooltip.h">
+    <ClInclude Include="src\Utilities\tooltip.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\draw-list.h">

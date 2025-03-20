@@ -12,6 +12,7 @@ namespace big
 		HINSTANCE g_hmodule{};
 
 		Matrix g_viewproj{};
+		POINT g_cursor_coords{};
 		bool g_running{ true };
 		int open_key{ VK_INSERT };
 		int g_width{ 1920 };

@@ -12,6 +12,65 @@
 using namespace big;
 namespace plugins
 {
+	float get_soldier_yaw(ClientPlayer* player)
+	{
+		if (!IsValidPtr(player))
+			return 0.0f;
+
+		const auto soldier = player->GetSoldier();
+		if (!IsValidPtr(soldier) || !soldier->IsAlive())
+			return 0.0f;
+
+		// Get transform
+		TransformAABBStruct transform = get_transform(player);
+
+		// Convert the AABB to SimpleMath Matrix
+		Matrix transform_matrix(
+			transform.Transform.m[0][0], transform.Transform.m[0][1], transform.Transform.m[0][2], transform.Transform.m[0][3],
+			transform.Transform.m[1][0], transform.Transform.m[1][1], transform.Transform.m[1][2], transform.Transform.m[1][3],
+			transform.Transform.m[2][0], transform.Transform.m[2][1], transform.Transform.m[2][2], transform.Transform.m[2][3],
+			transform.Transform.m[3][0], transform.Transform.m[3][1], transform.Transform.m[3][2], transform.Transform.m[3][3]
+		);
+
+		// Extract forward vector (Z axis in DirectX)
+		Vector3 forward = transform_matrix.Forward();
+
+		// Calculate yaw from forward vector (in XZ plane)
+		float yaw = atan2f(forward.x, forward.z);
+
+		return yaw;
+	}
+
+	float get_vehicle_yaw(ClientVehicleEntity* vehicle)
+	{
+		if (!IsValidPtr(vehicle))
+			return 0.0f;
+
+		// Get vehicle transform
+		Matrix vehicleTransform;
+		vehicle->GetTransform(&vehicleTransform);
+
+		// Extract forward vector
+		Vector3 forward = vehicleTransform.Forward();
+
+		// Calculate yaw from forward vector (in XZ plane)
+		float yaw = atan2f(forward.x, forward.z);
+
+		return yaw;
+	}
+
+	float get_reliable_yaw(ClientPlayer* player)
+	{
+		if (!IsValidPtr(player))
+			return 0.0f;
+
+		// Vehicle
+		const auto vehicle = player->GetVehicle();
+
+		// Universal
+		return IsValidPtr(vehicle) ? get_vehicle_yaw(vehicle) : get_soldier_yaw(player);
+	}
+
 	void draw_radar()
 	{
 		if (!g_settings.radar) return;
@@ -33,14 +92,8 @@ namespace plugins
 		const auto component = local_soldier->m_pWeaponComponent;
 		if (!component) return;
 
-		const auto weapon = component->GetActiveSoldierWeapon();
-		if (!weapon) return;
-
-		const auto aiming = weapon->m_pAuthoritativeAiming;
-		if (!aiming) return;
-		
-		const auto yaw = aiming->m_Yaw;
-		if (!yaw) return;
+		// Negative yaw
+		float player_yaw = -get_reliable_yaw(local_player);
 
 		// Radar positions
 		ImVec2 center(g_settings.radar_x + g_settings.radar_width / 2.0f, g_settings.radar_y + g_settings.radar_height / 2.0f);
@@ -114,18 +167,17 @@ namespace plugins
 			Vector3 pos = (Vector3)transform.Transform.m[3];
 
 			float distance = get_distance(pos, local_pos);
-			double angle = -(double)yaw;
+			double angle = (double)player_yaw;
 
 			float difference_z = local_pos.z - pos.z;
 			float difference_x = local_pos.x - pos.x;
 
-			// Scale distances to fit within the radar
 			float scale_factor = radius / g_settings.radar_distance;
 			float scaled_x = difference_x * scale_factor;
 			float scaled_z = difference_z * scale_factor;
 
-			float x = scaled_x * (float)cos(angle) - scaled_z * (float)sin(angle);
-			float y = scaled_x * (float)sin(angle) + scaled_z * (float)cos(angle);
+			float x = -scaled_z * (float)sin(angle) - scaled_x * (float)cos(angle);
+			float y = -scaled_z * (float)cos(angle) + scaled_x * (float)sin(angle);
 
 			x += center.x;
 			y += center.y;

@@ -1,13 +1,12 @@
 #include "gui.h"
 #include "renderer.h"
 #include "Maps/bone_manager.h"
-#include "Maps/key_map.h"
 #include "../common.h"
 #include "../global.h"
 #include "../settings.h"
 #include "../Features/main.h"
 #include "../Utilities/other.h"
-#include "Utils/Tooltip.h"
+#include "../Utilities/tooltip.h"
 
 namespace big
 {
@@ -143,7 +142,7 @@ namespace big
 					ImGui::Separator();
 				}
 
-				ImGui::Text(xorstr_("Aim key"));
+				render_hotkey_selector(xorstr_("Aim key"), &g_settings.aim_key, 300.f, false);
 
 				// Controller support
 				if (is_controller_connected())
@@ -154,29 +153,6 @@ namespace big
 
 					ImGui::Spacing();
 				}
-
-				ImGui::PushItemWidth(300.f);
-
-				const char* current_item = xorstr_("Select a key");
-				auto it = key_map.find(g_settings.aim_key);
-				if (it != key_map.end())
-					current_item = it->second.c_str();
-
-				if (ImGui::BeginCombo(xorstr_("##Aimbot"), current_item))
-				{
-					for (const auto& [key, name] : key_map)
-					{
-						bool is_selected = (g_settings.aim_key == key);
-						if (ImGui::Selectable(name.c_str(), is_selected))
-							g_settings.aim_key = key;
-
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
-
-				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 				
@@ -242,7 +218,7 @@ namespace big
 				{
 					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script."));
 
-					ImGui::Checkbox(xorstr_("C4 Bot"), &g_settings.c4_bot);
+					ImGui::Checkbox(xorstr_("C4 Bot##C4"), &g_settings.c4_bot);
 					ImGui::Checkbox(xorstr_("Always active"), &g_settings.c4_bot_always_active);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("This will make the C4 Bot always active, even when not using a C4"));
@@ -273,29 +249,7 @@ namespace big
 					ImGui::PopItemWidth();
 
 					// Hotkey dropdown
-					ImGui::Text(xorstr_("Detonate hotkey:"));
-
-					ImGui::PushItemWidth(300.f);
-
-					const char* current_item = xorstr_("Select a key");
-					auto it = key_map.find(g_settings.c4_bot_key);
-					if (it != key_map.end())
-						current_item = it->second.c_str();
-
-					if (ImGui::BeginCombo(xorstr_("##C4DetonateKey"), current_item))
-					{
-						for (const auto& [key, name] : key_map)
-						{
-							bool is_selected = (g_settings.c4_bot_key == key);
-							if (ImGui::Selectable(name.c_str(), is_selected))
-								g_settings.c4_bot_key = key;
-							if (is_selected)
-								ImGui::SetItemDefaultFocus();
-						}
-						ImGui::EndCombo();
-					}
-
-					ImGui::PopItemWidth();
+					render_hotkey_selector(xorstr_("Detonation key"), &g_settings.c4_bot_key, 300.f, false);
 
 					ImGui::Spacing();
 
@@ -1111,29 +1065,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Open menu key"));
-
-				ImGui::PushItemWidth(200.f);
-
-				const char* current_item = xorstr_("Select a key");
-				auto it = open_key_map.find(g_globals.open_key);
-				if (it != open_key_map.end())
-					current_item = it->second.c_str();
-
-				if (ImGui::BeginCombo(xorstr_("##OpenKey"), current_item))
-				{
-					for (const auto& [key, name] : open_key_map)
-					{
-						bool is_selected = (g_globals.open_key == key);
-						if (ImGui::Selectable(name.c_str(), is_selected))
-							g_globals.open_key = key;
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
-
-				ImGui::PopItemWidth();
+				render_hotkey_selector(xorstr_("Open key"), &g_globals.open_key, 300.f, true);
 
 				ImGui::SameLine();
 

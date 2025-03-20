@@ -1,6 +1,6 @@
 #include "other.h"
+#include "key_map.h"
 #include "../global.h"
-#include <tchar.h>
 
 namespace big
 {
@@ -314,5 +314,34 @@ namespace big
 		}
 
 		return false;
+	}
+
+	void render_hotkey_selector(const char* name, int* pkey, float width, bool restricted)
+	{
+		const std::map<int, std::string>& key_source = restricted ? open_key_map : key_map;
+
+		ImGui::Text(xorstr_("%s"), name);
+
+		ImGui::PushItemWidth(width);
+
+		const char* current_item = xorstr_("Select a key");
+		auto it = key_source.find(*pkey);
+		if (it != key_source.end())
+			current_item = it->second.c_str();
+
+		if (ImGui::BeginCombo(name, current_item))
+		{
+			for (const auto& [key, name] : key_source)
+			{
+				bool is_selected = (*pkey == key);
+				if (ImGui::Selectable(name.c_str(), is_selected))
+					*pkey = key;
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::PopItemWidth();
 	}
 }

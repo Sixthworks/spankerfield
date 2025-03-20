@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common.h"
+#include "../common.h"
 
 std::map<int, std::string> key_map =
 {
@@ -50,7 +50,16 @@ std::map<int, std::string> key_map =
     // Additional useful keys
     { VK_RETURN, xorstr_("Enter") },
     { VK_DELETE, xorstr_("Delete") },
-    { VK_END, xorstr_("End") }
+    { VK_END, xorstr_("End") },
+    { VK_NEXT, xorstr_("Page Down") },
+    { VK_F5, xorstr_("F5") },
+    { VK_F6, xorstr_("F6") },
+    { VK_F7, xorstr_("F7") },
+    { VK_F8, xorstr_("F8") },
+    { VK_F9, xorstr_("F9") },
+    { VK_F10, xorstr_("F10") },
+    { VK_F11, xorstr_("F11") },
+    { VK_F12, xorstr_("F12") }
 };
 
 std::map<int, std::string> open_key_map =
@@ -63,5 +72,14 @@ std::map<int, std::string> open_key_map =
     { VK_NEXT, xorstr_("Page Down") },
     { VK_F1, xorstr_("F1") },
     { VK_F2, xorstr_("F2") },
-    { VK_F3, xorstr_("F3") }
+    { VK_F3, xorstr_("F3") },
+    { VK_F4, xorstr_("F4") },
+    { VK_F5, xorstr_("F5") },
+    { VK_F6, xorstr_("F6") },
+    { VK_F7, xorstr_("F7") },
+    { VK_F8, xorstr_("F8") },
+    { VK_F9, xorstr_("F9") },
+    { VK_F10, xorstr_("F10") },
+    { VK_F11, xorstr_("F11") },
+    { VK_F12, xorstr_("F12") }
 };

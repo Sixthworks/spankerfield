@@ -1,6 +1,6 @@
 #pragma once
 #include "../SDK/sdk.h"
-#include "../ImGui/imgui.h"
+#include <ImGui/imgui.h>
 
 namespace big
 {
@@ -32,4 +32,6 @@ namespace big
 
 	bool is_rivatuner_running();
 	bool has_rivatuner_hooking_zero(const std::filesystem::path& config_path);
+
+	void render_hotkey_selector(const char* name, int* pkey, float width, bool restricted);
 }

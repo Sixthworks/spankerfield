@@ -14,8 +14,6 @@
 // This float was manually tuned
 #define CLOSE_TARGET_DIST_FLOAT 6.55f
 
-using namespace big;
-
 namespace big
 {
 	AimbotPredictor::PredictionResult AimbotPredictor::PredictTarget(
@@ -450,6 +448,8 @@ namespace big
 		return distance_from_center.Length();
 	}
 }
+
+using namespace big;
 
 namespace plugins
 {

@@ -227,10 +227,10 @@
     <ClInclude Include="src\Rendering\font.h" />
     <ClInclude Include="src\Rendering\gui.h" />
     <ClInclude Include="src\Rendering\Maps\bone_manager.h" />
-    <ClInclude Include="src\Rendering\Maps\key_map.h" />
+    <ClInclude Include="src\Utilities\key_map.h" />
     <ClInclude Include="src\Rendering\Maps\nicknames.h" />
     <ClInclude Include="src\Rendering\renderer.h" />
-    <ClInclude Include="src\Rendering\Utils\Tooltip.h" />
+    <ClInclude Include="src\Utilities\tooltip.h" />
     <ClInclude Include="src\SDK\class_info.h" />
     <ClInclude Include="src\SDK\sdk.h" />
     <ClInclude Include="src\SDK\type_info.h" />

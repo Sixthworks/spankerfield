@@ -296,10 +296,10 @@ namespace big
 						g_renderer->post_reset();
 					}
 
-					return false;
+					return 0;
 				case WM_SYSCOMMAND:
 					if ((wparam & 0xfff0) == SC_KEYMENU)
-						return false;
+						return 0;
 
 					break;
 				}
@@ -308,7 +308,7 @@ namespace big
 				{
 					switch (msg)
 					{
-					case WM_MOUSEMOVE: return false;
+					case WM_MOUSEMOVE: return 0;
 					default:
 						break;
 					}
