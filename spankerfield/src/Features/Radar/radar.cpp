@@ -89,9 +89,6 @@ namespace plugins
 
 		if (!local_soldier->IsAlive()) return;
 
-		const auto component = local_soldier->m_pWeaponComponent;
-		if (!component) return;
-
 		// Negative yaw
 		float player_yaw = -get_reliable_yaw(local_player);
 
