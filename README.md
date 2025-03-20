@@ -59,7 +59,7 @@
 - Configuration Properties -> Advanced -> `Character Set: Use Unicode Character Set`
 - C/C++ -> Preprocessor -> Preprocessor Definitions: `_CRT_SECURE_NO_WARNINGS`
 - C/C++ -> Precompiled Headers -> Precompiled Header File: `common.h`
-- C/C++ -> General Additional Include Directories: `$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)`
+- C/C++ -> General -> Additional Include Directories: `$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)`
 - Linker -> Input -> Additional Dependencies: ```fmt.lib
 DirectXTK.lib
 freetype.lib
