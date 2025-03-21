@@ -338,20 +338,8 @@ namespace plugins
                 }
 
                 bool allow_text = !IsValidPtr(vehicle) || player->m_AttachedEntryId == 0;
-
                 if (allow_text)
                 {
-                    // Better approach than what spankerfield had before
-                    auto draw_esp_text = [&](float& x, float& y, const char* text, ImColor color, bool condition)
-                    {
-                        if (condition)
-                        {
-                            m_drawing->AddText(x, y, color, 14.f, FL_NONE, text);
-                            y += g_settings.esp_text_spacing;
-                        }
-                    };
-
-                    // Drawing part
                     ImColor text_color;
                     if (is_friend && !g_settings.esp_friend_color_to_tag)
                         text_color = g_settings.esp_friend_color;
@@ -360,17 +348,62 @@ namespace plugins
                     else
                         text_color = occluded ? g_settings.text_color_occluded : g_settings.text_color;
 
-                    float x = box_coords[1].x + 3.5f;
-                    float y = box_coords[0].y - 3.f;
+                    // Calculate position for text elements
+                    float x, y;
+                    int text_flags = FL_SHADOW;
 
-                    // Adjustment to work with the right side health bar properly
-                    if (g_settings.esp_draw_health && g_settings.esp_health_location == 3)
-                        x += 9.0f;
+                    // Count total text elements
+                    const std::vector<bool> text_elements =
+                    {
+                        g_settings.esp_draw_name,
+                        g_settings.esp_draw_distance,
+                        is_friend && g_settings.esp_friend_color_to_tag,
+                        g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle)
+                    };
 
-                    draw_esp_text(x, y, nickname, text_color, g_settings.esp_draw_name);
-                    draw_esp_text(x, y, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color, g_settings.esp_draw_distance);
-                    draw_esp_text(x, y, xorstr_("FRND"), g_settings.esp_friend_color, is_friend && g_settings.esp_friend_color_to_tag);
-                    draw_esp_text(x, y, xorstr_("VEH"), g_settings.esp_additional_tags_color, g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle));
+                    __int64 text_count = std::count(text_elements.begin(), text_elements.end(), true);
+                    float total_height = text_count * g_settings.esp_text_spacing;
+
+                    // Set position based on configuration (0 = right, 1 = top, 2 = bottom)
+                    switch (g_settings.esp_text_position)
+                    {
+                    case 1: // Top
+                        x = box_coords[0].x + (box_coords[1].x - box_coords[0].x) / 2.f;
+                        y = box_coords[0].y - total_height - 9.5f;
+                        text_flags = FL_CENTER_X | FL_SHADOW;
+
+                        break;
+                    case 2: // Bottom
+                        x = box_coords[0].x + (box_coords[1].x - box_coords[0].x) / 2.f;
+                        y = box_coords[1].y + 2.5f;
+                        text_flags = FL_CENTER_X | FL_SHADOW;
+
+                        break;
+                    default: // Right (0)
+                        x = box_coords[1].x + 3.5f;
+                        y = box_coords[0].y - 3.f;
+
+                        if (g_settings.esp_draw_health && g_settings.esp_health_location == 3)
+                            x += 9.0f;
+
+                        break;
+                    }
+
+                    // Helper function to draw text if condition is met
+                    auto draw_text_if = [&](bool condition, const char* text, const ImColor& color)
+                    {
+                        if (condition)
+                        {
+                            m_drawing->AddText(x, y, color, 14.f, text_flags, text);
+                            y += g_settings.esp_text_spacing;
+                        }
+                    };
+
+                    // Draw text elements using the helper function
+                    draw_text_if(g_settings.esp_draw_name, nickname, text_color);
+                    draw_text_if(g_settings.esp_draw_distance, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color);
+                    draw_text_if(is_friend && g_settings.esp_friend_color_to_tag, xorstr_("FRND"), g_settings.esp_friend_color);
+                    draw_text_if(g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle), xorstr_("VEH"), g_settings.esp_additional_tags_color);
                 }
 
                 // Aim Point, credit VincentVega

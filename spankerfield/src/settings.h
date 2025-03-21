@@ -8,6 +8,8 @@ namespace big
 	class settings
 	{
 	public:
+		bool use_cheap_text; // DebugRenderer2 text instead of ImGui text
+
 		bool blacklist{ true };
 		ImColor blacklist_color{ 255, 0, 0, 255 };
 		float blacklist_text_size{ 26.f };
@@ -106,7 +108,8 @@ namespace big
 		bool esp_draw_name{ false };
 		bool esp_draw_distance{ false };
 		bool esp_draw_vehicle_tag{ true };
-		float esp_text_spacing{ 10.f };
+		float esp_text_spacing{ 10.8f };
+		int esp_text_position{ 0 };
 		ImColor text_color_occluded{ 255, 255, 255, 255 };
 		ImColor text_color{ 255, 0, 0, 255 };
 
@@ -243,6 +246,8 @@ namespace big
 
 		void from_json(const nlohmann::json& j)
 		{
+			g_settings.use_cheap_text = j[xorstr_("settings")][xorstr_("use_cheap_text")];
+
 			g_settings.blacklist = j[xorstr_("settings")][xorstr_("blacklist")];
 			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
 			g_settings.blacklist_text_size = j[xorstr_("settings")][xorstr_("blacklist_text_size")];
@@ -338,6 +343,7 @@ namespace big
 			g_settings.esp_draw_distance = j[xorstr_("settings")][xorstr_("esp_draw_distance")];
 			g_settings.esp_draw_vehicle_tag = j[xorstr_("settings")][xorstr_("esp_draw_vehicle_tag")];
 			g_settings.esp_text_spacing = j[xorstr_("settings")][xorstr_("esp_text_spacing")];
+			g_settings.esp_text_position = j[xorstr_("settings")][xorstr_("esp_text_position")];
 
 			g_settings.text_color_occluded = string_to_color(j["settings"]["text_color_occluded"]);
 			g_settings.text_color = string_to_color(j["settings"]["text_color"]);
@@ -453,6 +459,7 @@ namespace big
 				{
 					xorstr_("settings"),
 					{
+			            { xorstr_("use_cheap_text"), g_settings.use_cheap_text },
 						{ xorstr_("blacklist"), g_settings.blacklist },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 						{ xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
@@ -494,6 +501,7 @@ namespace big
 						{ xorstr_("esp_draw_distance"), g_settings.esp_draw_distance },
 						{ xorstr_("esp_draw_vehicle_tag"), g_settings.esp_draw_vehicle_tag },
 						{ xorstr_("esp_text_spacing"), g_settings.esp_text_spacing },
+						{ xorstr_("esp_text_position"), g_settings.esp_text_position },
 						{ xorstr_("text_color_occluded"), color_to_string(g_settings.text_color_occluded) },
 						{ xorstr_("text_color"), color_to_string(g_settings.text_color) },
 						{ xorstr_("skeleton"), g_settings.skeleton },

@@ -116,12 +116,12 @@ namespace plugins
         // Draw watermark if visible or in debug mode
         if (watermark_visible || debug_watermark)
         {
-            m_drawing->AddText((float)current_x_pos, (float)current_y_pos, current_color, current_size, FL_NONE, xorstr_("Spankerfield"));
+            m_drawing->AddText((float)current_x_pos, (float)current_y_pos, current_color, current_size, FL_SHADOW, xorstr_("Spankerfield"));
 
-            m_drawing->AddText((float)current_x_pos, (float)current_y_pos + current_size + 2.f, current_link_color, current_size - 2.f, FL_NONE, xorstr_("nlog.us/donate"));
+            m_drawing->AddText((float)current_x_pos, (float)current_y_pos + current_size + 2.f, current_link_color, current_size - 2.f, FL_SHADOW, xorstr_("nlog.us/donate"));
 
             if (debug_watermark)
-                m_drawing->AddText((float)current_x_pos, (float)current_y_pos + current_size + current_size, ImColor(255, 50, 50, 200), current_size - 4.f, FL_NONE, xorstr_("DEBUG MODE"));
+                m_drawing->AddText((float)current_x_pos, (float)current_y_pos + current_size + current_size, ImColor(255, 50, 50, 200), current_size - 4.f, FL_SHADOW, xorstr_("DEBUG MODE"));
         }
     }
 }

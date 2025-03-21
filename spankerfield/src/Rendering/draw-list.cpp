@@ -1,4 +1,8 @@
 #include "draw-list.h"
+#include "../SDK/sdk.h"
+#include "../settings.h"
+
+using namespace big;
 
 std::unique_ptr<CDrawing>m_drawing = std::make_unique<CDrawing>();
 
@@ -64,53 +68,98 @@ void CDrawing::DrawLines(int x0, int y0, int x1, int y1, int r, int g, int b, in
 	AddLine(ImVec2((float)x0, (float)y0), ImVec2((float)x1, (float)y1), ImColor(r, g, b));
 }
 
-void CDrawing::AddText(float x, float y, const ImColor& color, float fontSize, int flags, const char* format, ...)
+void CDrawing::AddText(float x, float y, const ImColor& color, float font_size, int flags, const char* format, ...)
 {
-	if (!format)
-		return;
+    if (!format)
+        return;
 
-	auto& io = ImGui::GetIO();
-	auto DrawList = ImGui::GetBackgroundDrawList();
-	auto Font = io.FontDefault;
+    // Format the text with variable arguments
+    char sz_buff[256] = { '\0' };
+    va_list vlist = nullptr;
+    va_start(vlist, format);
+    vsprintf_s(sz_buff, format, vlist);
+    va_end(vlist);
 
-	char szBuff[256] = { '\0' };
-	va_list vlist = nullptr;
-	va_start(vlist, format);
-	vsprintf_s(szBuff, format, vlist);
-	va_end(vlist);
+    // Check if we should use the DebugRenderer2 text rendering
+    if (g_settings.use_cheap_text)
+    {
+        // Get DebugRenderer2 instance
+        DebugRenderer2* debug_renderer = DebugRenderer2::GetInstance();
+        if (debug_renderer)
+        {
+            // Calculate position adjustments for centering if needed
+            float text_x = x;
+            float text_y = y;
 
-	DrawList->PushTextureID(io.Fonts->TexID);
+            // Convert ImColor to Color32 for DebugRenderer2
+            // Assuming Color32 is RGBA format with 8-bit per channel
+            Color32 debug_color;
+            debug_color.R = static_cast<unsigned char>(color.Value.x * 255.0f);
+            debug_color.G = static_cast<unsigned char>(color.Value.y * 255.0f);
+            debug_color.B = static_cast<unsigned char>(color.Value.z * 255.0f);
+            debug_color.A = static_cast<unsigned char>(color.Value.w * 255.0f);
 
-	float size_font = fontSize;
+            if (flags & FL_CENTER_X || flags & FL_CENTER_Y)
+            {
+                // For centering, we need to calculate text dimensions
+                // This is an approximation since we don't have direct access to DebugRenderer's font metrics
+                float approx_char_width = font_size * 0.6f; // Approximate width per character
+                float approx_text_width = strlen(sz_buff) * approx_char_width;
+                float approx_text_height = font_size;
 
-	float size = size_font == 0.f ? Font->FontSize : size_font;
-	ImVec2 text_size = Font->CalcTextSizeA(size, FLT_MAX, 0.f, szBuff);
+                if (flags & FL_CENTER_X)
+                    text_x -= approx_text_width / 2.0f;
+                if (flags & FL_CENTER_Y)
+                    text_y -= approx_text_height / 2.0f;
+            }
 
-	ImColor Color = ImColor(0.f, 0.f, 0.f, color.Value.w);
+            // Calculate a better scale factor to match ImGui text size
+            float scale_factor = font_size / 16.0f;
 
-	if (flags & FL_CENTER_X)
-		x -= text_size.x / 2.f;
+            // Draw the text using DebugRenderer2
+            Vector2 screen_pos(text_x, text_y);
+            debug_renderer->drawText(screen_pos, debug_color, sz_buff, scale_factor);
+            return;
+        }
+    }
 
-	if (flags & FL_CENTER_Y)
-		y -= text_size.x / 2.f;
+    // Fallback to original ImGui rendering if DebugRenderer isn't available or disabled
+    auto& io = ImGui::GetIO();
+    auto draw_list = ImGui::GetBackgroundDrawList();
+    
+    auto font = io.FontDefault;
+    draw_list->PushTextureID(io.Fonts->TexID);
+    
+    float size = font_size == 0.f ? font->FontSize : font_size;
+    ImVec2 text_size = font->CalcTextSizeA(size, FLT_MAX, 0.f, sz_buff);
 
+    // Handle centering
+    if (flags & FL_CENTER_X)
+        x -= text_size.x / 2.f;
 
-	DrawList->AddText(Font, size, ImVec2(x + 1.f, y + 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
+    if (flags & FL_CENTER_Y)
+        y -= text_size.y / 2.f;
 
-	/*
-	DrawList->AddText(Font, size, ImVec2(x, y - 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x, y + 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x + 1.f, y), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x - 1.f, y), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
+    // Handle shadow
+    if (flags & FL_SHADOW)
+    {
+        ImColor shadow_color = ImColor(0.f, 0.f, 0.f, color.Value.w);
+        draw_list->AddText(font, size, ImVec2(x + 1.f, y + 1.f), ImGui::ColorConvertFloat4ToU32(shadow_color), sz_buff);
+    }
 
-	DrawList->AddText(Font, size, ImVec2(x - 1.f, y - 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x + 1.f, y - 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x - 1.f, y + 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	DrawList->AddText(Font, size, ImVec2(x + 1.f, y + 1.f), ImGui::ColorConvertFloat4ToU32(Color), szBuff);
-	*/
+    // Handle outline
+    if (flags & FL_OUTLINE)
+    {
+        ImColor outline_color = ImColor(0.f, 0.f, 0.f, color.Value.w);
+        draw_list->AddText(font, size, ImVec2(x - 1.f, y), ImGui::ColorConvertFloat4ToU32(outline_color), sz_buff);
+        draw_list->AddText(font, size, ImVec2(x + 1.f, y), ImGui::ColorConvertFloat4ToU32(outline_color), sz_buff);
+        draw_list->AddText(font, size, ImVec2(x, y - 1.f), ImGui::ColorConvertFloat4ToU32(outline_color), sz_buff);
+        draw_list->AddText(font, size, ImVec2(x, y + 1.f), ImGui::ColorConvertFloat4ToU32(outline_color), sz_buff);
+    }
 
-	DrawList->AddText(Font, size, ImVec2(x, y), ImGui::ColorConvertFloat4ToU32(color), szBuff);
-	DrawList->PopTextureID();
+    // Draw the main text
+    draw_list->AddText(font, size, ImVec2(x, y), ImGui::ColorConvertFloat4ToU32(color), sz_buff);
+    draw_list->PopTextureID();
 }
 
 void CDrawing::DrawBox(float x, float y, float w, float h, const ImColor& color)

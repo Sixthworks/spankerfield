@@ -131,7 +131,7 @@ namespace plugins
 			float offset = 0.f;
 			for (const auto& rs : spectators)
 			{
-				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor(255, 255, 255, 255), 26.f, FL_NONE, rs.c_str());
+				m_drawing->AddText(g_settings.spectator_x, g_settings.spectator_y + offset, ImColor(255, 255, 255, 255), 26.f, FL_SHADOW, rs.c_str());
 				offset += 20.f;
 			}
 		}
@@ -185,7 +185,7 @@ namespace plugins
 				{
 					std::string alert_text = xorstr_("NEW SPECTATOR: ") + it->first;
 					ImVec2 text_size = ImGui::CalcTextSize(alert_text.c_str());
-					m_drawing->AddText((float)g_globals.g_width / 2, y_pos, g_settings.spectator_warnings_color, g_settings.spectator_warnings_size, FL_CENTER_X, alert_text.c_str());
+					m_drawing->AddText((float)g_globals.g_width / 2, y_pos, g_settings.spectator_warnings_color, g_settings.spectator_warnings_size, FL_CENTER_X | FL_SHADOW, alert_text.c_str());
 
 					y_pos += g_settings.spectator_warnings_size * 1.25f;
 				}
@@ -195,7 +195,7 @@ namespace plugins
 			{
 				const char* text = xorstr_("BEING SPECTATED - VISUALS AND AIM DISABLED");
 				ImVec2 text_size = ImGui::CalcTextSize(text);
-				m_drawing->AddText((float)g_globals.g_width / 2.f, y_pos, g_settings.spectator_warnings_color, g_settings.spectator_warnings_size, FL_CENTER_X, text);
+				m_drawing->AddText((float)g_globals.g_width / 2.f, y_pos, g_settings.spectator_warnings_color, g_settings.spectator_warnings_size, FL_CENTER_X | FL_SHADOW, text);
 
 				y_pos += g_settings.spectator_warnings_size * 1.15f;
 			}

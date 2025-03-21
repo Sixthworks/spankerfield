@@ -60,7 +60,7 @@ namespace plugins
 
                     float offset = is_alive ? 150.f : 30.f; // Above gadgets when alive, bottom of the screen when not
 
-                    m_drawing->AddText((float)g_globals.g_width / 2.f, (float)g_globals.g_height - offset, ImColor(255, 0, 0, 255), 25.f, FL_CENTER_X, xorstr_("YOU JUST GOT SCREENSHOTTED!"));
+                    m_drawing->AddText((float)g_globals.g_width / 2.f, (float)g_globals.g_height - offset, ImColor(255, 0, 0, 255), 25.f, FL_CENTER_X | FL_SHADOW, xorstr_("YOU JUST GOT SCREENSHOTTED!"));
                 }
             }
             else
@@ -78,7 +78,7 @@ namespace plugins
                     if (count >= 1)
                     {
                         std::string str = text + std::to_string(count);
-                        m_drawing->AddText(12.f, (float)g_globals.g_height - offset, g_settings.screenshots_color, 25.f, FL_NONE, str.c_str());
+                        m_drawing->AddText(12.f, (float)g_globals.g_height - offset, g_settings.screenshots_color, 25.f, FL_SHADOW, str.c_str());
                         offset += 22.5f;
                     }
                 };

@@ -534,6 +534,7 @@ namespace big
 				ImGui::Text(xorstr_("Text spacing"));
 
 				ImGui::PushItemWidth(300.f);
+				ImGui::SliderInt(xorstr_("Text position"), &g_settings.esp_text_position, 0, 2);
 				ImGui::SliderFloat(xorstr_("Text spacing##ESP"), &g_settings.esp_text_spacing, 0.f, 50.f);
 				ImGui::PopItemWidth();
 
@@ -1044,6 +1045,12 @@ namespace big
 
 				ImGui::Separator();			
 
+				ImGui::Checkbox(xorstr_("Use cheap text"), &g_settings.use_cheap_text);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will use the game's DebugRenderer instead of ImGui to render text outside the menu."));
+
+				ImGui::SameLine();
+
 				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will use fake nicknames in ESP and censor out nicknames in Spectator List."));
@@ -1105,8 +1112,6 @@ namespace big
 
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This function is not safe at all, there is a big chance your game might crash when injecting the cheat again."));
-
-				ImGui::SameLine();
 
 				ImGui::Text(fmt::format(xorstr_("Release rev: {}"), xorstr_(__DATE__)).c_str());
 

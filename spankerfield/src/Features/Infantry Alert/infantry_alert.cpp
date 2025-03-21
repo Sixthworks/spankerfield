@@ -166,7 +166,7 @@ namespace plugins
                     base_y + (i * line_spacing),
                     lines[i].color,
                     g_settings.infantry_alert_text_size * lines[i].size_multiplier,
-                    FL_CENTER_X,
+                    FL_CENTER_X | FL_SHADOW,
                     lines[i].text
                 );
             }

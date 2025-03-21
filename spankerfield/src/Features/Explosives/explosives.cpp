@@ -55,7 +55,7 @@ namespace plugins
             float box_width = box_coords[1].x - box_coords[0].x;
             float box_height = box_coords[1].y - box_coords[0].y;
 
-            m_drawing->AddText(box_coords[0].x + (box_width / 2.f), box_coords[0].y + (box_height / 2.f), g_settings.explosives_color, 0.f, FL_CENTER_X, xorstr_("[#]"));
+            m_drawing->AddText(box_coords[0].x + (box_width / 2.f), box_coords[0].y + (box_height / 2.f), g_settings.explosives_color, 0.f, FL_CENTER_X | FL_SHADOW, xorstr_("[#]"));
         } while (explosives.next());
     }
 }

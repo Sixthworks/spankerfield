@@ -199,7 +199,7 @@ namespace plugins
 					if (nickname != bl.name)
 						request_name_change(bl.name);
 
-					m_drawing->AddText((float)g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, g_settings.blacklist_text_size, FL_CENTER_X, bl.name.c_str());
+					m_drawing->AddText((float)g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, g_settings.blacklist_text_size, FL_CENTER_X | FL_SHADOW, bl.name.c_str());
 					offset += 20.f;
 				}
 			}
