@@ -31,8 +31,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID reserved)
 
 			try
 			{
-				g_config.load();
-				LOG(INFO) << xorstr_("Configuration loaded.");
+				g_config.refresh_configs();
+				g_config.load(xorstr_("default"));
+				LOG(INFO) << xorstr_("Configuration system initialized.");
 
 				renderer_instance = std::make_unique<renderer>();
 				LOG(INFO) << xorstr_("Renderer initialized.");

@@ -173,7 +173,7 @@ namespace big
 					ImGui::Separator();
 				}
 
-				render_hotkey_selector(xorstr_("Aim key"), &g_settings.aim_key, 300.f, false);
+				render_hotkey_selector(xorstr_("Aim key"), &g_settings.aim_key, 200.f, false);
 
 				// Controller support
 				if (is_controller_connected())
@@ -188,9 +188,16 @@ namespace big
 				ImGui::Separator();
 				
 				ImGui::Text(xorstr_("Target Selection"));
-				const char* target_methods[] = { "FOV", "Distance with FOV" };
-				ImGui::Combo(xorstr_("Target selection method##Aimbot"), &g_settings.aim_target_selection, target_methods, IM_ARRAYSIZE(target_methods));
-				
+
+				std::vector<const char*> obfuscated_items;
+				obfuscated_items.push_back(xorstr_("FOV"));
+				obfuscated_items.push_back(xorstr_("Distance with FOV"));
+
+				const char** target_methods = obfuscated_items.data();
+				ImGui::PushItemWidth(300.f);
+				ImGui::Combo(xorstr_("Target selection method##Aimbot"), &g_settings.aim_target_selection, target_methods, (int)obfuscated_items.size());
+				ImGui::PopItemWidth();
+
 				ImGui::Checkbox(xorstr_("Auto aim bone"), &g_settings.aim_auto_bone);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Automatically selects the best bone for shooting (head -> torso -> hips)"));
@@ -280,7 +287,7 @@ namespace big
 					ImGui::PopItemWidth();
 
 					// Hotkey dropdown
-					render_hotkey_selector(xorstr_("Detonation key"), &g_settings.c4_bot_key, 300.f, false);
+					render_hotkey_selector(xorstr_("Detonation key"), &g_settings.c4_bot_key, 200.f, false);
 
 					ImGui::Spacing();
 
@@ -955,10 +962,10 @@ namespace big
 						plugins::delete_from_blacklist(nickname);
 				}
 
-				ImGui::Separator();
+				ImGui::Spacing();
 
 				static char nick[50]{};
-				ImGui::PushItemWidth(300.f);
+				ImGui::PushItemWidth(250.f);
 				ImGui::InputText(xorstr_("Nickname"), nick, IM_ARRAYSIZE(nick));
 				ImGui::PopItemWidth();
 
@@ -989,40 +996,67 @@ namespace big
 				if (g_settings.screenshots)
 					color_wrapper(xorstr_("Text##SC"), &g_settings.screenshots_color);
 
-				ImGui::Checkbox(xorstr_("Disable old PBSS bypass"), &g_settings.screenshots_pb_clean);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This makes the cheat only use the new PBSS cleaning method and ignore the old one."));
-				ImGui::WarningTooltip(xorstr_("It's recommended to not disable it, the old cleaner does not conflict with the new one."));
+				ImGui::Text(xorstr_("PBSS bypass method:"));
+
+				// We can't use xorstr_ in a regular array
+				std::vector<const char*> obfuscated_items;
+				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Temp Disable"));
+				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Clean"));
+
+				// Create an array of const char* pointers to pass to ImGui
+				const char** items_array = obfuscated_items.data();
+
+				// Update current_item based on the actual state of g_settings each frame
+				// This ensures the dropdown always reflects the current settings
+				int current_item = g_settings.screenshots_pb_clean ? 1 : 0;
+
+				ImGui::PushItemWidth(300.f);
+				if (ImGui::Combo(xorstr_("##bypass_method"), &current_item, items_array, (int)obfuscated_items.size()))
+				{
+					g_settings.screenshots_pb_clean = (current_item == 1);
+					g_settings.screenshots_pb_temp_disable = (current_item == 0);
+				}
+				ImGui::PopItemWidth();
 
 				ImGui::SameLine();
 
-				ImGui::Checkbox(xorstr_("Save PBSS to folder"), &g_settings.screenshots_pb_save_to_folder);
+				ImGui::Checkbox(xorstr_("Use both methods simultaneously"), &g_settings.screenshots_pb_use_both);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Saves captured PB screenshots to a folder. AppData\\Roaming\\Spankerfield\\PB Screenshots\\Timestamp.png."));
+					ImGui::SetTooltip(xorstr_("Use both the temp disable and clean PBSS bypass methods for maximum security."));
+				ImGui::WarningTooltip(xorstr_("Using both methods may affect gameplay a bit but provides better protection."));
 
-				if (ImGui::CollapsingHeader("PBSS bypass settings"))
+				ImGui::Spacing();
+
+				if (g_settings.screenshots_pb_clean || g_settings.screenshots_pb_use_both)
 				{
-					ImGui::PushItemWidth(300.f);
+					// Only show the "Save PBSS to folder" option when clean method is active
+					ImGui::Checkbox(xorstr_("Save PBSS to folder"), &g_settings.screenshots_pb_save_to_folder);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Saves captured PB screenshots to a folder. AppData\\Roaming\\Spankerfield\\PB Screenshots\\Timestamp.png."));
 
-					ImGui::SliderInt(xorstr_("update frame delay"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderInt(xorstr_("Clean frame update delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
+					ImGui::PopItemWidth();
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("Delay between each clean frame update for the new method."));
-					ImGui::WarningTooltip(xorstr_("Setting it too low will cause a lot of flickering in the cheat, setting it too high will increase the chance of you getting banned."));
+					ImGui::WarningTooltip(xorstr_("Setting it too low will cause a lot of flickering in the cheat, setting it too high might increase the chance of you getting banned."));
+				}
 
-					if (!g_settings.screenshots_pb_clean)
-					{
-						ImGui::SliderInt(xorstr_("before taking screenshot (old method)"), &g_settings.screenhots_pb_delay, 50, 1000);
-						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts."));
-						ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
-
-						ImGui::SliderInt(xorstr_("after taking screenshot (old method)"), &g_settings.screenhots_post_pb_delay, 0, 500);
-						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals."));
-						ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
-					}
-
+				if (g_settings.screenshots_pb_temp_disable || g_settings.screenshots_pb_use_both)
+				{
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderInt(xorstr_("Before taking screenshot (ms)"), &g_settings.screenhots_pb_delay, 50, 1000);
 					ImGui::PopItemWidth();
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts."));
+					ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
+
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderInt(xorstr_("After taking screenshot (ms)"), &g_settings.screenhots_post_pb_delay, 0, 500);
+					ImGui::PopItemWidth();
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals."));
+					ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
 				}
 
 				ImGui::Separator();
@@ -1037,7 +1071,7 @@ namespace big
 					g_settings.spoof_restore = true;
 				}
 
-				ImGui::PushItemWidth(300.f);
+				ImGui::PushItemWidth(250.f);
 				ImGui::InputText(xorstr_("Nickname"), g_settings.spoofed_name, 16);
 				ImGui::PopItemWidth();
 				if (ImGui::IsItemHovered())
@@ -1090,20 +1124,71 @@ namespace big
 				}
 
 				ImGui::Separator();
-
 				ImGui::Text(xorstr_("Configuration"));
 
+				// Config selection combo box
+				ImGui::PushItemWidth(200.f);
+
+				if (ImGui::BeginCombo(xorstr_("##ConfigSelection"), g_config.current_config.c_str()))
+				{
+					// Refresh available configs
+					g_config.refresh_configs();
+
+					for (const auto& config_name : g_config.available_configs)
+					{
+						bool is_selected = (g_config.current_config == config_name);
+
+						if (ImGui::Selectable(config_name.c_str(), is_selected))
+						{
+							g_config.current_config = config_name;
+						}
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				ImGui::PopItemWidth();
+
+				// Config controls
 				if (ImGui::Button(xorstr_("Load")))
 					g_config.load();
 
 				ImGui::SameLine();
 
 				if (ImGui::Button(xorstr_("Save")))
-					g_config.attempt_save();
+					g_config.save();
+
+				ImGui::SameLine();
+
+				// New config input
+				static char new_config_name[64] = "";
+				ImGui::PushItemWidth(150.0f);
+				ImGui::InputText(xorstr_("##NewConfigName"), new_config_name, IM_ARRAYSIZE(new_config_name));
+				ImGui::PopItemWidth();
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(xorstr_("Create")))
+				{
+					if (strlen(new_config_name) > 0)
+					{
+						g_config.save(new_config_name);
+						g_config.current_config = new_config_name;
+						memset(new_config_name, 0, sizeof(new_config_name));
+					}
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(xorstr_("Delete")) && g_config.current_config != "default")
+					g_config.delete_config(g_config.current_config);
 
 				ImGui::Separator();
 
-				render_hotkey_selector(xorstr_("Open key"), &g_globals.open_key, 300.f, true);
+				render_hotkey_selector(xorstr_("Open key"), &g_globals.open_key, 200.f, true);
 
 				ImGui::SameLine();
 

@@ -76,8 +76,8 @@ namespace big
 			// Add to the counter anyway, since hkTakeScreenshot is ran before the hkCopySubresourceRegion
 			g_globals.screenshots_pb++;
 
-			// If we're not using the new method
-			if (!g_settings.screenshots_pb_clean)
+			// If we're using the temp disable method or not using the new method
+			if (g_settings.screenshots_pb_temp_disable || !g_settings.screenshots_pb_clean)
 			{
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot] (using a delay of ")
 					<< g_settings.screenhots_pb_delay << xorstr_("+")
@@ -123,6 +123,10 @@ namespace big
 
 		void UpdateCleanFrame(IDXGISwapChain* pSwapChain, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 		{
+			// If the clean method is disabled, don't update clean frames
+			if (!g_settings.screenshots_pb_clean && !g_settings.screenshots_pb_use_both)
+				return;
+
 			ULONGLONG current_tick_count = GetTickCount64();
 
 			// Update the clean screenshot every 15 seconds (to minimize interruptions)
@@ -179,35 +183,42 @@ namespace big
 			{
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkCopySubresourceRegion]");
 
-				std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
-
-				if (!pCleanScreenShot)
-					return;
-
-				// Replace the source resource with the clean screenshot texture
-				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
-
-				// Save screenshot sent to PB to a folder
-				if (g_settings.screenshots_pb_save_to_folder)
+				if ((g_settings.screenshots_pb_clean || g_settings.screenshots_pb_use_both) && !g_settings.screenshots_pb_temp_disable)
 				{
-					std::filesystem::path screenshot_path = get_appdata_folder();
-					screenshot_path /= xorstr_("PBSS");
+					std::lock_guard<std::mutex> lock(clean_screenshot_mutex);
 
-					// Make sure it exists on the user end before saving anything
-					validate_path(screenshot_path);
+					if (!pCleanScreenShot)
+						return;
 
-					screenshot_path /= std::string(current_time() + xorstr_(".jpg"));
+					// Replace the source resource with the clean screenshot texture
+					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pCleanScreenShot, SrcSubresource, pSrcBox);
 
-					if (!std::filesystem::exists(screenshot_path))
+					// Save screenshot sent to PB to a folder
+					if (g_settings.screenshots_pb_save_to_folder)
 					{
-						TextureSaver texture_saver;
-						texture_saver.Initialize(g_renderer->m_d3d_device.Get());
-						texture_saver.SaveTextureToFile(pCleanScreenShot, screenshot_path);
+						std::filesystem::path screenshot_path = get_appdata_folder();
+						screenshot_path /= xorstr_("PBSS");
 
-						LOG(INFO) << xorstr_("Saved PBSS screenshot to: ") << screenshot_path.parent_path().string() << " as: " << screenshot_path.filename().string();
+						// Make sure it exists on the user end before saving anything
+						validate_path(screenshot_path);
+
+						screenshot_path /= std::string(current_time() + xorstr_(".jpg"));
+
+						if (!std::filesystem::exists(screenshot_path))
+						{
+							TextureSaver texture_saver;
+							texture_saver.Initialize(g_renderer->m_d3d_device.Get());
+							texture_saver.SaveTextureToFile(pCleanScreenShot, screenshot_path);
+
+							LOG(INFO) << xorstr_("Saved PBSS screenshot to: ") << screenshot_path.parent_path().string() << " as: " << screenshot_path.filename().string();
+						}
 					}
 				}
-
+				else
+				{
+					// If clean method is disabled or temporarily disabled, use original function
+					oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);
+				}
 			}
 			else
 				oCopySubresourceRegion(pContext, pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox);

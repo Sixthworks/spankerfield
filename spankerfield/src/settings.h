@@ -206,7 +206,9 @@ namespace big
 
 		bool screenshots;
 		bool screenshots_warn{ true };
-		bool screenshots_pb_clean; // Disable old PBSS screenshot cleaner, false by default
+		bool screenshots_pb_temp_disable;
+		bool screenshots_pb_clean{ true };
+		bool screenshots_pb_use_both;
 		bool screenshots_pb_save_to_folder;
 		int screenshots_pb_clean_delay{ 20000 };
 		int screenhots_pb_delay{ 300 };
@@ -223,6 +225,8 @@ namespace big
 	public:
 		nlohmann::json default_options;
 		nlohmann::json options;
+		std::string current_config = xorstr_("default");
+		std::vector<std::string> available_configs;
 
 		std::string color_to_string(ImColor color)
 		{
@@ -443,7 +447,9 @@ namespace big
 			g_settings.screenshots = j[xorstr_("settings")][xorstr_("screenshots")];
 			g_settings.screenshots_warn = j[xorstr_("settings")][xorstr_("screenshots_warn")];
 			g_settings.screenshots_color = string_to_color(j[xorstr_("settings")][xorstr_("screenshots_color")]);
+			g_settings.screenshots_pb_temp_disable = j[xorstr_("settings")][xorstr_("screenshots_pb_temp_disable")];
 			g_settings.screenshots_pb_clean = j[xorstr_("settings")][xorstr_("screenshots_pb_clean")];
+			g_settings.screenshots_pb_use_both = j[xorstr_("settings")][xorstr_("screenshots_pb_use_both")];
 			g_settings.screenshots_pb_save_to_folder = j[xorstr_("settings")][xorstr_("screenshots_pb_save_to_folder")];
 			g_settings.screenshots_pb_clean_delay = j[xorstr_("settings")][xorstr_("screenshots_pb_clean_delay")];
 			g_settings.screenhots_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_pb_delay")];
@@ -624,7 +630,9 @@ namespace big
 						{ xorstr_("screenshots"), g_settings.screenshots },
 						{ xorstr_("screenshots_warn"), g_settings.screenshots_warn },
 						{ xorstr_("screenshots_color"), color_to_string(g_settings.screenshots_color) },
+						{ xorstr_("screenshots_pb_temp_disable"), g_settings.screenshots_pb_temp_disable },
 						{ xorstr_("screenshots_pb_clean"), g_settings.screenshots_pb_clean },
+						{ xorstr_("screenshots_pb_use_both"), g_settings.screenshots_pb_use_both },
 						{ xorstr_("screenshots_pb_save_to_folder"), g_settings.screenshots_pb_save_to_folder },
 						{ xorstr_("screenshots_pb_clean_delay"), g_settings.screenshots_pb_clean_delay },
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
@@ -637,66 +645,142 @@ namespace big
 			};
 		}
 
-		void attempt_save()
+		void refresh_configs()
 		{
-			const nlohmann::json& j = to_json();
+			available_configs.clear();
 
-			if (deep_compare(options, j, true))
-				save();
+			auto config_dir = get_config_folder();
+
+			// Create directory if it doesn't exist
+			if (!std::filesystem::exists(config_dir))
+				std::filesystem::create_directories(config_dir);
+
+			// List all config files
+			for (const auto& entry : std::filesystem::directory_iterator(config_dir))
+			{
+				if (entry.is_regular_file() && entry.path().extension() == xorstr_(".json"))
+					available_configs.push_back(entry.path().stem().string());
+			}
+
+			// Add default config if it doesn't exist
+			if (std::find(available_configs.begin(), available_configs.end(), "default") == available_configs.end())
+			{
+				available_configs.push_back(xorstr_("default"));
+				save(xorstr_("default")); // Create default config
+			}
+
+			// Sort configs alphabetically
+			std::sort(available_configs.begin(), available_configs.end());
 		}
 
-		bool load()
+		std::filesystem::path get_config_folder()
 		{
+			auto folder_path = get_appdata_folder();
+			folder_path /= xorstr_("Configs");
+			return folder_path;
+		}
+
+		std::filesystem::path get_config_path(const std::string& config_name)
+		{
+			auto file_path = get_config_folder();
+			file_path /= config_name + ".json";
+			return file_path;
+		}
+
+		bool load(const std::string& config_name = "")
+		{
+			if (!config_name.empty())
+				current_config = config_name;
+
 			default_options = to_json();
 
-			auto file_path = get_path();
+			auto file_path = get_config_path(current_config);
 			std::ifstream file(file_path);
 
 			if (!file.is_open())
 			{
-				save();
-
+				save(current_config);
 				file.open(file_path);
 			}
 
 			try
 			{
 				file >> options;
-
 				file.close();
 			}
 			catch (const std::exception&)
 			{
 				file.close();
-
-				LOG(WARNING) << xorstr_("Detected corrupt settings, writing default config...");
-
-				save();
-
-				return load();
+				LOG(WARNING) << xorstr_("Detected corrupt settings in config '") << current_config << xorstr_("', writing default config...");
+				save(current_config);
+				return load(current_config);
 			}
 
 			bool should_save = deep_compare(options, default_options);
-
 			from_json(options);
 
 			if (should_save)
 			{
-				LOG(INFO) << xorstr_("Updating settings.");
-				save();
+				LOG(INFO) << xorstr_("Updating settings for config '") << current_config << xorstr_("'.");
+				save(current_config);
 			}
+
+			LOG(INFO) << xorstr_("Loaded config: ") << current_config;
+			return true;
+		}
+
+		bool save(const std::string& config_name = "")
+		{
+			if (!config_name.empty())
+				current_config = config_name;
+
+			auto config_dir = get_config_folder();
+
+			// Create directory if it doesn't exist
+			if (!std::filesystem::exists(config_dir))
+				std::filesystem::create_directories(config_dir);
+
+			auto file_path = get_config_path(current_config);
+
+			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
+			file << to_json().dump(4);
+			file.close();
+
+			LOG(INFO) << xorstr_("Saved config: ") << current_config;
+
+			// Refresh the list of configs after saving a new one
+			refresh_configs();
 
 			return true;
 		}
-	private:
-		std::filesystem::path get_path()
+
+		bool delete_config(const std::string& config_name)
 		{
-			auto file_path = get_appdata_folder();
-			file_path /= xorstr_("Config.json");
+			// Don't allow deleting the default config
+			if (config_name == xorstr_("default"))
+				return false;
 
-			return file_path;
+			auto file_path = get_config_path(config_name);
+
+			if (std::filesystem::exists(file_path))
+			{
+				std::filesystem::remove(file_path);
+				refresh_configs();
+
+				// If we deleted the current config, switch to default
+				if (current_config == config_name)
+				{
+					current_config = xorstr_("default");
+					load();
+				}
+
+				LOG(INFO) << xorstr_("Deleted config: ") << config_name;
+				return true;
+			}
+
+			return false;
 		}
-
+	private:
 		bool deep_compare(nlohmann::json& current_settings, const nlohmann::json& default_settings, bool compare_value = false)
 		{
 			bool should_save = false;
@@ -724,17 +808,6 @@ namespace big
 			}
 
 			return should_save;
-		}
-
-		bool save()
-		{
-			auto file_path = get_path();
-
-			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
-			file << to_json().dump(4);
-			file.close();
-
-			return true;
 		}
 	};
 
