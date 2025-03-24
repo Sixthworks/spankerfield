@@ -7,12 +7,12 @@ namespace big
 	class AimbotPredictor
 	{
 	public:
-		struct PredictionResult {
+		struct PredictionResult
+		{
 			Vector3 predicted_position;
-			float zero_angle;
 			bool success;
 			
-			PredictionResult() : zero_angle(0.0f), success(false) {}
+			PredictionResult() : success(false) {}
 		};
 
 		PredictionResult PredictTarget(ClientSoldierEntity* local_entity, 
@@ -22,9 +22,7 @@ namespace big
 		);
 
 	private:
-		float CalculateZeroAngle(const Vector3& origin, const Vector3& target, float bullet_speed, float gravity);
-
-		float DoPrediction(const Vector3& shoot_space, 
+		bool DoPrediction(const Vector3& shoot_space,
 						  Vector3& aim_point, 
 						  const Vector3& my_velocity, 
 						  const Vector3& enemy_velocity, 

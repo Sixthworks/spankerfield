@@ -9,6 +9,7 @@ namespace big
 	{
 	public:
 		bool use_cheap_text; // DebugRenderer2 text instead of ImGui text
+		bool use_cheap_boxes; // DebugRenderer2 boxes instead of ImGui
 
 		bool blacklist{ true };
 		ImColor blacklist_color{ 255, 0, 0, 255 };
@@ -34,6 +35,7 @@ namespace big
 		ImColor aim_fov_color{ 255, 255, 255, 200 };
 		float aim_min_time_to_target{ 0.25f };
 		float aim_max_time_to_target{ 0.7f };
+		float aim_vehicle_smooth{ 12.5f };
 		int aim_key{ VK_LMENU };
 		int aim_bone{ UpdatePoseResultData::BONES::Spine1 };
 		int aim_target_selection{ 1 };
@@ -251,6 +253,7 @@ namespace big
 		void from_json(const nlohmann::json& j)
 		{
 			g_settings.use_cheap_text = j[xorstr_("settings")][xorstr_("use_cheap_text")];
+			g_settings.use_cheap_boxes = j[xorstr_("settings")][xorstr_("use_cheap_boxes")];
 
 			g_settings.blacklist = j[xorstr_("settings")][xorstr_("blacklist")];
 			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
@@ -271,6 +274,7 @@ namespace big
 			g_settings.aim_fov_color = string_to_color(j[xorstr_("settings")][xorstr_("aim_fov_color")]);
 			g_settings.aim_min_time_to_target = j[xorstr_("settings")][xorstr_("aim_min_time_to_target")];
 			g_settings.aim_max_time_to_target = j[xorstr_("settings")][xorstr_("aim_max_time_to_target")];
+			g_settings.aim_vehicle_smooth = j[xorstr_("settings")][xorstr_("aim_vehicle_smooth")];
 			g_settings.aim_key = j[xorstr_("settings")][xorstr_("aim_key")];
 			g_settings.aim_bone = j[xorstr_("settings")][xorstr_("aim_bone")];
 			g_settings.aim_target_selection = j[xorstr_("settings")][xorstr_("aim_target_selection")];
@@ -466,6 +470,7 @@ namespace big
 					xorstr_("settings"),
 					{
 			            { xorstr_("use_cheap_text"), g_settings.use_cheap_text },
+						{ xorstr_("use_cheap_boxes"), g_settings.use_cheap_boxes },
 						{ xorstr_("blacklist"), g_settings.blacklist },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 						{ xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
@@ -547,6 +552,7 @@ namespace big
 						{ xorstr_("aim_fov_color"), color_to_string(g_settings.aim_fov_color) },
 						{ xorstr_("aim_min_time_to_target"), g_settings.aim_min_time_to_target },
 						{ xorstr_("aim_max_time_to_target"), g_settings.aim_max_time_to_target },
+						{ xorstr_("aim_vehicle_smooth"), g_settings.aim_vehicle_smooth },
 						{ xorstr_("aim_key"), g_settings.aim_key },
 						{ xorstr_("aim_bone"), g_settings.aim_bone },
 						{ xorstr_("aim_target_selection"), g_settings.aim_target_selection },
@@ -720,12 +726,8 @@ namespace big
 			from_json(options);
 
 			if (should_save)
-			{
-				LOG(INFO) << xorstr_("Updating settings for config '") << current_config << xorstr_("'.");
 				save(current_config);
-			}
 
-			LOG(INFO) << xorstr_("Loaded config: ") << current_config;
 			return true;
 		}
 
@@ -745,8 +747,6 @@ namespace big
 			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
 			file << to_json().dump(4);
 			file.close();
-
-			LOG(INFO) << xorstr_("Saved config: ") << current_config;
 
 			// Refresh the list of configs after saving a new one
 			refresh_configs();

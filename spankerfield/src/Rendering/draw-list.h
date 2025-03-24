@@ -16,8 +16,8 @@ class CDrawing
 {
 public:
 	void AddImage(const ImVec2& position, const ImVec2& size, const ImTextureID pTexture, const ImColor& color);
-	void AddCircleFilled(const ImVec2& position, float radius, const ImColor& color, int segments = 100);
-	void AddCircle(const ImVec2& position, float radius, const ImColor& color, int segments = 100);
+	void AddCircleFilled(const ImVec2& position, float radius, const ImColor& color, int segments = 12);
+	void AddCircle(const ImVec2& position, float radius, const ImColor& color, int segments = 12);
 	void AddRectFilled(const ImVec2& position, const ImVec2& size, const ImColor& color, float rounding = 0.f);
 	void AddRectFilledGradient(const ImVec2& position, const ImVec2& size, const ImColor& leftTop, const ImColor& rightTop, const ImColor& leftBot, const ImColor& rightBot);
 	void DrawFillArea(float x, float y, float w, float h, const ImColor& color, float rounding = 0.f);

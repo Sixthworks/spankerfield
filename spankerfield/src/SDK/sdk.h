@@ -26,7 +26,6 @@
 #define OFFSET_TAKESCREENSHOT         0x14015D4F0 // 48 8B C4 55 48 8D 68 A1 48 81 EC ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 58 08 48 89 78 10 48 8B D9 8B 05 ? ? ? ?
 #define OFFSET_SOMESCOREMANAGER       0x1423822D8 // 48 8B 05 ? ? ? ? 4C 8B 60 18 (https://www.unknowncheats.me/forum/battlefield-4/133815-getting-clientplayerscore-k-d-etc-without-calling-game-function.html + https://www.unknowncheats.me/forum/1044753-post19.html)
 #define OFFSET_PBSSRETURN			  0x140CBCD29
-
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
@@ -164,6 +163,8 @@ class MissileEntityData;
 class ClientPlayerScoreManager;
 class ClientPlayerScore;
 class SomeScoreManagerClass;
+class VehicleTurret;
+class ClientChassisComponent;
 
 template<typename T>
 struct WeakToken
@@ -1936,11 +1937,44 @@ public:
 	bool IsAlive();
 };//Size=0x0148
 
+class ClientChassisComponent
+{
+public:
+	char pad_0000[208]; //0x0000
+	Vector4 N000007EB; //0x00D0
+	char pad_00E0[192]; //0x00E0
+	Vector3 m_PrevLinearVelocity; //0x01A0
+	char pad_01AC[4]; //0x01AC
+	Vector3 m_AngularVelocity; //0x01B0
+	char pad_01BC[4]; //0x01BC
+	Vector3 m_LinearVelocity; //0x01C0
+	char _0x01D0[48];
+};//Size=0x0200
+
 class ClientVehicleEntity : public ClientControllableEntity
 {
 public:
+	char _0x0188[320 + 8];
+	/*float m_waterLevel; //0x0240
+	float m_terrainLevel; //0x0244
+	float m_waterLevelUpdateTimer; //0x0248
+	float m_terrainLevelUpdateTime; //0x024C
+	AxisAlignedBox m_childrenAABB; //0x0250
+	char _0x0268[24];*/
+	Vector3 m_VelocityVec; //0x0280 
+	char _0x028C[4];
+	Vector3 m_prevVelocity; //0x0290 
+	float zero2; //0x029C
+	char pad_02A0[316]; //0x02A0
+	float N000003C6; //0x03DC
+	ClientChassisComponent* m_Chassis; //0x03E0
+	char pad_03E8[186]; //0x03E8
 
-};
+	ClientChassisComponent* GetChassisComponent()
+	{
+		return *(ClientChassisComponent**)((uintptr_t)this + 0x03E0);
+	}
+};//Size=0x0480
 
 class ClientSoldierEntity : public ClientControllableEntity
 {
@@ -2186,6 +2220,18 @@ public:
 class ProjectileEntityData
 {
 public:
+	enum AntHitReactionWeaponType
+	{
+		AntHitReactionWeaponType_Pistol = 0,
+		AntHitReactionWeaponType_SMG = 1,
+		AntHitReactionWeaponType_AssaultRifle = 2,
+		AntHitReactionWeaponType_LMG = 3,
+		AntHitReactionWeaponType_Shotgun = 4,
+		AntHitReactionWeaponType_SniperRifle = 5,
+		AntHitReactionWeaponType_Explosion = 6,
+		AntHitReactionWeaponType_Flashbang = 7,
+		AntHitReactionWeaponType_Melee = 8
+	};
 	char _0x0000[96];
 	char* m_Name; //0x0060 
 	char _0x0068[40];
@@ -2201,10 +2247,12 @@ public:
 	WeaponSuppressionData* m_pSuppressionData; //0x00C0 
 	char* m_AmmunitionType; //0x00C8 
 	char _0x00D0[4];
-	__int32 m_HitReactionWeaponType; //0x00D4 
+	AntHitReactionWeaponType m_HitReactionWeaponType; //0x00D4 
 	unsigned char m_DetonateOnTimeout; //0x00D8 
 	unsigned char m_ServerProjectileDisabled; //0x00D9 
-	char N0000197A[6]; //0x00DA 
+	bool m_HideOnDetonation; //0x00DA
+	bool m_VehicleLightingEnable; // 0xdb
+	unsigned char _0xdc[0x4];
 
 };//Size=0x00E0
 
@@ -2310,6 +2358,38 @@ public:
 	ZeroingModifier* m_ZeroingModifier; //0x00C0 
 	char _0x00C8[48];
 };//Size=0x0044
+
+class VehicleTurret
+{
+public:
+	static VehicleTurret* GetInstance()
+	{
+		return (VehicleTurret*)OFFSET_ANGLES;
+	}
+
+	char pad_0000[8]; //0x0000
+	WeaponFiring* m_pWeaponFiring; //0x0008
+	char pad_0010[32]; //0x0010
+	Matrix m_VehicleMatrix; //0x0030
+	Matrix m_SoldierMatrix; //0x0070
+	float m_VehicleYawFixed; //0x00B0
+	Vector2 m_Angles; //0x00B4
+	float m_ZeroFloat; //0x00BC Always == zero
+	bool m_SomeBool; //0x00C0
+
+	Vector3 GetVehicleCameraOrigin()
+	{
+		if (!this) return { 0, 0, 0 };
+		return Vector3(m_VehicleMatrix._41, m_VehicleMatrix._42, m_VehicleMatrix._43);
+	};
+	Vector3 GetVehicleCrosshair()
+	{
+		if (!this) return { 0, 0, 0 };
+		auto pos = Vector3(m_VehicleMatrix._41, m_VehicleMatrix._42, m_VehicleMatrix._43);
+		auto forward = Vector3(m_VehicleMatrix._31, m_VehicleMatrix._32, m_VehicleMatrix._33);
+		return ((forward * 100.0f) + pos);
+	};
+}; //Size: 0x011C
 
 enum class WeaponClass
 {

@@ -25,6 +25,12 @@ namespace big
 		return (screen_height / 2) * tan(fov_radians / 2);
 	}
 
+	float get_abs_delta_at_given_points(const Vector2& src, const Vector2& dst)
+	{
+		Vector2 out = { src.x - dst.x, src.y - dst.y };
+		return fabsf(out.Length());
+	}
+
 	void normalize_angle(Vector2& angle)
 	{
 		if (angle.x <= (float)(-PI))

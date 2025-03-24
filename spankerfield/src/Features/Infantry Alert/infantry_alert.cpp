@@ -68,26 +68,7 @@ namespace plugins
                     const auto data = get_vehicle_data(vehicle);
                     if (IsValidPtrWithVTable(data))
                     {
-                        const auto type = data->GetVehicleType();
-                        const VehicleData::VehicleType light_types[] =
-                        {
-                            VehicleData::VehicleType::HELITRANS,
-                            VehicleData::VehicleType::BOAT,
-                            VehicleData::VehicleType::JEEP,
-                            VehicleData::VehicleType::CAR,
-                            VehicleData::VehicleType::JET, // Why would the player be in a jet and not in the sky? Must be infantry
-                            VehicleData::VehicleType::STATIONARY,
-                            VehicleData::VehicleType::STATIONARYWEAPON
-                        };
-
-                        bool indeed = false;
-                        for (int i = 0; i < sizeof(light_types) / sizeof(*light_types); i++)
-                        {
-                            if (type == light_types[i])
-                                indeed = true;
-                        }
-
-                        if (!indeed)
+                        if (!data->IsGroundVehicle())
                             continue;
                     }
                 }

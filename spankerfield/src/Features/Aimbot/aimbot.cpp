@@ -10,9 +10,9 @@
 
 #pragma warning( disable : 4244 )
 
-// For some reason, prediction math on close targets that are exactly <=6.55f distance far than you works really badly
+// For some reason, prediction math on close targets that are exactly <=6.57f distance far than you works really badly
 // This float was manually tuned
-#define CLOSE_TARGET_DIST_FLOAT 6.55f
+#define CLOSE_TARGET_DIST_FLOAT 6.57f
 
 namespace big
 {
@@ -28,19 +28,55 @@ namespace big
 		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
 			return result;
 
-		const auto weapon_component = local_entity->m_pWeaponComponent;
-		if (!IsValidPtr(weapon_component))
-			return result;
 
-		const auto weapon = weapon_component->GetActiveSoldierWeapon();
-		if (!IsValidPtr(weapon))
-			return result;
+		// Check if player is in vehicle
+		const auto local_player = ClientGameContext::GetInstance()->m_pPlayerManager->m_pLocalPlayer;
+		const auto local_vehicle = local_player->GetVehicle();
+		bool is_in_vehicle = IsValidPtr(local_vehicle);
 
-		const auto client_weapon = weapon->m_pWeapon;
-		if (!IsValidPtr(client_weapon))
-			return result;
+		// Weapon variables we need to populate
+		Vector3 fire_position;
+		Vector3 spawn_offset;
+		Vector3 initial_speed;
+		Vector3 my_velocity;
+		WeaponZeroingEntry zero_entry(-1.0f, -1.0f);
 
-		const auto weapon_firing = WeaponFiring::GetInstance();
+		// Get weapon data (either from vehicle or infantry)
+		if (is_in_vehicle)
+		{
+			auto vehicle_turret = VehicleTurret::GetInstance();
+			if (!IsValidPtr(vehicle_turret))
+				return result;
+
+			fire_position = vehicle_turret->GetVehicleCrosshair();
+			my_velocity = *local_vehicle->GetVelocity();
+		}
+		else
+		{
+			fire_position = shoot_space.Translation();
+			my_velocity = *local_entity->GetVelocity();
+
+			// Get zeroing information for infantry
+			if (auto weapon_component = local_entity->m_pWeaponComponent; IsValidPtr(weapon_component))
+			{
+				if (auto weapon = weapon_component->GetActiveSoldierWeapon(); IsValidPtr(weapon))
+				{
+					if (auto client_weapon = weapon->m_pWeapon; IsValidPtr(client_weapon) && IsValidPtr(client_weapon->m_pWeaponModifier))
+					{
+						auto* zeroing_modifier = client_weapon->m_pWeaponModifier->m_ZeroingModifier;
+						if (IsValidPtr(zeroing_modifier))
+						{
+							int zero_level_index = weapon_component->m_ZeroingDistanceLevel;
+							zero_entry = zeroing_modifier->GetZeroLevelAt(zero_level_index);
+						}
+					}
+				}
+			}
+		}
+
+		// Get common firing data (works for both vehicle and infantry)
+		const auto weapon_firing = is_in_vehicle ? VehicleTurret::GetInstance()->m_pWeaponFiring : WeaponFiring::GetInstance();
+
 		if (!IsValidPtr(weapon_firing))
 			return result;
 
@@ -52,33 +88,37 @@ namespace big
 		if (!IsValidPtrWithVTable(firing_data) || (uintptr_t)(firing_data) == 0x3893E06)
 			return result;
 
-		Vector4 spawn_offset_4 = firing_data->m_ShotConfigData.m_PositionOffset;
-		Vector3 spawn_offset = Vector3(spawn_offset_4.x, spawn_offset_4.y, spawn_offset_4.z);
-		Vector4 initial_speed_4 = firing_data->m_ShotConfigData.m_Speed;
-		Vector3 initial_speed = Vector3(initial_speed_4.x, initial_speed_4.y, initial_speed_4.z);
-
 		const auto bullet = firing_data->m_ShotConfigData.m_ProjectileData;
 		if (!IsValidPtrWithVTable(bullet))
 			return result;
 
-		float gravity = bullet->m_Gravity;
-		Vector3 my_velocity = *local_entity->GetVelocity();
+		Vector4 initial_speed_4 = firing_data->m_ShotConfigData.m_Speed;
+		initial_speed = Vector3(initial_speed_4.x, initial_speed_4.y, initial_speed_4.z);
+
+		// Get enemy velocity and force update
 		Vector3 enemy_velocity = *enemy->GetVelocity();
 		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
-		result.zero_angle = DoPrediction(shoot_space.Translation() + spawn_offset,
+		// Gravity
+		float gravity = bullet->m_Gravity;
+
+		if (gravity < -500.f || gravity > 500.f) gravity = 0.f;
+
+		// Calculate prediction
+		bool prediction_success = DoPrediction(
+			fire_position + spawn_offset,
 			result.predicted_position,
 			my_velocity,
 			enemy_velocity,
 			initial_speed,
 			gravity,
-			WeaponZeroingEntry(-1.0f, -1.0f));
-		result.success = true;
+			zero_entry);
 
+		result.success = prediction_success;
 		return result;
 	}
 
-	float AimbotPredictor::DoPrediction(
+	bool AimbotPredictor::DoPrediction(
 		const Vector3& shoot_space,
 		Vector3& aim_point,
 		const Vector3& my_velocity,
@@ -94,112 +134,123 @@ namespace big
 		if (distance <= CLOSE_TARGET_DIST_FLOAT)
 		{
 			// For close targets, just aim directly without adjusting the aim point
-			return atan2(relative_pos.y, sqrt(relative_pos.x * relative_pos.x + relative_pos.z * relative_pos.z));
+			return false;
 		}
 
-		float adjusted_gravity = fabs(gravity) * (1.0f + 0.02f * distance / 100.0f);
-		Vector3 gravity_vec(0, -adjusted_gravity, 0);
+		// Use the bullet speed magnitude for calculations
+		float bullet_velocity = bullet_speed.Length();
+		float bullet_gravity = fabs(gravity);
+		float travel_time = 0.0f;
+		Vector3 hit_pos = aim_point;
 
-		auto f_approx_pos = [](Vector3& cur_pos, const Vector3& velocity, const Vector3& accel, const float time)->Vector3
-			{
-				return cur_pos + velocity * time + .5f * accel * time * time;
-			};
-
-		float shortest_air_time = 0.0f;
-
-		// Use quartic equation to find time of impact, accounting for full 3D motion
-		const double a = 0.25 * gravity * gravity;
-		const double b = enemy_velocity.y * gravity;
-		const double c = (relative_pos.y * gravity) + enemy_velocity.Dot(enemy_velocity) - bullet_speed.LengthSquared();
-		const double d = 2.0 * relative_pos.Dot(enemy_velocity);
-		const double e = relative_pos.Dot(relative_pos);
-
-		const auto& roots = solve_quartic(b / (a), c / (a), d / (a), e / (a));
-
-		for (int i = 0; i < 4; ++i)
+		// Calculate zeroing adjustment
+		float zero_angle = 0.0f;
+		if (zero_entry.m_ZeroDistance != -1.0f && bullet_gravity != 0.0f)
 		{
-			if (roots[i].imag() == 0.0 && roots[i].real() > 0.01f)
+			float zero_air_time = zero_entry.m_ZeroDistance / bullet_velocity;
+			float zero_drop = 0.5f * bullet_gravity * zero_air_time * zero_air_time;
+			zero_angle = atan2(zero_drop, zero_entry.m_ZeroDistance);
+		}
+
+		// Handle prediction with gravity
+		if (bullet_gravity != 0.0f)
+		{
+			// Coefficients for the quartic equation
+			const double a = 0.25 * bullet_gravity * bullet_gravity;
+			const double b = enemy_velocity.y * bullet_gravity;
+			const double c = (relative_pos.y * bullet_gravity) + enemy_velocity.Dot(enemy_velocity) - (bullet_velocity * bullet_velocity);
+			const double d = 2.0 * relative_pos.Dot(enemy_velocity);
+			const double e = relative_pos.Dot(relative_pos);
+
+			// Solve the quartic equation to find time of impact
+			const auto& roots = solve_quartic(b / a, c / a, d / a, e / a);
+
+			// Find the smallest positive root (shortest time to impact)
+			for (int i = 0; i < 4; ++i)
 			{
-				if (shortest_air_time == 0.0f || roots[i].real() < shortest_air_time)
-					shortest_air_time = static_cast<float>(roots[i].real());
+				if (roots[i].imag() == 0.0 && roots[i].real() > 0.01f)
+				{
+					if (travel_time == 0.0f || roots[i].real() < travel_time)
+						travel_time = static_cast<float>(roots[i].real());
+				}
 			}
+
+			// If no valid travel time found, return
+			if (travel_time <= 0.0f)
+				return false;
+
+			// Calculate predicted hit velocity components
+			double hit_vel_x = (relative_pos.x / travel_time) + enemy_velocity.x;
+			double hit_vel_y = (relative_pos.y / travel_time) + enemy_velocity.y - (0.5f * bullet_gravity * travel_time);
+			double hit_vel_z = (relative_pos.z / travel_time) + enemy_velocity.z;
+
+			// Calculate predicted hit position with compensation
+			hit_pos.x = (shoot_space.x + hit_vel_x * travel_time);
+			hit_pos.y = (shoot_space.y + hit_vel_y * travel_time);
+			hit_pos.z = (shoot_space.z + hit_vel_z * travel_time);
+
+			if (zero_angle != 0.0f)
+				hit_pos.y += sin(zero_angle) * distance;
 		}
-
-		if (shortest_air_time <= 0.0f)
-			return 0.0f;
-
-		// Future target position
-		Vector3 future_target_pos = f_approx_pos(aim_point, enemy_velocity, gravity_vec, shortest_air_time);
-
-		// Calculate direction to future position
-		Vector3 dir_to_target = future_target_pos - shoot_space;
-		float horizontal_dist = sqrt(dir_to_target.x * dir_to_target.x + dir_to_target.z * dir_to_target.z);
-
-		// Calculate vertical angle with bullet drop compensation
-		float bullet_speed_mag = bullet_speed.Length();
-
-		// Use projectile motion equations to solve for proper angle
-		// For vertical component we need to solve: y = v0y*t + 0.5*g*t^2
-		// Where we know y (height difference), t (time of flight), and g (gravity)
-
-		// Calculate required initial vertical velocity component
-		float required_v0y = (dir_to_target.y - 0.5f * -adjusted_gravity * shortest_air_time * shortest_air_time) / shortest_air_time;
-
-		// Calculate horizontal velocity needed
-		float required_v0_horiz = horizontal_dist / shortest_air_time;
-
-		// Calculate total required initial velocity and check if it's within weapon capabilities
-		float required_v0 = sqrt(required_v0y * required_v0y + required_v0_horiz * required_v0_horiz);
-
-		if (required_v0 > bullet_speed_mag * 1.05f) // Allow slight buffer for numerical errors
+		else
 		{
-			// Target is too far for weapon capabilities at this angle
-			// Aim at best possible angle instead
-			float theta = atan2(required_v0y, required_v0_horiz);
-			float max_theta = asin(required_v0 * sin(theta) / bullet_speed_mag);
+			// No gravity case - simplified quadratic solution
+			const double a = (enemy_velocity.Dot(enemy_velocity)) - (bullet_velocity * bullet_velocity);
+			const double b = 2.0 * (relative_pos.Dot(enemy_velocity));
+			const double c = relative_pos.Dot(relative_pos);
 
-			// Recalculate target position using best possible angle
-			float max_v0y = bullet_speed_mag * sin(max_theta);
-			float t_flight = (max_v0y + sqrt(max_v0y * max_v0y + 2 * adjusted_gravity * dir_to_target.y)) / adjusted_gravity;
+			// Handle special case where a is zero (target moving at bullet speed)
+			if (fabs(a) < 0.0001f)
+				return false;
 
-			// Update aim point with adjusted prediction
-			future_target_pos = aim_point + enemy_velocity * t_flight + Vector3(0, 0.5f * -adjusted_gravity * t_flight * t_flight, 0);
+			double discriminant = b * b - (4 * a * c);
+
+			// Find the smallest non-negative solution
+			if (discriminant > 0.0f)
+			{
+				const double t1 = (-b - sqrt(discriminant)) / (2 * a);
+				const double t2 = (-b + sqrt(discriminant)) / (2 * a);
+
+				if (t1 > 0.01f && t2 > 0.01f)
+					travel_time = static_cast<float>(min(t1, t2));
+				else if (t1 <= 0.01f && t2 > 0.01f)
+					travel_time = static_cast<float>(t2);
+				else if (t1 > 0.01f && t2 <= 0.01f)
+					travel_time = static_cast<float>(t1);
+				else
+					return false;
+			}
+			else if (fabs(discriminant) < 0.0001f)
+			{
+				travel_time = static_cast<float>(-b / (2 * a));
+				if (travel_time <= 0.01f)
+					return 0.0f;
+			}
+			else
+			{
+				return 0.0f; // No real solutions
+			}
+
+			// Calculate hit velocity components
+			double hit_vel_x = (relative_pos.x / travel_time) + enemy_velocity.x;
+			double hit_vel_y = (relative_pos.y / travel_time) + enemy_velocity.y;
+			double hit_vel_z = (relative_pos.z / travel_time) + enemy_velocity.z;
+
+			// Calculate hit position
+			hit_pos.x = (shoot_space.x + hit_vel_x * travel_time);
+			hit_pos.y = (shoot_space.y + hit_vel_y * travel_time);
+			hit_pos.z = (shoot_space.z + hit_vel_z * travel_time);
+
+			if (zero_angle != 0.0f)
+				hit_pos.y += sin(zero_angle) * distance;
+
+			return true;
 		}
 
-		// Update aim point with our calculated future position
-		aim_point = future_target_pos;
+		// Update the aim point with our predicted hit position
+		aim_point = hit_pos;
 
-		// Calculate zero angle adjustment
-		return CalculateZeroAngle(shoot_space, aim_point, bullet_speed_mag, adjusted_gravity);
-	}
-
-	// New helper function to calculate zero angle
-	float AimbotPredictor::CalculateZeroAngle(const Vector3& origin, const Vector3& target, float bullet_speed, float gravity)
-	{
-		Vector3 dir = target - origin;
-		float dist_horiz = sqrt(dir.x * dir.x + dir.z * dir.z);
-		float dist_vert = dir.y;
-
-		// Add minimum distance check to prevent calculation issues at close range
-		if (dist_horiz <= CLOSE_TARGET_DIST_FLOAT)
-		{
-			// For close targets, just aim directly at them
-			return atan2(dist_vert, dist_horiz);
-		}
-
-		// Calculate angle needed to hit target with bullet drop
-		float g = fabs(gravity);
-		float v = bullet_speed;
-
-		// Quadratic formula to solve for angle: tan(theta) = (v^2 � sqrt(v^4 - g(g*x^2 + 2y*v^2)))/gx
-		float discriminant = powf(v, 4) - g * (g * dist_horiz * dist_horiz + 2 * dist_vert * v * v);
-
-		if (discriminant < 0)
-			return atan2(dist_vert, dist_horiz); // No solution possible, just aim directly
-
-		// We want the lower angle solution (usually)
-		float tan_theta = (v * v - sqrt(discriminant)) / (g * dist_horiz);
-		return atan(tan_theta);
+		return true;
 	}
 
 	AimbotSmoother::AimbotSmoother()
@@ -293,6 +344,10 @@ namespace big
 			if (!soldier->IsAlive())
 				continue;
 
+			// Don't aim at passengers (velocity is always 0 here)
+			if (player->m_AttachedEntryId == 2)
+				continue;
+
 			Vector3 head_vec;
 			bool got_bone = false;
 
@@ -302,35 +357,114 @@ namespace big
 			{
 				// Get player bones even when in vehicle
 				const auto ragdoll = soldier->m_pRagdollComponent;
-				if (!IsValidPtr(ragdoll))
-					continue;
-
-				// Force update pose for vehicle passenger
-				*(BYTE*)((uintptr_t)soldier + 0x1A) = 159;
-				soldier->m_Occluded = false;
-
-				if (g_settings.aim_auto_bone)
+				if (IsValidPtr(ragdoll))
 				{
-					static const UpdatePoseResultData::BONES bone_priority[] =
+					if (g_settings.aim_auto_bone)
 					{
-						UpdatePoseResultData::BONES::Head,
-						UpdatePoseResultData::BONES::Neck,
-						UpdatePoseResultData::BONES::Spine1,
-						UpdatePoseResultData::BONES::Spine2,
-						UpdatePoseResultData::BONES::Hips
-					};
-
-					for (const auto& bone : bone_priority)
-					{
-						if (ragdoll->GetBone(bone, head_vec))
+						static const UpdatePoseResultData::BONES bone_priority[] =
 						{
-							got_bone = true;
-							break;
+							UpdatePoseResultData::BONES::Head,
+							UpdatePoseResultData::BONES::Neck,
+							UpdatePoseResultData::BONES::Spine1,
+							UpdatePoseResultData::BONES::Spine2,
+							UpdatePoseResultData::BONES::Hips
+						};
+
+						for (const auto& bone : bone_priority)
+						{
+							if (ragdoll->GetBone(bone, head_vec))
+							{
+								got_bone = true;
+								break;
+							}
 						}
 					}
+					else
+						got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
 				}
-				else
-					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+
+				// If we failed to get the bone but the vehicle is valid, target a strategic point based on vehicle type
+				if (!got_bone)
+				{
+					TransformAABBStruct transform = get_transform(vehicle);
+					Vector3 center = transform.Transform.Translation() + (transform.AABB.m_Min + transform.AABB.m_Max) * 0.5f;
+
+					// Convert Vector4 to Vector3 for size calculation
+					Vector3 min = Vector3(transform.AABB.m_Min.x, transform.AABB.m_Min.y, transform.AABB.m_Min.z);
+					Vector3 max = Vector3(transform.AABB.m_Max.x, transform.AABB.m_Max.y, transform.AABB.m_Max.z);
+					Vector3 size = max - min;
+
+					// Get vehicle type
+					VehicleData::VehicleType type = VehicleData::VehicleType::VEHICLE; // Default
+					const auto data = vehicle->m_Data;
+					if (IsValidPtrWithVTable(data))
+						type = data->GetVehicleType();
+
+					// Offset from center based on vehicle type
+					Vector3 offset(0, 0, 0);
+
+					switch (type)
+					{
+					case VehicleData::VehicleType::TANK:
+					case VehicleData::VehicleType::TANKIFV:
+					case VehicleData::VehicleType::TANKARTY:
+					case VehicleData::VehicleType::TANKAA:
+					case VehicleData::VehicleType::TANKAT:
+					case VehicleData::VehicleType::TANKLC:
+						// For tanks, aim for the turret/upper area
+						offset = Vector3(0, size.y * 0.3f, 0);
+						break;
+
+					case VehicleData::VehicleType::HELIATTACK:
+					case VehicleData::VehicleType::HELISCOUT:
+					case VehicleData::VehicleType::HELITRANS:
+						// For helicopters, aim for the cockpit (front upper)
+						offset = Vector3(size.x * 0.3f, size.y * 0.2f, 0);
+						break;
+
+					case VehicleData::VehicleType::JET:
+					case VehicleData::VehicleType::JETBOMBER:
+						// For jets, aim for the cockpit or engine
+						offset = Vector3(size.x * 0.2f, size.y * 0.1f, 0);
+						break;
+
+					case VehicleData::VehicleType::BOAT:
+						// For boats, aim for the bridge/control area
+						offset = Vector3(size.x * 0.2f, size.y * 0.3f, 0);
+						break;
+
+					case VehicleData::VehicleType::CAR:
+					case VehicleData::VehicleType::JEEP:
+						// For land vehicles, aim for the driver area (front upper)
+						offset = Vector3(size.x * 0.25f, size.y * 0.2f, 0);
+						break;
+
+					case VehicleData::VehicleType::STATIONARY:
+					case VehicleData::VehicleType::STATICAT:
+					case VehicleData::VehicleType::STATICAA:
+						// For stationary weapons, aim for the gunner position
+						offset = Vector3(0, size.y * 0.4f, 0);
+						break;
+
+					default:
+						// Default aim point (slightly above center for most vehicles)
+						offset = Vector3(0, size.y * 0.1f, 0);
+						break;
+					}
+
+					Matrix rotation = transform.Transform;
+					rotation.Translation(Vector3(0, 0, 0)); // Clear translation component to keep only rotation
+
+					// Apply rotation to offset
+					Vector3 oriented_offset;
+					oriented_offset.x = offset.x * rotation._11 + offset.y * rotation._21 + offset.z * rotation._31;
+					oriented_offset.y = offset.x * rotation._12 + offset.y * rotation._22 + offset.z * rotation._32;
+					oriented_offset.z = offset.x * rotation._13 + offset.y * rotation._23 + offset.z * rotation._33;
+
+					// Set the aim point
+					head_vec = center + oriented_offset;
+					got_bone = true;
+				}
 			}
 			else
 			{
@@ -449,14 +583,61 @@ using namespace big;
 
 namespace plugins
 {
+	void vehicle_aimbot(AimbotTarget& target)
+	{
+		const auto border_input_node = BorderInputNode::GetInstance();
+		if (!border_input_node) return;
+
+		const auto mouse = border_input_node->m_pMouse;
+		if (!mouse) return;
+
+		const auto device = mouse->m_pDevice;
+		if (!device) return;
+
+		Vector2 camera_center;
+		if (auto vehicle_turret = VehicleTurret::GetInstance(); IsValidPtr(vehicle_turret))
+			world_to_screen(vehicle_turret->GetVehicleCrosshair(), camera_center);
+		else
+		{
+			Vector2 screen_size = get_screen_size();
+			camera_center = { screen_size.x * .5f, screen_size.y * .5f };
+		}
+
+		Vector2 predicted;
+		world_to_screen(target.m_WorldPosition, predicted);
+
+		auto delta = get_abs_delta_at_given_points(camera_center, predicted);
+		Vector2 delta_vec = camera_center - predicted;
+
+		// Calculate target movement
+		float target_x = -delta_vec.x / g_settings.aim_vehicle_smooth;
+		float target_y = -delta_vec.y / g_settings.aim_vehicle_smooth;
+
+		// Keep track of current movement (static to persist between function calls)
+		static float current_x = 0.0f;
+		static float current_y = 0.0f;
+
+		// Lerp factor controls how quickly to move toward the target (0.0-1.0)
+		float lerp_factor = 0.35f;
+
+		// Linear interpolation between current and target values
+		current_x = current_x + (target_x - current_x) * lerp_factor;
+		current_y = current_y + (target_y - current_y) * lerp_factor;
+
+		// Apply the lerped values to the mouse buffer
+		device->m_Buffer.x = current_x;
+		device->m_Buffer.y = current_y;
+	}
+
 	void aimbot(float delta_time)
 	{
 		// Controller support
 		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
 
 		// Pressed status
-		auto is_pressed = [=]() {
-			return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
+		auto is_pressed = [=]()
+			{
+				return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
 			};
 
 		if (!is_pressed())
@@ -475,6 +656,65 @@ namespace plugins
 		if (!IsValidPtr(local_soldier)) return;
 
 		if (!local_soldier->IsAlive()) return;
+
+		// Check if player is in vehicle
+		const auto local_vehicle = local_player->GetVehicle();
+
+		// Handle vehicle aimbot
+		if (IsValidPtr(local_vehicle))
+		{
+			// This aimbot wasn't designed for jets or helicopters
+			if (IsValidPtrWithVTable(local_vehicle->m_Data))
+			{
+				if (local_vehicle->m_Data->IsInHeli() || local_vehicle->m_Data->IsInJet())
+					return;
+			}
+
+			AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
+
+			if (!IsValidPtr(target.m_Player)) return;
+			if (!target.m_HasTarget) return;
+
+			// Friends list support
+			if (g_settings.aim_ignore_friends)
+			{
+				uint64_t persona_id = target.m_Player->m_onlineId.m_personaid;
+				bool is_friend = plugins::is_friend(persona_id);
+
+				// Quit if friend
+				if (is_friend)
+					return;
+			}
+
+			// Get correct entity for prediction
+			ClientControllableEntity* prediction_target = nullptr;
+			if (IsValidPtr(target.m_Player->GetVehicle()))
+				prediction_target = target.m_Player->GetVehicle();
+			else
+				prediction_target = target.m_Player->GetSoldier();
+
+			// Doing predict
+			auto prediction = m_AimbotPredictor.PredictTarget(
+				local_soldier,
+				prediction_target,
+				target.m_WorldPosition,
+				Matrix() // Empty matrix since vehicle doesn't use shoot space
+			);
+
+			if (!prediction.success)
+				return;
+
+			// Update
+			target.m_WorldPosition = prediction.predicted_position;
+
+			// Update global prediction point
+			g_globals.g_pred_aim_point = target.m_WorldPosition;
+			g_globals.g_has_pred_aim_point = target.m_HasTarget;
+
+			// Call vehicle aimbot
+			vehicle_aimbot(target);
+			return;
+		}
 
 		const auto weapon_component = local_soldier->m_pWeaponComponent;
 		if (!IsValidPtr(weapon_component)) return;
@@ -565,24 +805,21 @@ namespace plugins
 
 		m_AimbotSmoother.Update(delta_time);
 
-		Vector3 vDir = target.m_WorldPosition - shoot_space.Translation();
-		vDir.Normalize();
+		Vector3 v_dir = target.m_WorldPosition - shoot_space.Translation();
+		v_dir.Normalize();
 
-		float horizontal_angle = -atan2(vDir.x, vDir.z);
-		float vertical_angle = atan2(vDir.y, sqrt(vDir.x * vDir.x + vDir.z * vDir.z));
+		float horizontal_angle = -atan2(v_dir.x, v_dir.z);
+		float vertical_angle = atan2(v_dir.y, sqrt(v_dir.x * v_dir.x + v_dir.z * v_dir.z));
 
-		// Use zero angle from prediction if available
-		if (prediction.zero_angle != 0.0f)
-			vertical_angle = prediction.zero_angle;
-
-		Vector2 BotAngles = {
+		Vector2 aim_angles =
+		{
 			horizontal_angle,
 			vertical_angle
 		};
 
-		BotAngles -= aiming_simulation->m_Sway;
-		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, BotAngles);
-		aim_assist->m_AimAngles = BotAngles;
+		aim_angles -= aiming_simulation->m_Sway;
+		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, aim_angles);
+		aim_assist->m_AimAngles = aim_angles;
 		m_PreviousTarget = target;
 	}
 
@@ -598,8 +835,6 @@ namespace plugins
 
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!IsValidPtr(local_player)) return;
-
-		if (local_player->GetVehicle()) return;
 
 		const auto local_soldier = local_player->GetSoldier();
 		if (!IsValidPtr(local_soldier)) return;

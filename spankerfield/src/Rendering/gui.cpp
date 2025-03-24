@@ -230,7 +230,7 @@ namespace big
 
 				ImGui::Separator();
 
-				ImGui::Text(xorstr_("Smoothing"));
+				ImGui::Text(xorstr_("Soldier"));
 
 				ImGui::PushItemWidth(300.f);
 				ImGui::SliderFloat(xorstr_("Minimum time to target (sec)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
@@ -243,6 +243,12 @@ namespace big
 				if (g_settings.aim_max_time_to_target < 0.2f)
 					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
 
+				ImGui::PopItemWidth();
+
+				ImGui::Text(xorstr_("Vehicle"));
+
+				ImGui::PushItemWidth(300.f);
+				ImGui::SliderFloat(xorstr_("Smoothing factor##Aimbot"), &g_settings.aim_vehicle_smooth, 0.f, 20.f);
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
@@ -1078,6 +1084,12 @@ namespace big
 					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
 
 				ImGui::Separator();			
+
+				ImGui::Checkbox(xorstr_("Use cheap drawing"), &g_settings.use_cheap_boxes);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will use the game's DebugRenderer for the most part instead of ImGui to render most of the visuals."));
+
+				ImGui::SameLine();
 
 				ImGui::Checkbox(xorstr_("Use cheap text"), &g_settings.use_cheap_text);
 				if (ImGui::IsItemHovered())

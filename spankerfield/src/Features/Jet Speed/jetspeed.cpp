@@ -46,7 +46,7 @@ namespace plugins
 			const auto input = input_cache->m_Event;
 			if (!input) return;
 
-			Vector3 vehicle_velocity = *local_soldier->GetVelocity();
+			Vector3 vehicle_velocity = *local_vehicle->GetVelocity();
 			if (abs(vehicle_velocity.x) < 0.0001f && abs(vehicle_velocity.y) < 0.0001f && abs(vehicle_velocity.z) < 0.0001f)
 			    return;
 
