@@ -201,7 +201,7 @@ namespace plugins
 				if (IsValidPtr(vehicle))
 				{
 					const auto data = get_vehicle_data(vehicle);
-					if (IsValidPtr(data))
+					if (IsValidPtrWithVTable(data))
 					{
 						const auto name = data->m_NameID;
 						if (IsValidPtr(name))
