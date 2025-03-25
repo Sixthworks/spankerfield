@@ -227,6 +227,7 @@
     <ClInclude Include="src\Rendering\font.h" />
     <ClInclude Include="src\Rendering\gui.h" />
     <ClInclude Include="src\Rendering\Maps\bone_manager.h" />
+    <ClInclude Include="src\Utilities\firing_data.h" />
     <ClInclude Include="src\Utilities\key_map.h" />
     <ClInclude Include="src\Rendering\Maps\nicknames.h" />
     <ClInclude Include="src\Rendering\renderer.h" />

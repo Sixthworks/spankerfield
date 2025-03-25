@@ -16,6 +16,8 @@ namespace big
 
 	IDXGISwapChain* get_swapchain();
 	bool punkbuster_capturing();
+
+	bool is_localplayer_in_vehicle();
 	WeaponFiring* get_weapon_firing();
 
 	int generate_random_int(int min, int max);

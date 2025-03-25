@@ -5,6 +5,7 @@
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/quartic.h"
 #include "../../Utilities/other.h"
+#include "../../Utilities/firing_data.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Features/Friend List/friend_list.h"
 
@@ -49,7 +50,7 @@ namespace big
 				return result;
 
 			fire_position = vehicle_turret->GetVehicleCrosshair();
-			my_velocity = *local_vehicle->GetVelocity();
+			my_velocity = local_vehicle->m_VelocityVec;
 		}
 		else
 		{
@@ -75,28 +76,35 @@ namespace big
 		}
 
 		// Get common firing data (works for both vehicle and infantry)
-		const auto weapon_firing = is_in_vehicle ? VehicleTurret::GetInstance()->m_pWeaponFiring : WeaponFiring::GetInstance();
-
+		const auto weapon_firing = get_weapon_firing();
 		if (!IsValidPtr(weapon_firing))
 			return result;
 
-		const auto firing = weapon_firing->m_pPrimaryFire;
-		if (!IsValidPtr(firing) || (uintptr_t)firing == 0x10F00000030)
-			return result;
-
-		const auto firing_data = firing->m_FiringData;
-		if (!IsValidPtrWithVTable(firing_data) || (uintptr_t)(firing_data) == 0x3893E06)
+		const auto firing_data = WeaponFiringDataRetriever::GetSafeFiringData(weapon_firing, is_in_vehicle);
+		if (!IsValidPtr(firing_data))
 			return result;
 
 		const auto bullet = firing_data->m_ShotConfigData.m_ProjectileData;
-		if (!IsValidPtrWithVTable(bullet))
+		if (!IsValidPtr(bullet))
 			return result;
 
 		Vector4 initial_speed_4 = firing_data->m_ShotConfigData.m_Speed;
 		initial_speed = Vector3(initial_speed_4.x, initial_speed_4.y, initial_speed_4.z);
 
-		// Get enemy velocity and force update
+		// Get enemy velocity
 		Vector3 enemy_velocity = *enemy->GetVelocity();
+
+		// This is really retarded, but it's better to access the VelocityVec of the vehicle instead of GetVelocity()
+		if (IsValidPtr(enemy->m_Data))
+		{
+			if (enemy->m_Data->GetVehicleCategory() != VehicleData::VehicleCategory::UNUSED)
+			{
+				const auto vehicle = reinterpret_cast<ClientVehicleEntity*>(enemy);
+				enemy_velocity = vehicle->m_VelocityVec;
+			}
+		}
+
+		// Force update
 		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
 
 		// Gravity
@@ -132,15 +140,11 @@ namespace big
 
 		// Skip complex prediction for close targets
 		if (distance <= CLOSE_TARGET_DIST_FLOAT)
-		{
-			// For close targets, just aim directly without adjusting the aim point
 			return false;
-		}
 
 		// Use the bullet speed magnitude for calculations
 		float bullet_velocity = bullet_speed.Length();
 		float bullet_gravity = fabs(gravity);
-		float travel_time = 0.0f;
 		Vector3 hit_pos = aim_point;
 
 		// Calculate zeroing adjustment
@@ -152,7 +156,8 @@ namespace big
 			zero_angle = atan2(zero_drop, zero_entry.m_ZeroDistance);
 		}
 
-		// Handle prediction with gravity
+		float best_travel_time = 0.0f;
+
 		if (bullet_gravity != 0.0f)
 		{
 			// Coefficients for the quartic equation
@@ -165,87 +170,108 @@ namespace big
 			// Solve the quartic equation to find time of impact
 			const auto& roots = solve_quartic(b / a, c / a, d / a, e / a);
 
-			// Find the smallest positive root (shortest time to impact)
+			float min_prediction_error = FLT_MAX;
+
+			// Improved root selection with error minimization
 			for (int i = 0; i < 4; ++i)
 			{
-				if (roots[i].imag() == 0.0 && roots[i].real() > 0.01f)
+				// Only consider real, positive roots
+				if (roots[i].imag() == 0.0 && roots[i].real() > 0.01)
 				{
-					if (travel_time == 0.0f || roots[i].real() < travel_time)
-						travel_time = static_cast<float>(roots[i].real());
+					float current_time = static_cast<float>(roots[i].real());
+
+					// Calculate predicted hit position
+					Vector3 predicted_hit_pos;
+					predicted_hit_pos.x = shoot_space.x + ((relative_pos.x / current_time) + enemy_velocity.x) * current_time;
+					predicted_hit_pos.y = shoot_space.y + ((relative_pos.y / current_time) + enemy_velocity.y - (0.5f * bullet_gravity * current_time)) * current_time;
+					predicted_hit_pos.z = shoot_space.z + ((relative_pos.z / current_time) + enemy_velocity.z) * current_time;
+
+					// Calculate prediction error (distance from original aim point)
+					float prediction_error = (predicted_hit_pos - aim_point).Length();
+
+					// Select root with minimal prediction error
+					if (prediction_error < min_prediction_error)
+					{
+						min_prediction_error = prediction_error;
+						best_travel_time = current_time;
+						hit_pos = predicted_hit_pos;
+					}
 				}
 			}
 
-			// If no valid travel time found, return
-			if (travel_time <= 0.0f)
+			// Check if we found a valid solution
+			if (best_travel_time <= 0.0f)
 				return false;
-
-			// Calculate predicted hit velocity components
-			double hit_vel_x = (relative_pos.x / travel_time) + enemy_velocity.x;
-			double hit_vel_y = (relative_pos.y / travel_time) + enemy_velocity.y - (0.5f * bullet_gravity * travel_time);
-			double hit_vel_z = (relative_pos.z / travel_time) + enemy_velocity.z;
-
-			// Calculate predicted hit position with compensation
-			hit_pos.x = (shoot_space.x + hit_vel_x * travel_time);
-			hit_pos.y = (shoot_space.y + hit_vel_y * travel_time);
-			hit_pos.z = (shoot_space.z + hit_vel_z * travel_time);
-
-			if (zero_angle != 0.0f)
-				hit_pos.y += sin(zero_angle) * distance;
 		}
 		else
 		{
-			// No gravity case - simplified quadratic solution
+			// No gravity case - improved quadratic solution
 			const double a = (enemy_velocity.Dot(enemy_velocity)) - (bullet_velocity * bullet_velocity);
 			const double b = 2.0 * (relative_pos.Dot(enemy_velocity));
 			const double c = relative_pos.Dot(relative_pos);
 
-			// Handle special case where a is zero (target moving at bullet speed)
-			if (fabs(a) < 0.0001f)
-				return false;
-
-			double discriminant = b * b - (4 * a * c);
-
-			// Find the smallest non-negative solution
-			if (discriminant > 0.0f)
+			// Robust handling of near-zero coefficients
+			const double eps = 1e-6;
+			if (std::abs(a) < eps)
 			{
-				const double t1 = (-b - sqrt(discriminant)) / (2 * a);
-				const double t2 = (-b + sqrt(discriminant)) / (2 * a);
-
-				if (t1 > 0.01f && t2 > 0.01f)
-					travel_time = static_cast<float>(min(t1, t2));
-				else if (t1 <= 0.01f && t2 > 0.01f)
-					travel_time = static_cast<float>(t2);
-				else if (t1 > 0.01f && t2 <= 0.01f)
-					travel_time = static_cast<float>(t1);
+				// Linear approximation for very low relative velocity
+				if (std::abs(b) > eps)
+				{
+					best_travel_time = -c / b;
+					if (best_travel_time > 0.01f)
+					{
+						hit_pos.x = shoot_space.x + enemy_velocity.x * best_travel_time;
+						hit_pos.y = shoot_space.y + enemy_velocity.y * best_travel_time;
+						hit_pos.z = shoot_space.z + enemy_velocity.z * best_travel_time;
+					}
+					else
+						return false;
+				}
 				else
 					return false;
 			}
-			else if (fabs(discriminant) < 0.0001f)
-			{
-				travel_time = static_cast<float>(-b / (2 * a));
-				if (travel_time <= 0.01f)
-					return 0.0f;
-			}
 			else
 			{
-				return 0.0f; // No real solutions
+				// Calculate discriminant with improved stability
+				double discriminant = b * b - (4 * a * c);
+
+				// Robust root finding
+				if (discriminant >= -eps) // Allow for small numerical errors
+				{
+					// Handle near-zero discriminant case
+					if (std::abs(discriminant) < eps)
+						discriminant = 0.0;
+
+					// Take square root safely
+					double sqrt_disc = std::sqrt(max(0.0, discriminant));
+
+					// Calculate roots
+					double t1 = (-b - sqrt_disc) / (2 * a);
+					double t2 = (-b + sqrt_disc) / (2 * a);
+
+					// Select valid travel time
+					if (t1 > 0.01f && t2 > 0.01f)
+						best_travel_time = static_cast<float>(min(t1, t2));
+					else if (t1 > 0.01f)
+						best_travel_time = static_cast<float>(t1);
+					else if (t2 > 0.01f)
+						best_travel_time = static_cast<float>(t2);
+					else
+						return false;
+
+					// Calculate hit position
+					hit_pos.x = shoot_space.x + ((relative_pos.x / best_travel_time) + enemy_velocity.x) * best_travel_time;
+					hit_pos.y = shoot_space.y + ((relative_pos.y / best_travel_time) + enemy_velocity.y) * best_travel_time;
+					hit_pos.z = shoot_space.z + ((relative_pos.z / best_travel_time) + enemy_velocity.z) * best_travel_time;
+				}
+				else
+					return false; // No real solutions
 			}
-
-			// Calculate hit velocity components
-			double hit_vel_x = (relative_pos.x / travel_time) + enemy_velocity.x;
-			double hit_vel_y = (relative_pos.y / travel_time) + enemy_velocity.y;
-			double hit_vel_z = (relative_pos.z / travel_time) + enemy_velocity.z;
-
-			// Calculate hit position
-			hit_pos.x = (shoot_space.x + hit_vel_x * travel_time);
-			hit_pos.y = (shoot_space.y + hit_vel_y * travel_time);
-			hit_pos.z = (shoot_space.z + hit_vel_z * travel_time);
-
-			if (zero_angle != 0.0f)
-				hit_pos.y += sin(zero_angle) * distance;
-
-			return true;
 		}
+
+		// Apply zeroing compensation if needed
+		if (zero_angle != 0.0f)
+			hit_pos.y += sin(zero_angle) * distance;
 
 		// Update the aim point with our predicted hit position
 		aim_point = hit_pos;
@@ -397,7 +423,7 @@ namespace big
 					// Get vehicle type
 					VehicleData::VehicleType type = VehicleData::VehicleType::VEHICLE; // Default
 					const auto data = vehicle->m_Data;
-					if (IsValidPtrWithVTable(data))
+					if (IsValidPtr(data))
 						type = data->GetVehicleType();
 
 					// Offset from center based on vehicle type
@@ -664,7 +690,7 @@ namespace plugins
 		if (IsValidPtr(local_vehicle))
 		{
 			// This aimbot wasn't designed for jets or helicopters
-			if (IsValidPtrWithVTable(local_vehicle->m_Data))
+			if (IsValidPtr(local_vehicle->m_Data))
 			{
 				if (local_vehicle->m_Data->IsInHeli() || local_vehicle->m_Data->IsInJet())
 					return;

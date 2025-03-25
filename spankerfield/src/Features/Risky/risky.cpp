@@ -67,7 +67,7 @@ namespace plugins
 			if (!IsValidPtr(sway)) return;
 
 			const auto data = sway->m_Data;
-			if (!IsValidPtrWithVTable(data)) return;
+			if (!IsValidPtr(data)) return;
 
 			if (g_settings.no_recoil)
 			{

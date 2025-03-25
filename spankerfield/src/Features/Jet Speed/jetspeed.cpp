@@ -46,11 +46,8 @@ namespace plugins
 			const auto input = input_cache->m_Event;
 			if (!input) return;
 
-			Vector3 vehicle_velocity = *local_vehicle->GetVelocity();
-			if (abs(vehicle_velocity.x) < 0.0001f && abs(vehicle_velocity.y) < 0.0001f && abs(vehicle_velocity.z) < 0.0001f)
-			    return;
-
-			auto velocity = sqrt(pow(vehicle_velocity.x, 2) + pow(vehicle_velocity.y, 2) + pow(vehicle_velocity.z, 2)) * 3.6f;
+			// Simpler velocity
+			auto velocity = local_vehicle->m_VelocityVec.Length() * 3.6f;
 
 			switch (vehicle_data->GetVehicleType())
 			{

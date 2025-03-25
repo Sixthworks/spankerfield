@@ -341,5 +341,8 @@
     <ClInclude Include="src\Features\C4 Bot\c4_bot.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utilities\firing_data.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

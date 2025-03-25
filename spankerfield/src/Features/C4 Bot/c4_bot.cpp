@@ -175,7 +175,7 @@ namespace plugins
             if (!IsValidPtr(explosive_controllable)) continue;
 
             // Check if data is valid
-            if (!IsValidPtrWithVTable(explosive_controllable->m_Data)) continue;
+            if (!IsValidPtr(explosive_controllable->m_Data)) continue;
 
             // Check if this is C4 
             auto explosive_type = explosive_controllable->m_Data->GetVehicleType();
@@ -185,7 +185,7 @@ namespace plugins
             auto explosive_owner = explosive->m_pOwner;
             auto explosive_owner_data = explosive_owner.GetData();
 
-            if (!IsValidPtrWithVTable(explosive_owner_data))
+            if (!IsValidPtr(explosive_owner_data))
                 continue;
 
             if (explosive_owner_data != local_player) continue;

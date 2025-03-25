@@ -54,7 +54,7 @@ namespace plugins
         if (!IsValidPtr(local_missile)) return;
 
         const auto data = local_missile->m_pMissileEntityData;
-        if (!IsValidPtrWithVTable(data)) return;
+        if (!IsValidPtr(data)) return;
 
         if (data->IsLockable()) return;
 

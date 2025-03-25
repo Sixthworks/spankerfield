@@ -48,7 +48,7 @@ namespace big
 	VehicleData* get_vehicle_data(ClientVehicleEntity* vehicle)
 	{
 		const auto data = vehicle->m_Data;
-		if (!IsValidPtrWithVTable(data)) return nullptr;
+		if (!IsValidPtr(data)) return nullptr;
 
 		return data;
 	}
@@ -120,6 +120,20 @@ namespace big
 		return (*(int*)(*screenshot_module + 0x14) != -1);
 	}
 
+	bool is_localplayer_in_vehicle()
+	{
+		const auto game_context = ClientGameContext::GetInstance();
+		if (!game_context) return false;
+
+		const auto player_manager = game_context->m_pPlayerManager;
+		if (!player_manager) return false;
+
+		const auto local_player = player_manager->m_pLocalPlayer;
+		if (!local_player) return false;
+
+		return IsValidPtr(local_player->GetVehicle());
+	}
+
 	WeaponFiring* get_weapon_firing()
 	{
 		const auto game_context = ClientGameContext::GetInstance();
@@ -131,18 +145,10 @@ namespace big
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return nullptr;
 
-		const auto local_soldier = local_player->GetSoldier();
-		if (!local_soldier) return nullptr;
+		const auto weapon_firing = IsValidPtr(local_player->GetVehicle()) ? VehicleTurret::GetInstance()->m_pWeaponFiring : WeaponFiring::GetInstance();
+		if (!IsValidPtr(weapon_firing)) return nullptr;
 
-		if (local_soldier->IsAlive())
-		{
-			const auto weapon = WeaponFiring::GetInstance();
-			if (!weapon) return nullptr;
-
-			return weapon;
-		}
-
-		return nullptr;
+		return weapon_firing;
 	}
 
 	int generate_random_int(int min, int max)
