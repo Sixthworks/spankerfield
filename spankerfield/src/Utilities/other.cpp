@@ -145,8 +145,8 @@ namespace big
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!local_player) return nullptr;
 
-		const auto weapon_firing = IsValidPtr(local_player->GetVehicle()) ? VehicleTurret::GetInstance()->m_pWeaponFiring : WeaponFiring::GetInstance();
-		if (!IsValidPtr(weapon_firing)) return nullptr;
+		const auto weapon_firing = WeaponFiring::GetInstance();
+		if (!weapon_firing) return nullptr;
 
 		return weapon_firing;
 	}

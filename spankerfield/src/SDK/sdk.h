@@ -1435,7 +1435,8 @@ public:
 		FLOAT data[4][4];
 	};
 	LinearTransform()
-	{}
+	{
+	}
 };
 
 class AxisAlignedBox
@@ -1445,7 +1446,8 @@ public:
 	Vector4 m_Max; //0x0010 
 
 	AxisAlignedBox()
-	{}
+	{
+	}
 };//Size=0x0020
 
 struct TransformAABBStruct
@@ -1455,7 +1457,8 @@ struct TransformAABBStruct
 	Matrix pad;
 
 	TransformAABBStruct()
-	{}
+	{
+	}
 };
 
 class Message : public ITypedObject
@@ -2190,14 +2193,14 @@ public:
 	__int32 m_BulletsPerBurst; //0x0080 
 
 	/*
-		High probability of a dumper's error 
+		High probability of a dumper's error
 		just commented old code
 	*/
 	// unsigned char m_RelativeTargetAiming; //0x0080 
-    // unsigned char m_ForceSpawnToCamera; //0x0081 
-    // unsigned char m_SpawnVisualAtWeaponBone; //0x0082 
-    // unsigned char m_ActiveForceSpawnToCamera; //0x0083 
-    // char N00001926[12]; //0x0084
+	// unsigned char m_ForceSpawnToCamera; //0x0081 
+	// unsigned char m_SpawnVisualAtWeaponBone; //0x0082 
+	// unsigned char m_ActiveForceSpawnToCamera; //0x0083 
+	// char N00001926[12]; //0x0084
 	unsigned char m_RelativeTargetAiming; //0x0084
 	unsigned char m_ForceSpawnToCamera; //0x0085 
 	unsigned char m_SpawnVisualAtWeaponBone; //0x0086 
@@ -3390,7 +3393,8 @@ public:
 
 public:
 	Tuple2(T t_one, T t_two)
-		: m_one(std::move(t_one)), m_two(std::move(t_two)) { }
+		: m_one(std::move(t_one)), m_two(std::move(t_two)) {
+	}
 };
 
 class Color32
@@ -3410,12 +3414,15 @@ public:
 
 public:
 	Color32(const DWORD t_color)
-		: dwColor(t_color) { }
+		: dwColor(t_color) {
+	}
 	Color32()
-		: dwColor(0) { }
+		: dwColor(0) {
+	}
 
 	Color32(const BYTE Red, const BYTE Green, const BYTE Blue, const BYTE Alpha)
-		: R(Red), G(Green), B(Blue), A(Alpha) { }
+		: R(Red), G(Green), B(Blue), A(Alpha) {
+	}
 };
 
 class DebugRenderer2

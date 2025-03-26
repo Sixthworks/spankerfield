@@ -17,6 +17,62 @@
 
 namespace big
 {
+	void AimbotPredictor::PredictLinearMove(const Vector3& linearVelocity, const double predictionTime, const Vector3& curPosition, Vector3* out)
+	{
+		*out = curPosition + (linearVelocity * predictionTime);
+	}
+
+	void AimbotPredictor::PredictRotation(const Vector3& angularVelocity, const Quaternion& orientation, const double predictionTime, Quaternion* out)
+	{
+		float angle = angularVelocity.Length() * static_cast<float>(predictionTime);
+		Vector3 rotation_axis = angularVelocity / angularVelocity.Length();
+		Quaternion rotation_from_angular_velocity = Quaternion::CreateFromAxisAngle(rotation_axis, angle);
+
+		*out = orientation * rotation_from_angular_velocity;
+	}
+
+	void AimbotPredictor::PredictFinalRotation(const Vector3& linearVel, const Vector3& angularVel, const double predTime, const Quaternion& orientation, const Vector3& curPosition, Quaternion* predOrientationOut, Vector3* predLinearVelOut)
+	{
+		auto translation = [](const Quaternion& quat, const Vector3& vec) -> Vector3
+			{
+				float num = quat.x * 2.f;
+				float num2 = quat.y * 2.f;
+				float num3 = quat.z * 2.f;
+				float num4 = quat.x * num;
+				float num5 = quat.y * num2;
+				float num6 = quat.z * num3;
+				float num7 = quat.x * num2;
+				float num8 = quat.x * num3;
+				float num9 = quat.y * num3;
+				float num10 = quat.w * num;
+				float num11 = quat.w * num2;
+				float num12 = quat.w * num3;
+
+				Vector3 result;
+				result.x = (1.f - (num5 + num6)) * vec.x + (num7 - num12) * vec.y + (num8 + num11) * vec.z;
+				result.y = (num7 + num12) * vec.x + (1.f - (num4 + num6)) * vec.y + (num9 - num10) * vec.z;
+				result.z = (num8 - num11) * vec.x + (num9 + num10) * vec.y + (1.f - (num4 + num5)) * vec.z;
+
+				return result;
+			};
+
+		Quaternion pred_orientation = orientation;
+		Vector3 pred_lin_vel = linearVel;
+		Vector3 pred_displacement = curPosition;
+		
+		float delta_time = (predTime * 69.f / 100.0f) / 16;
+		for (int i = 0; i < 16; ++i)
+		{
+			PredictLinearMove(pred_lin_vel, delta_time, pred_displacement, &pred_displacement);
+			PredictRotation(angularVel, pred_orientation, delta_time, &pred_orientation);
+
+			pred_lin_vel = translation(pred_orientation, Vector3(0.0f, 0.0f, pred_lin_vel.Length()));
+		}
+
+		*predLinearVelOut = pred_lin_vel;
+		*predOrientationOut = pred_orientation;
+	}
+
 	AimbotPredictor::PredictionResult AimbotPredictor::PredictTarget(
 		ClientSoldierEntity* local_entity,
 		ClientControllableEntity* enemy,
@@ -29,7 +85,6 @@ namespace big
 		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
 			return result;
 
-
 		// Check if player is in vehicle
 		const auto local_player = ClientGameContext::GetInstance()->m_pPlayerManager->m_pLocalPlayer;
 		const auto local_vehicle = local_player->GetVehicle();
@@ -37,10 +92,10 @@ namespace big
 
 		// Weapon variables we need to populate
 		Vector3 fire_position;
-		Vector3 spawn_offset;
 		Vector3 initial_speed;
 		Vector3 my_velocity;
 		WeaponZeroingEntry zero_entry(-1.0f, -1.0f);
+		AngularPredictionData_s angular_data;
 
 		// Get weapon data (either from vehicle or infantry)
 		if (is_in_vehicle)
@@ -49,7 +104,7 @@ namespace big
 			if (!IsValidPtr(vehicle_turret))
 				return result;
 
-			fire_position = vehicle_turret->GetVehicleCrosshair();
+			fire_position = vehicle_turret->GetVehicleCameraOrigin();
 			my_velocity = local_vehicle->m_VelocityVec;
 		}
 		else
@@ -101,6 +156,16 @@ namespace big
 			{
 				const auto vehicle = reinterpret_cast<ClientVehicleEntity*>(enemy);
 				enemy_velocity = vehicle->m_VelocityVec;
+
+				if (IsValidPtr(vehicle->GetChassisComponent()))
+				{
+					Matrix model_matrix;
+					vehicle->GetTransform(&model_matrix);
+
+					angular_data.orientation = matrix_to_quaternion(model_matrix);
+					angular_data.angular_velocity = vehicle->GetChassisComponent()->m_AngularVelocity;
+					angular_data.valid = true;
+				}
 			}
 		}
 
@@ -114,13 +179,14 @@ namespace big
 
 		// Calculate prediction
 		bool prediction_success = DoPrediction(
-			fire_position + spawn_offset,
+			fire_position,
 			result.predicted_position,
 			my_velocity,
 			enemy_velocity,
 			initial_speed,
 			gravity,
-			zero_entry);
+			zero_entry,
+			&angular_data);
 
 		result.success = prediction_success;
 		return result;
@@ -133,7 +199,8 @@ namespace big
 		const Vector3& enemy_velocity,
 		const Vector3& bullet_speed,
 		const float gravity,
-		const WeaponZeroingEntry& zero_entry)
+		const WeaponZeroingEntry& zero_entry,
+		const AngularPredictionData_s* angular_data)
 	{
 		Vector3 relative_pos = aim_point - shoot_space;
 		float distance = relative_pos.Length();
@@ -180,11 +247,27 @@ namespace big
 				{
 					float current_time = static_cast<float>(roots[i].real());
 
+					// Initialize target velocity as original enemy velocity
+					Vector3 target_vel = enemy_velocity;
+
+					if (angular_data && angular_data->valid)
+					{
+						PredictFinalRotation(
+							target_vel,
+							angular_data->angular_velocity,
+							current_time,
+							angular_data->orientation,
+							aim_point,
+							&g_globals.g_predicted_orientation,
+							&target_vel
+						);
+					}
+
 					// Calculate predicted hit position
 					Vector3 predicted_hit_pos;
-					predicted_hit_pos.x = shoot_space.x + ((relative_pos.x / current_time) + enemy_velocity.x) * current_time;
-					predicted_hit_pos.y = shoot_space.y + ((relative_pos.y / current_time) + enemy_velocity.y - (0.5f * bullet_gravity * current_time)) * current_time;
-					predicted_hit_pos.z = shoot_space.z + ((relative_pos.z / current_time) + enemy_velocity.z) * current_time;
+					predicted_hit_pos.x = shoot_space.x + ((relative_pos.x / current_time) + target_vel.x) * current_time;
+					predicted_hit_pos.y = shoot_space.y + ((relative_pos.y / current_time) + target_vel.y - (0.5f * bullet_gravity * current_time)) * current_time;
+					predicted_hit_pos.z = shoot_space.z + ((relative_pos.z / current_time) + target_vel.z) * current_time;
 
 					// Calculate prediction error (distance from original aim point)
 					float prediction_error = (predicted_hit_pos - aim_point).Length();
@@ -220,9 +303,24 @@ namespace big
 					best_travel_time = -c / b;
 					if (best_travel_time > 0.01f)
 					{
-						hit_pos.x = shoot_space.x + enemy_velocity.x * best_travel_time;
-						hit_pos.y = shoot_space.y + enemy_velocity.y * best_travel_time;
-						hit_pos.z = shoot_space.z + enemy_velocity.z * best_travel_time;
+						Vector3 target_vel = enemy_velocity;
+
+						if (angular_data && angular_data->valid)
+						{
+							PredictFinalRotation(
+								target_vel,
+								angular_data->angular_velocity,
+								best_travel_time,
+								angular_data->orientation,
+								aim_point,
+								&g_globals.g_predicted_orientation,
+								&target_vel
+							);
+						}
+
+						hit_pos.x = shoot_space.x + target_vel.x * best_travel_time;
+						hit_pos.y = shoot_space.y + target_vel.y * best_travel_time;
+						hit_pos.z = shoot_space.z + target_vel.z * best_travel_time;
 					}
 					else
 						return false;
@@ -259,10 +357,26 @@ namespace big
 					else
 						return false;
 
+					// Just a new variable
+					Vector3 target_vel = enemy_velocity;
+
+					if (angular_data && angular_data->valid)
+					{
+						PredictFinalRotation(
+							target_vel,
+							angular_data->angular_velocity,
+							best_travel_time,
+							angular_data->orientation,
+							aim_point,
+							&g_globals.g_predicted_orientation,
+							&target_vel
+						);
+					}
+
 					// Calculate hit position
-					hit_pos.x = shoot_space.x + ((relative_pos.x / best_travel_time) + enemy_velocity.x) * best_travel_time;
-					hit_pos.y = shoot_space.y + ((relative_pos.y / best_travel_time) + enemy_velocity.y) * best_travel_time;
-					hit_pos.z = shoot_space.z + ((relative_pos.z / best_travel_time) + enemy_velocity.z) * best_travel_time;
+					hit_pos.x = shoot_space.x + ((relative_pos.x / best_travel_time) + target_vel.x) * best_travel_time;
+					hit_pos.y = shoot_space.y + ((relative_pos.y / best_travel_time) + target_vel.y) * best_travel_time;
+					hit_pos.z = shoot_space.z + ((relative_pos.z / best_travel_time) + target_vel.z) * best_travel_time;
 				}
 				else
 					return false; // No real solutions
@@ -271,7 +385,7 @@ namespace big
 
 		// Apply zeroing compensation if needed
 		if (zero_angle != 0.0f)
-			hit_pos.y += sin(zero_angle) * distance;
+			hit_pos.y += sinf(zero_angle) * distance;
 
 		// Update the aim point with our predicted hit position
 		aim_point = hit_pos;
@@ -409,86 +523,11 @@ namespace big
 						got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
 				}
 
-				// If we failed to get the bone but the vehicle is valid, target a strategic point based on vehicle type
+				// If we failed to get the bone but the vehicle is valid, target the center of the AABB
 				if (!got_bone)
 				{
 					TransformAABBStruct transform = get_transform(vehicle);
-					Vector3 center = transform.Transform.Translation() + (transform.AABB.m_Min + transform.AABB.m_Max) * 0.5f;
-
-					// Convert Vector4 to Vector3 for size calculation
-					Vector3 min = Vector3(transform.AABB.m_Min.x, transform.AABB.m_Min.y, transform.AABB.m_Min.z);
-					Vector3 max = Vector3(transform.AABB.m_Max.x, transform.AABB.m_Max.y, transform.AABB.m_Max.z);
-					Vector3 size = max - min;
-
-					// Get vehicle type
-					VehicleData::VehicleType type = VehicleData::VehicleType::VEHICLE; // Default
-					const auto data = vehicle->m_Data;
-					if (IsValidPtr(data))
-						type = data->GetVehicleType();
-
-					// Offset from center based on vehicle type
-					Vector3 offset(0, 0, 0);
-
-					switch (type)
-					{
-					case VehicleData::VehicleType::TANK:
-					case VehicleData::VehicleType::TANKIFV:
-					case VehicleData::VehicleType::TANKARTY:
-					case VehicleData::VehicleType::TANKAA:
-					case VehicleData::VehicleType::TANKAT:
-					case VehicleData::VehicleType::TANKLC:
-						// For tanks, aim for the turret/upper area
-						offset = Vector3(0, size.y * 0.3f, 0);
-						break;
-
-					case VehicleData::VehicleType::HELIATTACK:
-					case VehicleData::VehicleType::HELISCOUT:
-					case VehicleData::VehicleType::HELITRANS:
-						// For helicopters, aim for the cockpit (front upper)
-						offset = Vector3(size.x * 0.3f, size.y * 0.2f, 0);
-						break;
-
-					case VehicleData::VehicleType::JET:
-					case VehicleData::VehicleType::JETBOMBER:
-						// For jets, aim for the cockpit or engine
-						offset = Vector3(size.x * 0.2f, size.y * 0.1f, 0);
-						break;
-
-					case VehicleData::VehicleType::BOAT:
-						// For boats, aim for the bridge/control area
-						offset = Vector3(size.x * 0.2f, size.y * 0.3f, 0);
-						break;
-
-					case VehicleData::VehicleType::CAR:
-					case VehicleData::VehicleType::JEEP:
-						// For land vehicles, aim for the driver area (front upper)
-						offset = Vector3(size.x * 0.25f, size.y * 0.2f, 0);
-						break;
-
-					case VehicleData::VehicleType::STATIONARY:
-					case VehicleData::VehicleType::STATICAT:
-					case VehicleData::VehicleType::STATICAA:
-						// For stationary weapons, aim for the gunner position
-						offset = Vector3(0, size.y * 0.4f, 0);
-						break;
-
-					default:
-						// Default aim point (slightly above center for most vehicles)
-						offset = Vector3(0, size.y * 0.1f, 0);
-						break;
-					}
-
-					Matrix rotation = transform.Transform;
-					rotation.Translation(Vector3(0, 0, 0)); // Clear translation component to keep only rotation
-
-					// Apply rotation to offset
-					Vector3 oriented_offset;
-					oriented_offset.x = offset.x * rotation._11 + offset.y * rotation._21 + offset.z * rotation._31;
-					oriented_offset.y = offset.x * rotation._12 + offset.y * rotation._22 + offset.z * rotation._32;
-					oriented_offset.z = offset.x * rotation._13 + offset.y * rotation._23 + offset.z * rotation._33;
-
-					// Set the aim point
-					head_vec = center + oriented_offset;
+					head_vec = transform.Transform.Translation() + (transform.AABB.m_Min + transform.AABB.m_Max) * 0.5f;
 					got_bone = true;
 				}
 			}

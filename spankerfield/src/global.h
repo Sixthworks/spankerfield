@@ -28,6 +28,8 @@ namespace big
 
 		Vector3 g_pred_aim_point{ 0.0f, 0.0f, 0.0f };
 		bool g_has_pred_aim_point{ false };
+
+		Quaternion g_predicted_orientation;
 	};
 
 	inline globals g_globals;

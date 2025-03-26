@@ -85,4 +85,48 @@ namespace big
 
 		return Vector2((float)screen->m_Width, (float)screen->m_Height);
 	}
+
+	// Function to convert a matrix to a quaternion using SimpleMath
+	Quaternion matrix_to_quaternion(const Matrix& matrix)
+	{
+		Quaternion result;
+
+		// Extract the diagonal elements
+		float trace = matrix._11 + matrix._22 + matrix._33;
+
+		if (trace > 0.0f)
+		{
+			float S = sqrt(trace + 1.0f) * 2.0f;
+			result.w = 0.25f * S;
+			result.x = (matrix._23 - matrix._32) / S;
+			result.y = (matrix._31 - matrix._13) / S;
+			result.z = (matrix._12 - matrix._21) / S;
+		}
+		else if ((matrix._11 > matrix._22) && (matrix._11 > matrix._33))
+		{
+			float S = sqrt(1.0f + matrix._11 - matrix._22 - matrix._33) * 2.0f;
+			result.w = (matrix._23 - matrix._32) / S;
+			result.x = 0.25f * S;
+			result.y = (matrix._12 + matrix._21) / S;
+			result.z = (matrix._31 + matrix._13) / S;
+		}
+		else if (matrix._22 > matrix._33)
+		{
+			float S = sqrt(1.0f + matrix._22 - matrix._11 - matrix._33) * 2.0f;
+			result.w = (matrix._31 - matrix._13) / S;
+			result.x = (matrix._12 + matrix._21) / S;
+			result.y = 0.25f * S;
+			result.z = (matrix._23 + matrix._32) / S;
+		}
+		else
+		{
+			float S = sqrt(1.0f + matrix._33 - matrix._11 - matrix._22) * 2.0f;
+			result.w = (matrix._12 - matrix._21) / S;
+			result.x = (matrix._31 + matrix._13) / S;
+			result.y = (matrix._23 + matrix._32) / S;
+			result.z = 0.25f * S;
+		}
+
+		return result;
+	}
 }

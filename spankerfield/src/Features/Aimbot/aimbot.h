@@ -22,13 +22,25 @@ namespace big
 		);
 
 	private:
+		struct AngularPredictionData_s
+		{
+			Quaternion orientation;
+			Vector3 angular_velocity;
+			bool valid = false;
+		};
+
+		void PredictLinearMove(const Vector3& linearVelocity, const double predictionTime, const Vector3& curPosition, Vector3* out);
+		void PredictRotation(const Vector3& angularVelocity, const Quaternion& orientation, const double predictionTime, Quaternion* out);
+		void PredictFinalRotation(const Vector3& linearVel, const Vector3& angularVel, const double predTime, const Quaternion& orientation, const Vector3& curPosition, Quaternion* predOrientationOut, Vector3* predLinearVelOut);
+
 		bool DoPrediction(const Vector3& shoot_space,
 						  Vector3& aim_point, 
 						  const Vector3& my_velocity, 
 						  const Vector3& enemy_velocity, 
 						  const Vector3& bullet_speed, 
 						  const float gravity,
-						  const WeaponZeroingEntry& zero_entry);
+						  const WeaponZeroingEntry& zero_entry,
+			              const AngularPredictionData_s* angular_data);
 	};
 
 	// Smoother

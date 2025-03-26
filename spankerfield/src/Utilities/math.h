@@ -12,4 +12,5 @@ namespace big
 	Vector2 clamp_magnitude(const Vector2& v, float maxLength);
 	float vector_dot(const Vector3& v1, const Vector3& v2);
 	Vector2 get_screen_size();
+	Quaternion matrix_to_quaternion(const Matrix& matrix);
 }
