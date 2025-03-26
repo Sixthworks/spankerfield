@@ -46,7 +46,7 @@
   - Spectator list
   - Name spoofer
   - Streamer mode
-  - Anti-AFK
+  - Anti-AFK    (Only works if you don't tab out)
 
 - **Anti-Cheat Bypass**
   - PunkBuster bypass
