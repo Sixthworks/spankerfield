@@ -29,37 +29,41 @@
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
-#define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
+constexpr uintptr_t PTR_MIN_VALUE = 0x10000;
+constexpr uintptr_t PTR_MAX_VALUE = 0x000F000000000000;
+constexpr uintptr_t VTABLE_MIN_VALUE = 0x140000000;
+constexpr uintptr_t VTABLE_MAX_VALUE = 0x14FFFFFFF;
 
-constexpr bool IsValidPtr(PVOID p)
+template<typename T = void*>
+[[nodiscard]] constexpr bool IsValidPtr(T* p) noexcept
 {
-	return (p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && p != nullptr;
+	static_assert(std::is_pointer_v<T*>, "Must be a pointer type");
+
+	// Reinterpret as uintptr_t for range checks
+	auto ptr_value = reinterpret_cast<uintptr_t>(p);
+
+	// Comprehensive pointer validation
+	return p != nullptr &&                  // Not null
+		ptr_value >= PTR_MIN_VALUE &&    // Above minimum valid address
+		ptr_value < PTR_MAX_VALUE &&     // Below maximum valid address
+		(ptr_value % alignof(std::max_align_t) == 0);  // Aligned to system's max alignment
 }
 
-#define MIN_VTABLE ((uint64_t)0x140000000)
-#define MAX_VTABLE ((uint64_t)0x14FFFFFFF)
-
-constexpr bool IsValidPtrWithVTable(PVOID p)
+// Enhanced vtable validation with additional checks
+template<typename T = void*>
+[[nodiscard]] constexpr bool IsValidPtrWithVTable(T* p) noexcept
 {
-	if (IsValidPtr(p))
-	{
-		void* vtable = *reinterpret_cast<PVOID*>(p);
-		if (IsValidPtr(vtable) && reinterpret_cast<uint64_t>(vtable) > MIN_VTABLE && reinterpret_cast<uint64_t>(vtable) < MAX_VTABLE)
-			return true;
-	}
+	// Preliminary pointer check
+	if (!IsValidPtr(p))
+		return false;
 
-	return false;
-}
+	// Safely retrieve vtable pointer
+	auto vtable_ptr = *reinterpret_cast<uintptr_t*>(p);
 
-constexpr bool IsValidMemory(PVOID p, size_t size = sizeof(void*))
-{
-	if (!p) return false;
-
-	MEMORY_BASIC_INFORMATION mbi;
-	if (VirtualQuery(p, &mbi, sizeof(mbi)) == 0) return false;
-	if (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) return false;
-
-	return true;
+	// Comprehensive vtable validation
+	return IsValidPtr(reinterpret_cast<void*>(vtable_ptr)) &&
+		vtable_ptr >= VTABLE_MIN_VALUE &&
+		vtable_ptr < VTABLE_MAX_VALUE;
 }
 
 using namespace DirectX::SimpleMath;

@@ -150,9 +150,9 @@ namespace big
 		Vector3 enemy_velocity = *enemy->GetVelocity();
 
 		// This is really retarded, but it's better to access the VelocityVec of the vehicle instead of GetVelocity()
-		if (IsValidPtr(enemy->m_Data))
+		if (IsValidPtrWithVTable(enemy->m_Data))
 		{
-			if (enemy->m_Data->GetVehicleCategory() != VehicleData::VehicleCategory::UNUSED)
+			if (enemy->m_Data->m_MaxPlayersInVehicle > 0)
 			{
 				const auto vehicle = reinterpret_cast<ClientVehicleEntity*>(enemy);
 				enemy_velocity = vehicle->m_VelocityVec;
