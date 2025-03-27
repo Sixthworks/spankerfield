@@ -729,7 +729,7 @@ namespace plugins
 		if (IsValidPtr(local_vehicle))
 		{
 			// This aimbot wasn't designed for jets or helicopters
-			if (IsValidPtr(local_vehicle->m_Data))
+			if (IsValidPtrWithVTable(local_vehicle->m_Data))
 			{
 				if (local_vehicle->m_Data->IsInHeli() || local_vehicle->m_Data->IsInJet())
 					return;
