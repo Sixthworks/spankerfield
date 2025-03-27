@@ -674,24 +674,11 @@ namespace plugins
 		auto delta = get_abs_delta_at_given_points(camera_center, predicted);
 		Vector2 delta_vec = camera_center - predicted;
 
-		// Calculate target movement
 		float target_x = -delta_vec.x / g_settings.aim_vehicle_smooth;
 		float target_y = -delta_vec.y / g_settings.aim_vehicle_smooth;
 
-		// Keep track of current movement (static to persist between function calls)
-		static float current_x = 0.0f;
-		static float current_y = 0.0f;
-
-		// Lerp factor controls how quickly to move toward the target (0.0-1.0)
-		float lerp_factor = 0.35f;
-
-		// Linear interpolation between current and target values
-		current_x = current_x + (target_x - current_x) * lerp_factor;
-		current_y = current_y + (target_y - current_y) * lerp_factor;
-
-		// Apply the lerped values to the mouse buffer
-		device->m_Buffer.x = current_x;
-		device->m_Buffer.y = current_y;
+		device->m_Buffer.x = target_x;
+		device->m_Buffer.y = target_y;
 	}
 
 	void aimbot(float delta_time)
