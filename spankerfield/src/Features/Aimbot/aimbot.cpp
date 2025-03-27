@@ -149,9 +149,9 @@ namespace big
 		// Get enemy velocity
 		Vector3 enemy_velocity = *enemy->GetVelocity();
 
-		// This is really retarded, but it's better to access the VelocityVec of the vehicle instead of GetVelocity()
 		if (IsValidPtrWithVTable(enemy->m_Data))
 		{
+			// We check if it's actually a vehicle by checking the number of seats available
 			if (enemy->m_Data->m_MaxPlayersInVehicle > 0)
 			{
 				const auto vehicle = reinterpret_cast<ClientVehicleEntity*>(enemy);
@@ -210,8 +210,8 @@ namespace big
 			return false;
 
 		// Use the bullet speed magnitude for calculations
-		float bullet_velocity = bullet_speed.Length();
-		float bullet_gravity = fabs(gravity);
+		float bullet_velocity = bullet_speed.z;
+		float bullet_gravity = gravity;
 		Vector3 hit_pos = aim_point;
 
 		// Calculate zeroing adjustment

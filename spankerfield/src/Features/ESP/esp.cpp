@@ -406,7 +406,7 @@ namespace plugins
                     draw_text_if(g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle), xorstr_("VEH"), g_settings.esp_additional_tags_color);
                 }
 
-                // Aim Point, credit VincentVega
+                // Aim Point, credit VincentVega, upgraded by nloginov
                 if (g_settings.esp_draw_aim_point)
                 {
                     if (g_globals.g_has_pred_aim_point)
