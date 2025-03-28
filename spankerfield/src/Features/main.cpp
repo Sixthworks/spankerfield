@@ -14,10 +14,7 @@ namespace big
         plugins::draw_spectators();
         plugins::draw_health_bar();
         plugins::draw_esp();
-
-        if (g_settings.aimbot)
-            plugins::draw_fov();
-
+        plugins::draw_fov();
         plugins::draw_radar();
         plugins::draw_explosives();
         plugins::draw_missiles();
@@ -37,7 +34,7 @@ namespace big
         plugins::overheat_control();
         plugins::kill_sound();
 
-        if (g_settings.aimbot)
+        if (g_settings.aimbot || g_settings.aimbot_vehicle)
         {
             m_PlayerManager.update_players();
             plugins::aimbot(delta_time);

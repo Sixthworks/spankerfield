@@ -60,7 +60,11 @@ namespace big
 		Vector3 pred_lin_vel = linearVel;
 		Vector3 pred_displacement = curPosition;
 		
-		float delta_time = (predTime * 69.f / 100.0f) / 16;
+		// Compile time variables
+		constexpr int SIMULATION_STEPS = 16;
+		constexpr float TIME_MULTIPLIER = 0.69f;
+
+		float delta_time = (predTime * TIME_MULTIPLIER / 100.0f) / SIMULATION_STEPS;
 		for (int i = 0; i < 16; ++i)
 		{
 			PredictLinearMove(pred_lin_vel, delta_time, pred_displacement, &pred_displacement);
@@ -715,6 +719,10 @@ namespace plugins
 		// Handle vehicle aimbot
 		if (IsValidPtr(local_vehicle))
 		{
+			// Disable if we're in a vehicle and the user doesn't have vehicle aimbot selected
+			if (!g_settings.aimbot_vehicle)
+				return;
+
 			// This aimbot wasn't designed for jets or helicopters
 			if (IsValidPtrWithVTable(local_vehicle->m_Data))
 			{
@@ -767,6 +775,9 @@ namespace plugins
 			vehicle_aimbot(target);
 			return;
 		}
+
+		// Don't run infantry aimbot if not enabled
+		if (!g_settings.aimbot) return;
 
 		const auto weapon_component = local_soldier->m_pWeaponComponent;
 		if (!IsValidPtr(weapon_component)) return;
@@ -877,6 +888,7 @@ namespace plugins
 
 	void draw_fov()
 	{
+		if (!g_settings.aimbot && !g_settings.aimbot_vehicle) return;
 		if (!g_settings.aim_fov_method) return;
 
 		const auto game_context = ClientGameContext::GetInstance();

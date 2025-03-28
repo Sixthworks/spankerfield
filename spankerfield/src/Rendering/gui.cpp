@@ -131,6 +131,9 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Aimbot")))
 			{
 				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
+				ImGui::Checkbox(xorstr_("Vehicle aimbot"), &g_settings.aimbot_vehicle);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will activate the aimbot when you're inside vehicles."));
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
 				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
 				if (ImGui::IsItemHovered())
