@@ -35,7 +35,7 @@ namespace big
 		BOOL WINAPI hkBitBlt(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
 		{
 			LOG(INFO) << xorstr_("FairFight initiated a screenshot.");
-			g_globals.screenshots_ff++;
+			g_globals.g_screenshots_ff++;
 
 			std::lock_guard<std::mutex> lock(ff_screenshot_mutex);
 			while (ff_screenshot_in_progress.load())
@@ -74,7 +74,7 @@ namespace big
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
 			// Add to the counter anyway, since hkTakeScreenshot is ran before the hkCopySubresourceRegion
-			g_globals.screenshots_pb++;
+			g_globals.g_screenshots_pb++;
 
 			// If we're using the temp disable method or not using the new method
 			if (g_settings.screenshots_pb_temp_disable || !g_settings.screenshots_pb_clean)
@@ -132,7 +132,7 @@ namespace big
 			// Update the clean screenshot every 15 seconds (to minimize interruptions)
 			if (current_tick_count > last_clean_frame + g_settings.screenshots_pb_clean_delay)
 			{
-				if (g_globals.screenshots_clean_frames > 5)
+				if (g_globals.g_screenshots_clean_frames > 5)
 				{
 					ID3D11Texture2D* pBuffer = nullptr;
 					HRESULT hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBuffer));
@@ -259,11 +259,11 @@ namespace big
 
 						if (g_globals.g_should_draw)
 						{
-							g_globals.screenshots_clean_frames = 0;
+							g_globals.g_screenshots_clean_frames = 0;
 							g_renderer->on_present();
 						}
 						else
-							g_globals.screenshots_clean_frames++;
+							g_globals.g_screenshots_clean_frames++;
 					}
 				}
 			}

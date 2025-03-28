@@ -3,5 +3,6 @@
 
 namespace plugins
 {
+	VeniceClientMissileEntity* get_local_missile();
 	void draw_missiles();
 }

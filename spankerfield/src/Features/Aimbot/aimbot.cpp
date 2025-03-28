@@ -8,6 +8,8 @@
 #include "../../Utilities/firing_data.h"
 #include "../../Rendering/draw-list.h"
 #include "../../Features/Friend List/friend_list.h"
+#include "../../Features/Missiles/missiles.h"
+#include "../../SDK/class_info.h"
 
 #pragma warning( disable : 4244 )
 
@@ -77,6 +79,28 @@ namespace big
 		*predOrientationOut = pred_orientation;
 	}
 
+	float AimbotPredictor::ComputeMissileFinalVelocity(float initSpd, float maxSpd, float accel, float engIgnTime, float dist, float* travelTime)
+	{
+		if ((accel == 0.0f) || (maxSpd < initSpd)) return 0.0f;
+
+		auto before_ignition_distance = initSpd * engIgnTime;
+		auto acceleration_time = (maxSpd - initSpd) / accel;
+		auto acceleration_dist = (initSpd * acceleration_time) + (accel * acceleration_time * acceleration_time) / 2.f;
+		auto postAccelerationDist = dist - before_ignition_distance - acceleration_dist;
+		auto post_acceleration_time = postAccelerationDist / maxSpd;
+		auto final_air_time = engIgnTime + acceleration_time + post_acceleration_time;
+		auto final_distance = before_ignition_distance + acceleration_dist + postAccelerationDist;
+
+		if (final_air_time <= 0.0f) return 0.0f;
+
+		if (travelTime) *travelTime = final_air_time;
+
+		auto velocity = final_distance / final_air_time;
+		velocity = std::clamp(velocity, initSpd, maxSpd);
+
+		return velocity;
+	}
+
 	AimbotPredictor::PredictionResult AimbotPredictor::PredictTarget(
 		ClientSoldierEntity* local_entity,
 		ClientControllableEntity* enemy,
@@ -134,19 +158,28 @@ namespace big
 			}
 		}
 
-		// Get common firing data (works for both vehicle and infantry)
+		// Get firing data
 		const auto weapon_firing = get_weapon_firing();
 		if (!IsValidPtr(weapon_firing))
 			return result;
 
+		// Hyperhook had issues with crashes when entering the vehicle because the firing data was invalid muddafuka
+		// Fixed it by delaying the firing data for 150ms
 		const auto firing_data = WeaponFiringDataRetriever::GetSafeFiringData(weapon_firing, is_in_vehicle);
 		if (!IsValidPtr(firing_data))
 			return result;
 
+		// Projectile data
 		const auto bullet = firing_data->m_ShotConfigData.m_ProjectileData;
 		if (!IsValidPtr(bullet))
 			return result;
 
+		// Gravity
+		float gravity = bullet->m_Gravity;
+		
+		if (gravity < -500.f || gravity > 500.f) gravity = 0.f;
+
+		// Initial speed (z component is our bullet velocity)
 		Vector4 initial_speed_4 = firing_data->m_ShotConfigData.m_Speed;
 		initial_speed = Vector3(initial_speed_4.x, initial_speed_4.y, initial_speed_4.z);
 
@@ -173,13 +206,52 @@ namespace big
 			}
 		}
 
+		// Support for AT Launcher velocity and gravity
+		if (!is_in_vehicle)
+		{
+			// Check for explosion hit type
+			if (bullet->m_HitReactionWeaponType == ProjectileEntityData::AntHitReactionWeaponType_Explosion)
+			{
+				// Check the weapon type for AT (anti-tank)
+				const auto weapon_type = weapon_firing->GetWeaponClass();
+				if (weapon_type == WeaponClass::At)
+				{
+					// Travel time of the rocket
+					float travel_time = 0.0f;
+
+					// Prediction code itself
+					const auto missile_data = reinterpret_cast<MissileEntityData*>(bullet);
+					if (IsValidPtr(missile_data))
+					{
+						const auto is_laser_guided = missile_data->IsLaserGuided();
+						const auto& ignition_time = missile_data->m_EngineTimeToIgnition;
+						const auto& acceleration = missile_data->m_EngineStrength;
+						const auto& max_speed = missile_data->m_MaxSpeed;
+
+						// Local missile
+						VeniceClientMissileEntity* my_missile = plugins::get_local_missile();
+
+						// Start position
+						auto start_position = !is_laser_guided ? fire_position : IsValidPtr(my_missile) ? my_missile->m_Position : fire_position;
+						float distance = (start_position - aim_point).Length();
+
+						// Calculating final velocity first time to solve 't' at given 'dst' to target
+						initial_speed.z = ComputeMissileFinalVelocity(initial_speed.z, max_speed, acceleration, ignition_time, distance, &travel_time);
+
+						// Calculate where target will be after 't' seconds
+						const auto position_after_time = (aim_point - fire_position) + (enemy_velocity * travel_time);
+						distance = (position_after_time - aim_point).Length();
+
+						// Calculate final velocity again for new target position 
+						initial_speed.z = ComputeMissileFinalVelocity(initial_speed.z, max_speed, acceleration, ignition_time, distance, &travel_time);
+						gravity = missile_data->m_Gravity > 0.f ? 0.0f : missile_data->m_Gravity;
+					}
+				}
+			}
+		}
+
 		// Force update
 		*(BYTE*)((uintptr_t)enemy + 0x1A) = 159;
-
-		// Gravity
-		float gravity = bullet->m_Gravity;
-
-		if (gravity < -500.f || gravity > 500.f) gravity = 0.f;
 
 		// Calculate prediction
 		bool prediction_success = DoPrediction(
@@ -257,7 +329,7 @@ namespace big
 					if (angular_data && angular_data->valid)
 					{
 						PredictFinalRotation(
-							target_vel,
+							enemy_velocity,
 							angular_data->angular_velocity,
 							current_time,
 							angular_data->orientation,
@@ -312,7 +384,7 @@ namespace big
 						if (angular_data && angular_data->valid)
 						{
 							PredictFinalRotation(
-								target_vel,
+								enemy_velocity,
 								angular_data->angular_velocity,
 								best_travel_time,
 								angular_data->orientation,
@@ -367,7 +439,7 @@ namespace big
 					if (angular_data && angular_data->valid)
 					{
 						PredictFinalRotation(
-							target_vel,
+							enemy_velocity,
 							angular_data->angular_velocity,
 							best_travel_time,
 							angular_data->orientation,
@@ -772,30 +844,15 @@ namespace plugins
 			g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
 			// Call vehicle aimbot
-			vehicle_aimbot(target);
+			if (g_settings.aimbot_snap_to_target)
+			    vehicle_aimbot(target);
+
 			return;
 		}
 
 		// Don't run infantry aimbot if not enabled
-		if (!g_settings.aimbot) return;
-
-		const auto weapon_component = local_soldier->m_pWeaponComponent;
-		if (!IsValidPtr(weapon_component)) return;
-
-		const auto weapon = weapon_component->GetActiveSoldierWeapon();
-		if (!IsValidPtr(weapon)) return;
-
-		const auto client_weapon = weapon->m_pWeapon;
-		if (!IsValidPtr(client_weapon)) return;
-
-		const auto primary_fire = weapon->m_pPrimary;
-		if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030) return;
-
-		if (g_settings.aim_must_not_reload)
-		{
-			if (primary_fire->m_ReloadTimer >= 0.01f)
-				return;
-		}
+		if (!g_settings.aimbot)
+			return;
 
 		// Controller support
 		if (using_controller)
@@ -806,14 +863,11 @@ namespace plugins
 				mouse_device->m_Buffer.x = mouse_device->m_Buffer.x - 1;
 		}
 
-		const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
-		if (!IsValidPtr(aiming_simulation)) return;
+		// The reason the weapon component is here, far away from other weapon-related variables is because of support for non-standart weapons
+		const auto weapon_component = local_soldier->m_pWeaponComponent;
+		if (!IsValidPtr(weapon_component)) return;
 
-		const auto aim_assist = aiming_simulation->m_pFPSAimer;
-		if (!IsValidPtr(aim_assist)) return;
-
-		Matrix shoot_space = client_weapon->m_ShootSpace;
-
+		// Target
 		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
 		if (!IsValidPtr(target.m_Player)) return;
 		if (!target.m_HasTarget) return;
@@ -836,6 +890,63 @@ namespace plugins
 		else
 			prediction_target = target.m_Player->GetSoldier();
 
+		// This is fucking retarded, the GetActiveSoldierWeapon() can't be retrieved for non-standart weapons like rocket launchers
+		const auto weapon = weapon_component->GetActiveSoldierWeapon();
+		if (!IsValidPtr(weapon))
+		{
+			// Prediction, but without the aiming part
+			if (g_settings.aimbot_non_standart)
+			{
+				const auto game_renderer = GameRenderer::GetInstance();
+				if (!game_renderer) return;
+
+				const auto render_view = game_renderer->m_pRenderView;
+				if (!render_view) return;
+
+				// Doing predict
+				auto prediction = m_AimbotPredictor.PredictTarget(
+					local_soldier,
+					prediction_target,
+					target.m_WorldPosition,
+					render_view->m_ViewInverse // Normally we would retrieve the shoot space from GetActiveSoldierWeapon()->m_pWeapon
+				);
+
+				if (!prediction.success)
+					return;
+
+				// Update
+				target.m_WorldPosition = prediction.predicted_position;
+
+				// Update global prediction point
+				g_globals.g_pred_aim_point = target.m_WorldPosition;
+				g_globals.g_has_pred_aim_point = target.m_HasTarget;
+
+				return;
+			}
+			else
+				return;
+		}
+
+		const auto client_weapon = weapon->m_pWeapon;
+		if (!IsValidPtr(client_weapon)) return;
+
+		const auto primary_fire = weapon->m_pPrimary;
+		if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030) return;
+
+		if (g_settings.aim_must_not_reload)
+		{
+			if (primary_fire->m_ReloadTimer >= 0.01f)
+				return;
+		}
+
+		const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
+		if (!IsValidPtr(aiming_simulation)) return;
+
+		const auto aim_assist = aiming_simulation->m_pFPSAimer;
+		if (!IsValidPtr(aim_assist)) return;
+
+		Matrix shoot_space = client_weapon->m_ShootSpace;
+
 		// Doing predict
 		auto prediction = m_AimbotPredictor.PredictTarget(
 			local_soldier,
@@ -854,36 +965,40 @@ namespace plugins
 		g_globals.g_pred_aim_point = target.m_WorldPosition;
 		g_globals.g_has_pred_aim_point = target.m_HasTarget;
 
-		if (g_settings.aim_max_time_to_target <= 0.f) return;
-
-		if (target.m_Player != m_PreviousTarget.m_Player)
+		// Snapping part
+		if (g_settings.aimbot_snap_to_target)
 		{
-			Vector2 vec_rand =
+			if (g_settings.aim_max_time_to_target <= 0.f) return;
+
+			if (target.m_Player != m_PreviousTarget.m_Player)
 			{
-				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
-				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
+				Vector2 vec_rand =
+				{
+					generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
+					generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
+				};
+				m_AimbotSmoother.ResetTimes(vec_rand);
+			}
+
+			m_AimbotSmoother.Update(delta_time);
+
+			Vector3 v_dir = target.m_WorldPosition - shoot_space.Translation();
+			v_dir.Normalize();
+
+			float horizontal_angle = -atan2(v_dir.x, v_dir.z);
+			float vertical_angle = atan2(v_dir.y, sqrt(v_dir.x * v_dir.x + v_dir.z * v_dir.z));
+
+			Vector2 aim_angles =
+			{
+				horizontal_angle,
+				vertical_angle
 			};
-			m_AimbotSmoother.ResetTimes(vec_rand);
+
+			aim_angles -= aiming_simulation->m_Sway;
+			m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, aim_angles);
+			aim_assist->m_AimAngles = aim_angles;
+			m_PreviousTarget = target;
 		}
-
-		m_AimbotSmoother.Update(delta_time);
-
-		Vector3 v_dir = target.m_WorldPosition - shoot_space.Translation();
-		v_dir.Normalize();
-
-		float horizontal_angle = -atan2(v_dir.x, v_dir.z);
-		float vertical_angle = atan2(v_dir.y, sqrt(v_dir.x * v_dir.x + v_dir.z * v_dir.z));
-
-		Vector2 aim_angles =
-		{
-			horizontal_angle,
-			vertical_angle
-		};
-
-		aim_angles -= aiming_simulation->m_Sway;
-		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, aim_angles);
-		aim_assist->m_AimAngles = aim_angles;
-		m_PreviousTarget = target;
 	}
 
 	void draw_fov()

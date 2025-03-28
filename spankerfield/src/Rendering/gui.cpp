@@ -131,9 +131,18 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Aimbot")))
 			{
 				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
-				ImGui::Checkbox(xorstr_("Vehicle aimbot"), &g_settings.aimbot_vehicle);
+				ImGui::Checkbox(xorstr_("Vehicle Aimbot"), &g_settings.aimbot_vehicle);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will activate the aimbot when you're inside vehicles."));
+				ImGui::Checkbox(xorstr_("Snap to target"), &g_settings.aimbot_snap_to_target);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make the cheat automatically aim at your enemies."));
+				if (!g_settings.aimbot_snap_to_target)
+					ImGui::WarningTooltip(xorstr_("Make sure you use the draw aim point with this, if not then it's better to disable aimbot at all."));
+				ImGui::Checkbox(xorstr_("Support non-standart weapons"), &g_settings.aimbot_non_standart);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make the prediction of the aimbot supports weapons like Rocket Launchers."));
+				ImGui::WarningTooltip(xorstr_("Snap to target won't work with these weapons."));
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
 				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
 				if (ImGui::IsItemHovered())
@@ -991,8 +1000,8 @@ namespace big
 
 				if (ImGui::Button(xorstr_("Reset counters")))
 				{
-					g_globals.screenshots_ff = NULL;
-					g_globals.screenshots_pb = NULL;
+					g_globals.g_screenshots_ff = NULL;
+					g_globals.g_screenshots_pb = NULL;
 				}
 
 				if (g_settings.screenshots)
@@ -1196,7 +1205,7 @@ namespace big
 
 				ImGui::Separator();
 
-				render_hotkey_selector(xorstr_("Open key"), &g_globals.open_key, 200.f, true);
+				render_hotkey_selector(xorstr_("Open key"), &g_globals.g_open_key, 200.f, true);
 
 				ImGui::SameLine();
 

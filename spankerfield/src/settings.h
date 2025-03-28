@@ -25,6 +25,8 @@ namespace big
 		char spoofed_name[16];
 
 		bool aimbot;
+		bool aimbot_snap_to_target{ true };
+		bool aimbot_non_standart{ true };
 		bool aimbot_vehicle;
 		bool aim_support_controller;
 		bool aim_must_be_visible{ true };
@@ -265,6 +267,8 @@ namespace big
 			g_settings.rainbow_speed = j[xorstr_("settings")][xorstr_("rainbow_speed")];
 
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
+			g_settings.aimbot_snap_to_target = j[xorstr_("settings")][xorstr_("aimbot_snap_to_target")];
+			g_settings.aimbot_non_standart = j[xorstr_("settings")][xorstr_("aimbot_non_standart")];
 			g_settings.aimbot_vehicle = j[xorstr_("settings")][xorstr_("aimbot_vehicle")];
 			g_settings.aim_support_controller = j[xorstr_("settings")][xorstr_("aim_support_controller")];
 			g_settings.aim_must_be_visible = j[xorstr_("settings")][xorstr_("aim_must_be_visible")];
@@ -462,7 +466,7 @@ namespace big
 			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
 
 			g_settings.disable_watermark = j[xorstr_("settings")][xorstr_("disable_watermark")];
-			g_globals.open_key = j[xorstr_("settings")][xorstr_("open_key")];
+			g_globals.g_open_key = j[xorstr_("settings")][xorstr_("open_key")];
 		}
 
 		nlohmann::json to_json()
@@ -544,6 +548,8 @@ namespace big
 						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
 						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
 						{ xorstr_("aimbot"), g_settings.aimbot },
+						{ xorstr_("aimbot_snap_to_target"), g_settings.aimbot_snap_to_target },
+						{ xorstr_("aimbot_non_standart"), g_settings.aimbot_non_standart },
 						{ xorstr_("aimbot_vehicle"), g_settings.aimbot_vehicle },
 						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
@@ -647,7 +653,7 @@ namespace big
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },
 						{ xorstr_("disable_watermark"), g_settings.disable_watermark },
-						{ xorstr_("open_key"), g_globals.open_key },
+						{ xorstr_("open_key"), g_globals.g_open_key },
 					},
 				},
 

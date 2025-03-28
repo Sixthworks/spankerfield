@@ -14,6 +14,7 @@ namespace big
         plugins::draw_spectators();
         plugins::draw_health_bar();
         plugins::draw_esp();
+        plugins::draw_aim_point(); // Draw after ESP so that it doesn't get covered
         plugins::draw_fov();
         plugins::draw_radar();
         plugins::draw_explosives();

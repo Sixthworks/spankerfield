@@ -22,11 +22,11 @@ namespace plugins
             return;
 
         // Check if screenshot counts have changed
-        if (g_globals.screenshots_ff > s_screenshot_state.last_ff_count || g_globals.screenshots_pb > s_screenshot_state.last_pb_count)
+        if (g_globals.g_screenshots_ff > s_screenshot_state.last_ff_count || g_globals.g_screenshots_pb > s_screenshot_state.last_pb_count)
         {
             // Update the counts
-            s_screenshot_state.last_ff_count = g_globals.screenshots_ff;
-            s_screenshot_state.last_pb_count = g_globals.screenshots_pb;
+            s_screenshot_state.last_ff_count = g_globals.g_screenshots_ff;
+            s_screenshot_state.last_pb_count = g_globals.g_screenshots_pb;
 
             // Set the time when screenshot was taken
             s_screenshot_state.last_screenshot_time = std::chrono::steady_clock::now();
@@ -84,10 +84,10 @@ namespace plugins
                 };
 
             // Draw FF screenshots
-            draw_screenshot_text(xorstr_("FF screenshots: "), g_globals.screenshots_ff);
+            draw_screenshot_text(xorstr_("FairFight screenshots: "), g_globals.g_screenshots_ff);
 
             // Draw PB screenshots
-            draw_screenshot_text(xorstr_("PB screenshots: "), g_globals.screenshots_pb);
+            draw_screenshot_text(xorstr_("PunkBuster screenshots: "), g_globals.g_screenshots_pb);
         }
     }
 }
