@@ -12,6 +12,9 @@ namespace big
 		bool use_cheap_boxes; // DebugRenderer2 boxes instead of ImGui
 
 		bool blacklist{ true };
+		bool blacklist_warn_on_screen{ true };
+		bool blacklist_tag_in_esp{ true };
+		ImColor blacklist_tag_color{ 255, 0, 0, 255 };
 		ImColor blacklist_color{ 255, 0, 0, 255 };
 		float blacklist_text_size{ 26.f };
 
@@ -136,7 +139,7 @@ namespace big
 		float crosshair_thickness{ 1.f };
 		ImColor crosshair_color{ 0, 0, 0, 255 };
 
-		bool draw_health_bar;
+		bool draw_health_bar{ true };
 		bool health_bar_soldier{ true };
 		bool health_bar_vehicle{ true };
 		float health_bar_width{ 285.f };
@@ -154,6 +157,7 @@ namespace big
 		bool radar_draw_teammates{ true };
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
+		bool radar_cross_detailed;
 		bool radar_outline{ true };
 		float radar_x{ 20.f };
 		float radar_y{ 245.f };
@@ -259,6 +263,9 @@ namespace big
 			g_settings.use_cheap_boxes = j[xorstr_("settings")][xorstr_("use_cheap_boxes")];
 
 			g_settings.blacklist = j[xorstr_("settings")][xorstr_("blacklist")];
+			g_settings.blacklist_warn_on_screen = j[xorstr_("settings")][xorstr_("blacklist_warn_on_screen")];
+			g_settings.blacklist_tag_in_esp = j[xorstr_("settings")][xorstr_("blacklist_tag_in_esp")];
+			g_settings.blacklist_tag_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_tag_color")]);
 			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
 			g_settings.blacklist_text_size = j[xorstr_("settings")][xorstr_("blacklist_text_size")];
 
@@ -398,6 +405,7 @@ namespace big
 			g_settings.radar_draw_teammates = j[xorstr_("settings")][xorstr_("radar_draw_teammates")];
 			g_settings.radar_draw_you = j[xorstr_("settings")][xorstr_("radar_draw_you")];
 			g_settings.radar_cross = j[xorstr_("settings")][xorstr_("radar_cross")];
+			g_settings.radar_cross_detailed = j[xorstr_("settings")][xorstr_("radar_cross_detailed")];
 			g_settings.radar_outline = j[xorstr_("settings")][xorstr_("radar_outline")];
 			g_settings.radar_x = j[xorstr_("settings")][xorstr_("radar_x")];
 			g_settings.radar_y = j[xorstr_("settings")][xorstr_("radar_y")];
@@ -478,6 +486,9 @@ namespace big
 			            { xorstr_("use_cheap_text"), g_settings.use_cheap_text },
 						{ xorstr_("use_cheap_boxes"), g_settings.use_cheap_boxes },
 						{ xorstr_("blacklist"), g_settings.blacklist },
+						{ xorstr_("blacklist_warn_on_screen"), g_settings.blacklist_warn_on_screen },
+						{ xorstr_("blacklist_tag_in_esp"), g_settings.blacklist_tag_in_esp },
+						{ xorstr_("blacklist_tag_color"), color_to_string(g_settings.blacklist_tag_color) },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 						{ xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
 						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
@@ -595,6 +606,7 @@ namespace big
 						{ xorstr_("radar_draw_teammates"), g_settings.radar_draw_teammates },
 						{ xorstr_("radar_draw_you"), g_settings.radar_draw_you },
 						{ xorstr_("radar_cross"), g_settings.radar_cross },
+						{ xorstr_("radar_cross_detailed"), g_settings.radar_cross_detailed },
 						{ xorstr_("radar_outline"), g_settings.radar_outline },
 						{ xorstr_("radar_x"), g_settings.radar_x },
 						{ xorstr_("radar_y"), g_settings.radar_y },

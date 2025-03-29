@@ -131,7 +131,7 @@ namespace big
 			if (ImGui::BeginTabItem(xorstr_("Aimbot")))
 			{
 				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
-				ImGui::Checkbox(xorstr_("Vehicle Aimbot"), &g_settings.aimbot_vehicle);
+				ImGui::Checkbox(xorstr_("Vehicle aimbot"), &g_settings.aimbot_vehicle);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will activate the aimbot when you're inside vehicles."));
 				ImGui::Checkbox(xorstr_("Snap to target"), &g_settings.aimbot_snap_to_target);
@@ -141,8 +141,11 @@ namespace big
 					ImGui::WarningTooltip(xorstr_("Make sure you use the draw aim point with this, if not then it's better to disable aimbot at all."));
 				ImGui::Checkbox(xorstr_("Support non-standart weapons"), &g_settings.aimbot_non_standart);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will make the prediction of the aimbot supports weapons like Rocket Launchers."));
-				ImGui::WarningTooltip(xorstr_("Snap to target won't work with these weapons."));
+					ImGui::SetTooltip(xorstr_("This will make the prediction of the aimbot support weapons like Rocket Launchers."));
+				
+				if (g_settings.aimbot_snap_to_target)
+				    ImGui::WarningTooltip(xorstr_("Snap to target won't work with these weapons."));
+
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
 				ImGui::Checkbox(xorstr_("Target must be visible"), &g_settings.aim_must_be_visible);
 				if (ImGui::IsItemHovered())
@@ -249,12 +252,12 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Minimum time to target (sec)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
 
 				if (g_settings.aim_min_time_to_target < 0.15f)
-					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+					ImGui::WarningTooltip(xorstr_("Having this option that low will most likely get you banned."));
 
 				ImGui::SliderFloat(xorstr_("Maximum time to target (sec)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
 
 				if (g_settings.aim_max_time_to_target < 0.2f)
-					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+					ImGui::WarningTooltip(xorstr_("Having this option that low will most likely get you banned."));
 
 				ImGui::PopItemWidth();
 
@@ -440,8 +443,8 @@ namespace big
 
 								ImGui::Separator();
 
-								ImGui::Text(xorstr_("I dont know what this is"));
-								ImGui::WarningTooltip(xorstr_("You can test what it is at your own risk."));
+								ImGui::Text(xorstr_("These values are unknown to me"));
+								ImGui::WarningTooltip(xorstr_("You can test them at your own risk."));
 
 								ImGui::Checkbox(xorstr_("Relative target aiming"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_RelativeTargetAiming));
 								ImGui::Checkbox(xorstr_("Force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ForceSpawnToCamera));
@@ -471,7 +474,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Draw friends##ESP"), &g_settings.esp_draw_friends);
 
 				ImGui::Text(xorstr_("Friends color"));
-				ImGui::Checkbox(xorstr_("Use tag instead of friendly colors##ESP"), &g_settings.esp_friend_color_to_tag);
+				ImGui::Checkbox(xorstr_("Use ESP tag instead of friendly colors##ESP"), &g_settings.esp_friend_color_to_tag);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will make the cheat not change any of the colors in the ESP, and only use the FRND friend tag."));
 
@@ -499,7 +502,9 @@ namespace big
 				ImGui::PopItemWidth();
 				color_wrapper(xorstr_("Box color"), &g_settings.esp_box_color);
 				color_wrapper(xorstr_("Box color (occluded)"), &g_settings.esp_box_color_occluded);
-				color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
+
+				if (g_settings.esp_box_fill)
+				    color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
 
 				ImGui::Separator();
 
@@ -625,7 +630,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Draws a health bar indicating the local player/vehicle health state."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Player##HB"), &g_settings.health_bar_soldier);
+				ImGui::Checkbox(xorstr_("Soldier##HB"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Vehicle##HB"), &g_settings.health_bar_vehicle);
 
@@ -659,7 +664,10 @@ namespace big
 					ImGui::SetTooltip(xorstr_("This will make the health bar use the traditional red (being lowest) -> green (being highest) system for coloring."));
 				
 				if (!g_settings.health_bar_use_default_color)
+				{
+					ImGui::SameLine();
 					color_wrapper(xorstr_("Bar##HB"), &g_settings.health_bar_color);
+				}
 
 				// Add spacing UI only if both are activated
 				if (g_settings.health_bar_soldier && g_settings.health_bar_vehicle)
@@ -714,7 +722,19 @@ namespace big
 				ImGui::PopItemWidth();
 
 				ImGui::Checkbox(xorstr_("Draw cross##RDR"), &g_settings.radar_cross);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws lines on the radar for better orientation in space."));
 				ImGui::SameLine();
+				
+				// Show detailed cross only if the regular one is enabled
+				if (g_settings.radar_cross)
+				{
+					ImGui::Checkbox(xorstr_("Detailed cross##RDR"), &g_settings.radar_cross_detailed);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Makes the radar cross have a more detailed and professional look."));
+					ImGui::SameLine();
+				}
+
 				ImGui::Checkbox(xorstr_("Draw outline##RDR"), &g_settings.radar_outline);
 
 				ImGui::Separator();
@@ -904,6 +924,7 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Friends")))
 			{
+				ImGui::PushItemFlag(ImGuiTreeNodeFlags_DefaultOpen, true);
 				if (ImGui::TreeNode(xorstr_("Friends list")))
 				{
 					int i = 0;
@@ -915,6 +936,7 @@ namespace big
 					}
 					ImGui::TreePop();
 				}
+				ImGui::PopItemFlag();
 
 				if (ImGui::Button(xorstr_("Delete friend")))
 				{
@@ -928,7 +950,7 @@ namespace big
 
 				ImGui::Separator();
 				static char friend_nick[50]{};
-				ImGui::PushItemWidth(300.f);
+				ImGui::PushItemWidth(250.f);
 				ImGui::InputText(xorstr_("Friend Nickname"), friend_nick, IM_ARRAYSIZE(friend_nick));
 				ImGui::PopItemWidth();
 				if (ImGui::Button(xorstr_("Add friend")))
@@ -939,16 +961,35 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Blacklist")))
 			{
-				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &g_settings.blacklist);
+				ImGui::Checkbox(xorstr_("Blacklist##BL"), &g_settings.blacklist);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Warn about blacklisted players"), &g_settings.blacklist_warn_on_screen);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws blacklisted players in the center part of the screen."));
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
-				ImGui::PopItemWidth();
+					ImGui::SetTooltip(xorstr_("Screen warning of blacklisted players on the server."));
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Show blacklisted tag in ESP"), &g_settings.blacklist_tag_in_esp);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Adds a tag to ESP if the player is blacklisted."));
 
-				ImGui::Text(xorstr_("Text color"));
+				if (g_settings.blacklist_warn_on_screen)
+				{
+					ImGui::PushItemWidth(300.f);
+				    ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
+				    ImGui::PopItemWidth();
+			    }
 
-				color_wrapper(xorstr_("Text##BL"), &g_settings.blacklist_color);
+				if (g_settings.blacklist_warn_on_screen || g_settings.blacklist_tag_in_esp)
+				{
+					ImGui::Text(xorstr_("Colors"));
+
+					if (g_settings.blacklist_warn_on_screen)
+						color_wrapper(xorstr_("Text##BL"), &g_settings.blacklist_color);
+
+					if (g_settings.blacklist_tag_in_esp)
+						color_wrapper(xorstr_("ESP##BL"), &g_settings.blacklist_tag_color);
+				}
+				else
+					ImGui::Text(xorstr_("Colors unavailable, no options selected."));
 
 				ImGui::Separator();
 
@@ -1105,21 +1146,7 @@ namespace big
 				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("This will use fake nicknames in ESP and censor out nicknames in Spectator List."));
-
-				ImGui::SameLine();
-
-				ImGui::Checkbox(xorstr_("Rainbow mode"), &g_settings.rainbow_mode);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will make every visual color have the Rainbow effect."));
-
-				if (g_settings.rainbow_mode)
-				{
-					ImGui::SameLine(); // Want to keep it on the same line
-
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("Speed##RM"), &g_settings.rainbow_speed, 0.1f, 2.0f);
-					ImGui::PopItemWidth();
-				}
+				
 
 				ImGui::Checkbox(xorstr_("Disable watermark"), &g_settings.disable_watermark);
 				if (ImGui::IsItemHovered())
@@ -1138,6 +1165,19 @@ namespace big
 
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("Lets you debug the watermark, mostly developer only."));
+				}
+
+				ImGui::Checkbox(xorstr_("Rainbow mode"), &g_settings.rainbow_mode);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This will make every visual color have the Rainbow effect."));
+
+				if (g_settings.rainbow_mode)
+				{
+					ImGui::SameLine(); // Want to keep it on the same line
+
+					ImGui::PushItemWidth(250.f);
+					ImGui::SliderFloat(xorstr_("Speed##RM"), &g_settings.rainbow_speed, 0.1f, 2.0f);
+					ImGui::PopItemWidth();
 				}
 
 				ImGui::Separator();

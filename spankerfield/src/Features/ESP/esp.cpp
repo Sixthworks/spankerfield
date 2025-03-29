@@ -7,6 +7,7 @@
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/other.h"
 #include "../../Features/Friend List/friend_list.h"
+#include "../../Features/Blacklist\blacklist.h"
 
 using namespace big;
 namespace plugins
@@ -207,6 +208,7 @@ namespace plugins
             // Player status
             uint64_t persona_id = player->m_onlineId.m_personaid;
             bool is_friend = plugins::is_friend(persona_id);
+            bool is_blacklisted = plugins::is_blacklisted(persona_id);
             bool teammate = player->m_TeamId == local_player->m_TeamId;
 
             // Don't question such logic
@@ -415,6 +417,7 @@ namespace plugins
                         g_settings.esp_draw_name,
                         g_settings.esp_draw_distance,
                         is_friend && g_settings.esp_friend_color_to_tag,
+                        is_blacklisted && g_settings.blacklist_tag_in_esp,
                         g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle)
                     };
 
@@ -460,6 +463,7 @@ namespace plugins
                     draw_text_if(g_settings.esp_draw_name, nickname, text_color);
                     draw_text_if(g_settings.esp_draw_distance, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color);
                     draw_text_if(is_friend && g_settings.esp_friend_color_to_tag, xorstr_("FRND"), g_settings.esp_friend_color);
+                    draw_text_if(is_blacklisted && g_settings.blacklist_tag_in_esp, xorstr_("BLKLST"), g_settings.blacklist_color);
                     draw_text_if(g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle), xorstr_("VEH"), g_settings.esp_additional_tags_color);
                 }
 

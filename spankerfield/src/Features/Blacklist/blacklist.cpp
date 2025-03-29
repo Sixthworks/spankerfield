@@ -10,7 +10,7 @@
 using namespace big;
 namespace plugins
 {
-	static int exclusive = 193738923; // Random persona ID which won't occur in a game by random chance.
+	static int exclusive = 335619123; // Random persona ID which won't occur in a game by random chance.
 
 	std::filesystem::path get_path()
 	{
@@ -117,7 +117,7 @@ namespace plugins
 		const auto val = IsValidPtr(player) ? player->m_onlineId.m_personaid : exclusive;
 
 		players[name][xorstr_("Persona ID")] = val;
-		players[name][xorstr_("Time added")] = current_time();
+		players[name][xorstr_("Time added")] = current_time(); // Isn't used anywhere
 
 		save_json(players);
 		parse_blacklist();
@@ -146,19 +146,39 @@ namespace plugins
 		parse_blacklist();
 	}
 
-	static ULONGLONG last_check = 0;
+	bool is_blacklisted(uint64_t persona_id)
+	{
+		for (const auto& fr : blacklisted)
+		{
+			if (fr.persona_id == persona_id)
+				return true;
+		}
+		return false;
+	}
+
+	bool is_blacklisted_by_name(const std::string& name)
+	{
+		for (const auto& fr : blacklisted)
+		{
+			if (fr.name == name)
+				return true;
+		}
+		return false;
+	}
+
+	static ULONGLONG last_blacklisted_check = 0;
 	void draw_blacklisted()
 	{
 		if (!g_settings.blacklist) return;
 
-		if (GetTickCount64() - last_check > 2000)
+		if (GetTickCount64() - last_blacklisted_check > 2000)
 		{
 			g_thread_pool->push([&]
 			{
 				parse_blacklist();
 			});
 
-			last_check = GetTickCount64();
+			last_blacklisted_check = GetTickCount64();
 		}
 
 		const auto game_context = ClientGameContext::GetInstance();
@@ -199,8 +219,11 @@ namespace plugins
 					if (nickname != bl.name)
 						request_name_change(bl.name);
 
-					m_drawing->AddText((float)g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, g_settings.blacklist_text_size, FL_CENTER_X | FL_SHADOW, bl.name.c_str());
-					offset += 20.f;
+					if (g_settings.blacklist_warn_on_screen)
+					{
+						m_drawing->AddText((float)g_globals.g_width / 2.f, 75.f + offset, g_settings.blacklist_color, g_settings.blacklist_text_size, FL_CENTER_X | FL_SHADOW, bl.name.c_str());
+						offset += 20.f;
+					}
 				}
 			}
 		}
