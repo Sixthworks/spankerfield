@@ -96,9 +96,7 @@ namespace plugins
 					normalized_health = fmaxf(0.0f, fminf(1.0f, normalized_health));
 				}
 				else
-				{
 					normalized_health = static_cast<float>(health) / max_health;
-				}
 
 				BYTE red = static_cast<BYTE>(255 - normalized_health * 255);
 				BYTE green = static_cast<BYTE>(normalized_health * 255);

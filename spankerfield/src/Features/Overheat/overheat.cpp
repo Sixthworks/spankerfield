@@ -4,7 +4,6 @@
 using namespace big;
 namespace plugins
 {
-	static bool about_to_overheat = false;
 	void overheat_control()
 	{
 		if (!g_settings.overheat_control) return;
@@ -37,7 +36,6 @@ namespace plugins
 
 		if (weapon->m_Overheat >= g_settings.overheat_control_critical)
 		{
-			about_to_overheat = true;
 			device->m_Buffer.buttons[0] = false;
 		}
 		else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)

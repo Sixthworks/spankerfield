@@ -113,7 +113,7 @@ namespace big
 		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
 			return result;
 
-		// Check if player is in vehicleR
+		// Check if player is in vehicle
 		const auto local_player = ClientGameContext::GetInstance()->m_pPlayerManager->m_pLocalPlayer;
 		const auto local_vehicle = local_player->GetVehicle();
 		bool is_in_vehicle = IsValidPtr(local_vehicle);
