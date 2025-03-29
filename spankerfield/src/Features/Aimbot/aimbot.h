@@ -81,6 +81,7 @@ namespace big
 	protected:
 		void update_all_player_list();
 		void update_closest_crosshair_list();
+		bool get_bone_position(RagdollComponent* ragdoll, Vector3& position);
 		float get_screen_distance(Vector3& EnemyScreen, Vector2 ScreenSize);
 	private:
 		std::vector<ClientPlayer*> m_PlayerList;

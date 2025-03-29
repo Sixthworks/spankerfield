@@ -61,7 +61,7 @@ namespace big
 		Quaternion pred_orientation = orientation;
 		Vector3 pred_lin_vel = linearVel;
 		Vector3 pred_displacement = curPosition;
-		
+
 		// Compile time variables
 		constexpr int SIMULATION_STEPS = 16;
 		constexpr float TIME_MULTIPLIER = 0.69f;
@@ -113,7 +113,7 @@ namespace big
 		if (!IsValidPtr(local_entity) || !IsValidPtr(enemy))
 			return result;
 
-		// Check if player is in vehicle
+		// Check if player is in vehicleR
 		const auto local_player = ClientGameContext::GetInstance()->m_pPlayerManager->m_pLocalPlayer;
 		const auto local_vehicle = local_player->GetVehicle();
 		bool is_in_vehicle = IsValidPtr(local_vehicle);
@@ -176,7 +176,7 @@ namespace big
 
 		// Gravity
 		float gravity = bullet->m_Gravity;
-		
+
 		if (gravity < -500.f || gravity > 500.f) gravity = 0.f;
 
 		// Initial speed (z component is our bullet velocity)
@@ -526,6 +526,40 @@ namespace big
 		}
 	}
 
+	// Helper function to get bone position from ragdoll component
+	bool BotPlayerManager::get_bone_position(RagdollComponent* ragdoll, Vector3& position)
+	{
+		if (!IsValidPtr(ragdoll))
+			return false;
+
+		// Try to get bone based on auto or manual selection
+		if (g_settings.aim_auto_bone)
+		{
+			static const UpdatePoseResultData::BONES bone_priority[] =
+			{
+				UpdatePoseResultData::BONES::Head,
+				UpdatePoseResultData::BONES::Neck,
+				UpdatePoseResultData::BONES::Spine1,
+				UpdatePoseResultData::BONES::Spine2,
+				UpdatePoseResultData::BONES::Hips
+			};
+
+			// Try each bone in priority order
+			for (const auto& bone : bone_priority)
+			{
+				if (ragdoll->GetBone(bone, position))
+					return true;
+			}
+
+			return false;
+		}
+		else
+		{
+			// Use manually selected bone
+			return ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, position);
+		}
+	}
+
 	void BotPlayerManager::update_closest_crosshair_list()
 	{
 		float closest_distance = 99999.0f;
@@ -564,89 +598,37 @@ namespace big
 			if (player->m_AttachedEntryId == 2)
 				continue;
 
+			// Main targeting logic
 			Vector3 head_vec;
 			bool got_bone = false;
 
+			// Get player ragdoll component
+			const auto ragdoll = soldier->m_pRagdollComponent;
+
 			// Check if player is in vehicle
 			const auto vehicle = player->GetVehicle();
-			if (IsValidPtr(vehicle))
+			const bool in_vehicle = IsValidPtr(vehicle);
+
+			// Visibility check for infantry
+			if (!in_vehicle && g_settings.aim_must_be_visible && soldier->m_Occluded)
+				continue;
+
+			// Try to get bone position
+			got_bone = get_bone_position(ragdoll, head_vec);
+
+			// If in vehicle and bone targeting failed, use vehicle center
+			if (in_vehicle && !got_bone)
 			{
-				// Get player bones even when in vehicle
-				const auto ragdoll = soldier->m_pRagdollComponent;
-				if (IsValidPtr(ragdoll))
-				{
-					if (g_settings.aim_auto_bone)
-					{
-						static const UpdatePoseResultData::BONES bone_priority[] =
-						{
-							UpdatePoseResultData::BONES::Head,
-							UpdatePoseResultData::BONES::Neck,
-							UpdatePoseResultData::BONES::Spine1,
-							UpdatePoseResultData::BONES::Spine2,
-							UpdatePoseResultData::BONES::Hips
-						};
-
-						for (const auto& bone : bone_priority)
-						{
-							if (ragdoll->GetBone(bone, head_vec))
-							{
-								got_bone = true;
-								break;
-							}
-						}
-					}
-					else
-						got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
-				}
-
-				// If we failed to get the bone but the vehicle is valid, target the center of the AABB
-				if (!got_bone)
-				{
-					TransformAABBStruct transform = get_transform(vehicle);
-					head_vec = transform.Transform.Translation() + (transform.AABB.m_Min + transform.AABB.m_Max) * 0.5f;
-					got_bone = true;
-				}
-			}
-			else
-			{
-				if (!g_settings.aim_must_be_visible)
-				{
-					if (soldier->m_Occluded)
-						continue;
-				}
-
-				const auto ragdoll = soldier->m_pRagdollComponent;
-				if (!IsValidPtr(ragdoll))
-					continue;
-
-				// Bone selection for infantry
-				if (g_settings.aim_auto_bone)
-				{
-					static const UpdatePoseResultData::BONES bone_priority[] =
-					{
-						UpdatePoseResultData::BONES::Head,
-						UpdatePoseResultData::BONES::Neck,
-						UpdatePoseResultData::BONES::Spine1,
-						UpdatePoseResultData::BONES::Spine2,
-						UpdatePoseResultData::BONES::Hips
-					};
-
-					for (const auto& bone : bone_priority)
-					{
-						if (ragdoll->GetBone(bone, head_vec))
-						{
-							got_bone = true;
-							break;
-						}
-					}
-				}
-				else
-					got_bone = ragdoll->GetBone((UpdatePoseResultData::BONES)g_settings.aim_bone, head_vec);
+				TransformAABBStruct transform = get_transform(vehicle);
+				head_vec = transform.Transform.Translation() + (transform.AABB.m_Min + transform.AABB.m_Max) * 0.5f;
+				got_bone = true;
 			}
 
+			// Skip if we couldn't get a target position
 			if (!got_bone)
 				continue;
 
+			// Convert world position to screen position
 			Vector3 screen_vec;
 			if (!world_to_screen(head_vec, screen_vec))
 				continue;
@@ -724,7 +706,7 @@ using namespace big;
 
 namespace plugins
 {
-	void vehicle_aimbot(AimbotTarget& target)
+	void mouse_aim(AimbotTarget& target)
 	{
 		const auto border_input_node = BorderInputNode::GetInstance();
 		if (!border_input_node) return;
@@ -757,20 +739,92 @@ namespace plugins
 		device->m_Buffer.y = target_y;
 	}
 
-	void aimbot(float delta_time)
+	void perform_prediction_and_aim(
+		ClientSoldierEntity* local_soldier,
+		ClientControllableEntity* prediction_target,
+		AimbotTarget& target,
+		const Matrix& space_matrix,
+		float delta_time,
+		bool perform_aim,
+		SoldierAimingSimulation* aiming_simulation = nullptr,
+		AimAssist* aim_assist = nullptr)
 	{
-		// Controller support
-		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
+		// Perform prediction
+		auto prediction = m_AimbotPredictor.PredictTarget(
+			local_soldier,
+			prediction_target,
+			target.m_WorldPosition,
+			space_matrix
+		);
 
-		// Pressed status
-		auto is_pressed = [=]()
-			{
-				return GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
-			};
-
-		if (!is_pressed())
+		if (!prediction.success)
 			return;
 
+		// Update target position with prediction
+		target.m_WorldPosition = prediction.predicted_position;
+
+		// Update global prediction point
+		g_globals.g_pred_aim_point = target.m_WorldPosition;
+		g_globals.g_has_pred_aim_point = target.m_HasTarget;
+
+		// Skip aiming part if not requested
+		if (!perform_aim || !g_settings.aimbot_snap_to_target)
+			return;
+
+		// Handle vehicle aiming
+		if (!aim_assist)
+		{
+			mouse_aim(target);
+			return;
+		}
+
+		// Handle infantry aiming with standard weapons
+		if (g_settings.aim_max_time_to_target <= 0.f)
+			return;
+
+		// Reset smoothing if target changed
+		if (target.m_Player != m_PreviousTarget.m_Player)
+		{
+			Vector2 vec_rand =
+			{
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
+				generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
+			};
+			m_AimbotSmoother.ResetTimes(vec_rand);
+		}
+
+		m_AimbotSmoother.Update(delta_time);
+
+		// Calculate aim angles
+		Vector3 v_dir = target.m_WorldPosition - space_matrix.Translation();
+		v_dir.Normalize();
+
+		float horizontal_angle = -atan2(v_dir.x, v_dir.z);
+		float vertical_angle = atan2(v_dir.y, sqrt(v_dir.x * v_dir.x + v_dir.z * v_dir.z));
+
+		Vector2 aim_angles =
+		{
+			horizontal_angle,
+			vertical_angle
+		};
+
+		// Apply final aiming
+		aim_angles -= aiming_simulation->m_Sway;
+		m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, aim_angles);
+		aim_assist->m_AimAngles = aim_angles;
+		m_PreviousTarget = target;
+	}
+
+	void aimbot(float delta_time)
+	{
+		// Check if aim key is pressed
+		bool using_controller = g_settings.aim_support_controller && is_left_trigger_pressed(0.5f);
+		bool is_aim_pressed = GetAsyncKeyState(g_settings.aim_key) != 0 || using_controller;
+
+		if (!is_aim_pressed)
+			return;
+
+		// Get essential game objects
 		const auto game_context = ClientGameContext::GetInstance();
 		if (!game_context) return;
 
@@ -781,105 +835,36 @@ namespace plugins
 		if (!IsValidPtr(local_player)) return;
 
 		const auto local_soldier = local_player->GetSoldier();
-		if (!IsValidPtr(local_soldier)) return;
-
-		if (!local_soldier->IsAlive()) return;
+		if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
 
 		// Check if player is in vehicle
 		const auto local_vehicle = local_player->GetVehicle();
+		bool in_vehicle = IsValidPtr(local_vehicle);
 
-		// Handle vehicle aimbot
-		if (IsValidPtr(local_vehicle))
-		{
-			// Disable if we're in a vehicle and the user doesn't have vehicle aimbot selected
-			if (!g_settings.aimbot_vehicle)
-				return;
-
-			// This aimbot wasn't designed for jets or helicopters
-			if (IsValidPtrWithVTable(local_vehicle->m_Data))
-			{
-				if (local_vehicle->m_Data->IsInHeli() || local_vehicle->m_Data->IsInJet())
-					return;
-			}
-
-			AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
-
-			if (!IsValidPtr(target.m_Player)) return;
-			if (!target.m_HasTarget) return;
-
-			// Friends list support
-			if (g_settings.aim_ignore_friends)
-			{
-				uint64_t persona_id = target.m_Player->m_onlineId.m_personaid;
-				bool is_friend = plugins::is_friend(persona_id);
-
-				// Quit if friend
-				if (is_friend)
-					return;
-			}
-
-			// Get correct entity for prediction
-			ClientControllableEntity* prediction_target = nullptr;
-			if (IsValidPtr(target.m_Player->GetVehicle()))
-				prediction_target = target.m_Player->GetVehicle();
-			else
-				prediction_target = target.m_Player->GetSoldier();
-
-			// Doing predict
-			auto prediction = m_AimbotPredictor.PredictTarget(
-				local_soldier,
-				prediction_target,
-				target.m_WorldPosition,
-				Matrix() // Empty matrix since vehicle doesn't use shoot space
-			);
-
-			if (!prediction.success)
-				return;
-
-			// Update
-			target.m_WorldPosition = prediction.predicted_position;
-
-			// Update global prediction point
-			g_globals.g_pred_aim_point = target.m_WorldPosition;
-			g_globals.g_has_pred_aim_point = target.m_HasTarget;
-
-			// Call vehicle aimbot
-			if (g_settings.aimbot_snap_to_target)
-			    vehicle_aimbot(target);
-
-			return;
-		}
-
-		// Don't run infantry aimbot if not enabled
-		if (!g_settings.aimbot)
+		// Early termination conditions
+		if (in_vehicle && !g_settings.aimbot_vehicle)
 			return;
 
-		// Controller support
-		if (using_controller)
+		if (!in_vehicle && !g_settings.aimbot)
+			return;
+
+		// Skip for jets or helicopters
+		if (in_vehicle && IsValidPtrWithVTable(local_vehicle->m_Data))
 		{
-			// Simulate a little bit of mouse movement
-			const auto mouse_device = BorderInputNode::GetInstance()->m_pMouse->m_pDevice;
-			if (IsValidPtr(mouse_device))
-				mouse_device->m_Buffer.x = mouse_device->m_Buffer.x - 1;
+			if (local_vehicle->m_Data->IsInHeli() || local_vehicle->m_Data->IsInJet())
+				return;
 		}
 
-		// The reason the weapon component is here, far away from other weapon-related variables is because of support for non-standart weapons
-		const auto weapon_component = local_soldier->m_pWeaponComponent;
-		if (!IsValidPtr(weapon_component)) return;
-
-		// Target
+		// Find target
 		AimbotTarget target = m_PlayerManager.get_closest_crosshair_player();
-		if (!IsValidPtr(target.m_Player)) return;
-		if (!target.m_HasTarget) return;
+		if (!IsValidPtr(target.m_Player) || !target.m_HasTarget)
+			return;
 
 		// Friends list support
 		if (g_settings.aim_ignore_friends)
 		{
 			uint64_t persona_id = target.m_Player->m_onlineId.m_personaid;
-			bool is_friend = plugins::is_friend(persona_id);
-
-			// Quit if friend
-			if (is_friend)
+			if (plugins::is_friend(persona_id))
 				return;
 		}
 
@@ -890,114 +875,67 @@ namespace plugins
 		else
 			prediction_target = target.m_Player->GetSoldier();
 
-		// This is fucking retarded, the GetActiveSoldierWeapon() can't be retrieved for non-standart weapons like rocket launchers
-		const auto weapon = weapon_component->GetActiveSoldierWeapon();
-		if (!IsValidPtr(weapon))
+		// Controller support for infantry
+		if (!in_vehicle && using_controller)
 		{
-			// Prediction, but without the aiming part
-			if (g_settings.aimbot_non_standart)
-			{
-				const auto game_renderer = GameRenderer::GetInstance();
-				if (!game_renderer) return;
-
-				const auto render_view = game_renderer->m_pRenderView;
-				if (!render_view) return;
-
-				// Doing predict
-				auto prediction = m_AimbotPredictor.PredictTarget(
-					local_soldier,
-					prediction_target,
-					target.m_WorldPosition,
-					render_view->m_ViewInverse // Normally we would retrieve the shoot space from GetActiveSoldierWeapon()->m_pWeapon
-				);
-
-				if (!prediction.success)
-					return;
-
-				// Update
-				target.m_WorldPosition = prediction.predicted_position;
-
-				// Update global prediction point
-				g_globals.g_pred_aim_point = target.m_WorldPosition;
-				g_globals.g_has_pred_aim_point = target.m_HasTarget;
-
-				return;
-			}
-			else
-				return;
+			// Simulate a little bit of mouse movement
+			const auto mouse_device = BorderInputNode::GetInstance()->m_pMouse->m_pDevice;
+			if (IsValidPtr(mouse_device))
+				mouse_device->m_Buffer.x = mouse_device->m_Buffer.x - 1;
 		}
 
-		const auto client_weapon = weapon->m_pWeapon;
-		if (!IsValidPtr(client_weapon)) return;
-
-		const auto primary_fire = weapon->m_pPrimary;
-		if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030) return;
-
-		if (g_settings.aim_must_not_reload)
+		// Handle prediction and aiming based on context (vehicle or infantry)
+		if (in_vehicle)
 		{
-			if (primary_fire->m_ReloadTimer >= 0.01f)
-				return;
+			// Vehicle aiming
+			Matrix empty; // Empty matrix since vehicle doesn't use shoot space
+			perform_prediction_and_aim(local_soldier, prediction_target, target, empty, delta_time, true);
 		}
+		else {
+			// Infantry aiming
+			const auto weapon_component = local_soldier->m_pWeaponComponent;
+			if (!IsValidPtr(weapon_component)) return;
 
-		const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
-		if (!IsValidPtr(aiming_simulation)) return;
+			const auto weapon = weapon_component->GetActiveSoldierWeapon();
 
-		const auto aim_assist = aiming_simulation->m_pFPSAimer;
-		if (!IsValidPtr(aim_assist)) return;
-
-		Matrix shoot_space = client_weapon->m_ShootSpace;
-
-		// Doing predict
-		auto prediction = m_AimbotPredictor.PredictTarget(
-			local_soldier,
-			prediction_target,
-			target.m_WorldPosition,
-			shoot_space
-		);
-
-		if (!prediction.success)
-			return;
-
-		// Update
-		target.m_WorldPosition = prediction.predicted_position;
-
-		// Update global prediction point
-		g_globals.g_pred_aim_point = target.m_WorldPosition;
-		g_globals.g_has_pred_aim_point = target.m_HasTarget;
-
-		// Snapping part
-		if (g_settings.aimbot_snap_to_target)
-		{
-			if (g_settings.aim_max_time_to_target <= 0.f) return;
-
-			if (target.m_Player != m_PreviousTarget.m_Player)
+			// Non-standard weapons (like rocket launchers)
+			if (!IsValidPtr(weapon))
 			{
-				Vector2 vec_rand =
+				if (g_settings.aimbot_non_standart)
 				{
-					generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target),
-					generate_random_float(g_settings.aim_min_time_to_target, g_settings.aim_max_time_to_target)
-				};
-				m_AimbotSmoother.ResetTimes(vec_rand);
+					const auto game_renderer = GameRenderer::GetInstance();
+					if (!game_renderer) return;
+
+					const auto render_view = game_renderer->m_pRenderView;
+					if (!render_view) return;
+
+					// Only perform prediction, no aiming for non-standard weapons
+					perform_prediction_and_aim(local_soldier, prediction_target, target, render_view->m_ViewInverse, delta_time, false);
+				}
+
+				return;
 			}
 
-			m_AimbotSmoother.Update(delta_time);
+			// Standard weapons
+			const auto client_weapon = weapon->m_pWeapon;
+			if (!IsValidPtr(client_weapon)) return;
 
-			Vector3 v_dir = target.m_WorldPosition - shoot_space.Translation();
-			v_dir.Normalize();
+			const auto primary_fire = weapon->m_pPrimary;
+			if (!IsValidPtr(primary_fire) || (uintptr_t)primary_fire == 0x10F00000030) return;
 
-			float horizontal_angle = -atan2(v_dir.x, v_dir.z);
-			float vertical_angle = atan2(v_dir.y, sqrt(v_dir.x * v_dir.x + v_dir.z * v_dir.z));
+			// Don't aim while reloading if setting enabled
+			if (g_settings.aim_must_not_reload && primary_fire->m_ReloadTimer >= 0.01f)
+				return;
 
-			Vector2 aim_angles =
-			{
-				horizontal_angle,
-				vertical_angle
-			};
+			const auto aiming_simulation = weapon->m_pAuthoritativeAiming;
+			if (!IsValidPtr(aiming_simulation)) return;
 
-			aim_angles -= aiming_simulation->m_Sway;
-			m_AimbotSmoother.SmoothAngles(aim_assist->m_AimAngles, aim_angles);
-			aim_assist->m_AimAngles = aim_angles;
-			m_PreviousTarget = target;
+			const auto aim_assist = aiming_simulation->m_pFPSAimer;
+			if (!IsValidPtr(aim_assist)) return;
+
+			// Perform prediction and aiming with standard weapon
+			Matrix shoot_space = client_weapon->m_ShootSpace;
+			perform_prediction_and_aim(local_soldier, prediction_target, target, shoot_space, delta_time, true, aiming_simulation, aim_assist);
 		}
 	}
 
@@ -1024,6 +962,6 @@ namespace plugins
 		float fov_radius = get_fov_radius(g_settings.aim_fov, (float)g_globals.g_width, (float)g_globals.g_height);
 
 		if (g_settings.aim_fov_method && g_settings.aim_draw_fov)
-			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), fov_radius, g_settings.aim_fov_color);
+			m_drawing->AddCircle(ImVec2(g_globals.g_width / 2.f, g_globals.g_height / 2.f), fov_radius, g_settings.aim_fov_color, 32);
 	}
 }

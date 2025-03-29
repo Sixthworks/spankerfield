@@ -144,10 +144,10 @@ namespace big
 					ImGui::SetTooltip(xorstr_("This will make the prediction of the aimbot supports weapons like Rocket Launchers."));
 				ImGui::WarningTooltip(xorstr_("Snap to target won't work with these weapons."));
 				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
-				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
+				ImGui::Checkbox(xorstr_("Target must be visible"), &g_settings.aim_must_be_visible);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Locks on targets without them being fully visible to you."));
-				ImGui::WarningTooltip(xorstr_("There is a PBSS/BF4DB risk while using this, play clean if you are using this"));
+					ImGui::SetTooltip(xorstr_("This option decides whether to lock on targets without them being fully visible to you."));
+				ImGui::WarningTooltip(xorstr_("There is a PBSS/BF4DB risk while having this off, play clean if you are using this"));
 				ImGui::Checkbox(xorstr_("Don't aim while reloading"), &g_settings.aim_must_not_reload);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
