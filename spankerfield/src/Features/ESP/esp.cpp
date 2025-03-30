@@ -9,6 +9,8 @@
 #include "../../Features/Friend List/friend_list.h"
 #include "../../Features/Blacklist\blacklist.h"
 
+#define PI 3.14159265f
+
 using namespace big;
 namespace plugins
 {
@@ -161,7 +163,7 @@ namespace plugins
                             // Smooth fade out using cosine interpolation
                             float fade_progress = (time_elapsed - 300.0f) / 200.0f;
                             fade_progress = std::clamp(fade_progress, 0.0f, 1.0f);
-                            alpha_multiplier = 0.5f + 0.5f * cosf(fade_progress * 3.14159265f); // Cosine curve
+                            alpha_multiplier = 0.5f + 0.5f * cosf(fade_progress * PI); // Cosine curve
                         }
 
                         // Apply alpha to color with smooth transition

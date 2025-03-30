@@ -891,7 +891,8 @@ namespace plugins
 			Matrix empty; // Empty matrix since vehicle doesn't use shoot space
 			perform_prediction_and_aim(local_soldier, prediction_target, target, empty, delta_time, true);
 		}
-		else {
+		else
+		{
 			// Infantry aiming
 			const auto weapon_component = local_soldier->m_pWeaponComponent;
 			if (!IsValidPtr(weapon_component)) return;

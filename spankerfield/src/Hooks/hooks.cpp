@@ -73,8 +73,8 @@ namespace big
 
 		void __fastcall hkTakeScreenshot(void* pThis)
 		{
-			// Add to the counter anyway, since hkTakeScreenshot is ran before the hkCopySubresourceRegion
 			g_globals.g_screenshots_pb++;
+			LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkTakeScreenshot]");
 
 			// If we're using the temp disable method or not using the new method
 			if (g_settings.screenshots_pb_temp_disable || !g_settings.screenshots_pb_clean)
@@ -129,7 +129,6 @@ namespace big
 
 			ULONGLONG current_tick_count = GetTickCount64();
 
-			// Update the clean screenshot every 15 seconds (to minimize interruptions)
 			if (current_tick_count > last_clean_frame + g_settings.screenshots_pb_clean_delay)
 			{
 				if (g_globals.g_screenshots_clean_frames > 5)
@@ -181,6 +180,7 @@ namespace big
 			// Check if the call is from PunkBuster's screenshot logic
 			if (reinterpret_cast<DWORD_PTR>(return_address) == OFFSET_PBSSRETURN)
 			{
+				g_globals.g_screenshots_pb++;
 				LOG(INFO) << xorstr_("PunkBuster initiated a screenshot [hkCopySubresourceRegion]");
 
 				if ((g_settings.screenshots_pb_clean || g_settings.screenshots_pb_use_both) && !g_settings.screenshots_pb_temp_disable)
