@@ -189,6 +189,9 @@
     <ClCompile Include="src\Features\C4 Bot\c4_bot.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\Features\Spot spam\spot_spam.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Features\Aimbot\aimbot.h">
@@ -342,6 +345,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\firing_data.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Features\Spot spam\spot_spam.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

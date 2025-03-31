@@ -192,6 +192,10 @@ namespace big
 		bool c4_bot_smart_self_damage{ true };
 		float c4_bot_health_buffer{ 35.0f };
 
+		bool spot_spam{ true };
+		float spot_spam_threshold{ 65.f };
+		int spot_spam_cooldown{ 1500 };
+
 		bool missiles_own{ true };
 		ImColor missiles_color{ 14, 231, 231, 255 };
 
@@ -440,6 +444,10 @@ namespace big
 			g_settings.c4_bot_smart_self_damage = j[xorstr_("settings")][xorstr_("c4_bot_smart_self_damage")];
 			g_settings.c4_bot_health_buffer = j[xorstr_("settings")][xorstr_("c4_bot_health_buffer")];
 
+			g_settings.spot_spam = j[xorstr_("settings")][xorstr_("spot_spam")];
+			g_settings.spot_spam_threshold = j[xorstr_("settings")][xorstr_("spot_spam_threshold")];
+			g_settings.spot_spam_cooldown = j[xorstr_("settings")][xorstr_("spot_spam_cooldown")];
+
 			g_settings.missiles_own = j[xorstr_("settings")][xorstr_("missiles_own")];
 			g_settings.missiles_color = string_to_color(j[xorstr_("settings")][xorstr_("missiles_color")]);
 
@@ -638,6 +646,9 @@ namespace big
 						{ xorstr_("c4_bot_prevent_self_damage"), g_settings.c4_bot_prevent_self_damage },
 						{ xorstr_("c4_bot_smart_self_damage"), g_settings.c4_bot_smart_self_damage },
 						{ xorstr_("c4_bot_health_buffer"), g_settings.c4_bot_health_buffer },
+						{ xorstr_("spot_spam"), g_settings.spot_spam },
+						{ xorstr_("spot_spam_threshold"), g_settings.spot_spam_threshold },
+						{ xorstr_("spot_spam_cooldown"), g_settings.spot_spam_cooldown },
 						{ xorstr_("missiles_own"), g_settings.missiles_own },
 						{ xorstr_("missiles_color"), color_to_string(g_settings.missiles_color) },
 						{ xorstr_("jet_speed"), g_settings.jet_speed },

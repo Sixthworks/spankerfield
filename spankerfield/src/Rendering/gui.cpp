@@ -883,6 +883,23 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS, Streamlabs, Bandicam, Action... etc. is running."));
 
+				ImGui::Spacing();
+
+				ImGui::Checkbox(xorstr_("Spot-spam"), &g_settings.spot_spam);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This is not the same as auto-spot, this presses the spot key when needed, and the enemy is spotted for everyone."));
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(200.f);
+				ImGui::SliderFloat(xorstr_("Threshold"), &g_settings.spot_spam_threshold, 0.f, 100.f);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This is the threshold of pixels in the screen center to analyze targest in."));
+				ImGui::SameLine();
+				ImGui::SliderInt(xorstr_("Cooldown"), &g_settings.spot_spam_cooldown, 0, 10000);
+				ImGui::PopItemWidth();
+
+				ImGui::Spacing();
+
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Automatically turns the jet to achieve the best possible speed."));

@@ -33,6 +33,7 @@ namespace big
         plugins::no_hc_restrictions();
         plugins::sway_modify();
         plugins::overheat_control();
+        plugins::spot_spam();
         plugins::kill_sound();
 
         if (g_settings.aimbot || g_settings.aimbot_vehicle)

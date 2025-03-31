@@ -177,6 +177,7 @@
     <ClCompile Include="src\Features\Risky\risky.cpp" />
     <ClCompile Include="src\Features\Screenshots\screenshots.cpp" />
     <ClCompile Include="src\Features\Spectator List\spectators.cpp" />
+    <ClCompile Include="src\Features\Spot spam\spot_spam.cpp" />
     <ClCompile Include="src\Features\Watermark\watermark.cpp" />
     <ClCompile Include="src\Hooks\hooks.cpp" />
     <ClCompile Include="src\Rendering\draw-list.cpp" />
@@ -219,6 +220,7 @@
     <ClInclude Include="src\Features\Risky\risky.h" />
     <ClInclude Include="src\Features\Screenshots\screenshots.h" />
     <ClInclude Include="src\Features\Spectator List\spectators.h" />
+    <ClInclude Include="src\Features\Spot spam\spot_spam.h" />
     <ClInclude Include="src\Features\Watermark\watermark.h" />
     <ClInclude Include="src\global.h" />
     <ClInclude Include="src\Hooks\hooks.h" />
