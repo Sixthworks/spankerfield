@@ -27,6 +27,7 @@
 
 - **Combat Features**
   - Aimbot
+  - C4 Bot
   - Infantry alert
   - Overheat control
   - Player blacklist
@@ -69,8 +70,6 @@ minhook.x64.lib
 - Linker -> General -> Additional Library Directories: `$(ProjectDir)lib;%(AdditionalLibraryDirectories)`
 
 ### TODO
-- [ ] Enhanced aimbot system
-- [ ] Vehicle aimbot implementation
 - [ ] Loadout editor
 - [ ] Kill say functionality
 
