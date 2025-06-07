@@ -119,7 +119,7 @@ namespace plugins
 		const auto val = IsValidPtr(player) ? player->m_onlineId.m_personaid : exclusive;
 
 		players[name][xorstr_("Persona ID")] = val;
-		players[name][xorstr_("Time added")] = current_time();
+		players[name][xorstr_("Time added")] = current_time(); // Isn't used anywhere
 
 		save_friends_json(players);
 		parse_friends();

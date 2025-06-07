@@ -112,27 +112,59 @@ namespace plugins
 				m_drawing->DrawBoxOutline(g_settings.radar_x, g_settings.radar_y, g_settings.radar_width, g_settings.radar_height, g_settings.radar_outline_color);
 		}
 
+		// Cross (for both rectangular and circular radars)
+		if (g_settings.radar_cross)
+		{
+			if (g_settings.radar_circular)
+			{
+				// Basic cross for circular radar
+				m_drawing->AddLine(ImVec2(center.x - radius, center.y), ImVec2(center.x + radius, center.y), g_settings.radar_cross_color, 1.0f);
+				m_drawing->AddLine(ImVec2(center.x, center.y - radius), ImVec2(center.x, center.y + radius), g_settings.radar_cross_color, 1.0f);
+
+				// Detailed cross with concentric circles and additional cross lines
+				if (g_settings.radar_cross_detailed)
+				{
+					for (float ratio : {0.25f, 0.5f, 0.75f})
+					{
+						float circle_radius = radius * ratio;
+						m_drawing->AddCircle(center, circle_radius, g_settings.radar_cross_color);
+					}
+
+					// Add diagonal cross lines
+					m_drawing->AddLine(ImVec2(center.x - radius * 0.7f, center.y - radius * 0.7f), ImVec2(center.x + radius * 0.7f, center.y + radius * 0.7f), g_settings.radar_cross_color, 1.0f);
+					m_drawing->AddLine(ImVec2(center.x - radius * 0.7f, center.y + radius * 0.7f), ImVec2(center.x + radius * 0.7f, center.y - radius * 0.7f), g_settings.radar_cross_color, 1.0f);
+				}
+			}
+			else
+			{
+				// Basic cross for rectangular radar
+				m_drawing->AddLine(ImVec2(g_settings.radar_x, center.y), ImVec2(g_settings.radar_x + g_settings.radar_width, center.y), g_settings.radar_cross_color, 1.0f);
+				m_drawing->AddLine(ImVec2(center.x, g_settings.radar_y), ImVec2(center.x, g_settings.radar_y + g_settings.radar_height), g_settings.radar_cross_color, 1.0f);
+
+				// Detailed cross with grid lines
+				if (g_settings.radar_cross_detailed)
+				{
+					for (float ratio : {0.25f, 0.75f})
+					{
+						float y = g_settings.radar_y + g_settings.radar_height * ratio;
+						m_drawing->AddLine(ImVec2(g_settings.radar_x, y), ImVec2(g_settings.radar_x + g_settings.radar_width, y), g_settings.radar_cross_color, 0.7f);
+					}
+
+					for (float ratio : {0.25f, 0.75f})
+					{
+						float x = g_settings.radar_x + g_settings.radar_width * ratio;
+						m_drawing->AddLine(ImVec2(x, g_settings.radar_y), ImVec2(x, g_settings.radar_y + g_settings.radar_height), g_settings.radar_cross_color, 0.7f);
+					}
+				}
+			}
+		}
+
 		// Icon scale factor based on size
 		float icon_scale_factor = min(g_settings.radar_width, g_settings.radar_height) / 320.0f; // Assuming 320 is the base size
 
 		// You
 		if (g_settings.radar_draw_you)
 			m_drawing->AddCircleFilled(center, 3.5f * icon_scale_factor, g_settings.radar_you_color);
-
-		// Cross (for both rectangular and circular radars)
-		if (g_settings.radar_cross)
-		{
-			if (g_settings.radar_circular)
-			{
-				m_drawing->AddLine(ImVec2(center.x - radius, center.y), ImVec2(center.x + radius, center.y), g_settings.radar_cross_color, 1.0f);
-				m_drawing->AddLine(ImVec2(center.x, center.y - radius), ImVec2(center.x, center.y + radius), g_settings.radar_cross_color, 1.0f);
-			}
-			else
-			{
-				m_drawing->AddLine(ImVec2(g_settings.radar_x, center.y), ImVec2(g_settings.radar_x + g_settings.radar_width, center.y), g_settings.radar_cross_color, 1.0f);
-				m_drawing->AddLine(ImVec2(center.x, g_settings.radar_y), ImVec2(center.x, g_settings.radar_y + g_settings.radar_height), g_settings.radar_cross_color, 1.0f);
-			}
-		}
 		
 		// Players
 		for (int i = 0; i < MAX_PLAYERS; i++)

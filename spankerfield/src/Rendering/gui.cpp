@@ -15,145 +15,111 @@ namespace big
 	{
 		auto& style = ImGui::GetStyle();
 
-		// Basic style settings
-		style.WindowPadding = { 8.f, 8.f };
-		style.PopupRounding = 0.f;
-		style.FramePadding = { 4.f, 3.f };
-		style.ItemSpacing = { 6.5f, 4.5f };
-		style.ItemInnerSpacing = { 5.5f, 5.5f };
-		style.TouchExtraPadding = { 0.f, 0.f };
-		style.IndentSpacing = 20.f;
-		style.ScrollbarSize = 10.f;
-		style.GrabMinSize = 6.f;
+		// Modernisierte Style-Einstellungen
+		style.WindowPadding = { 10.f, 10.f };
+		style.FramePadding = { 8.f, 6.f };
+		style.ItemSpacing = { 10.f, 8.f };
+		style.ItemInnerSpacing = { 8.f, 8.f };
+		style.ScrollbarSize = 12.f;
+		style.GrabMinSize = 10.f;
 
-		// No rounded corners for a less glossy look
-		style.WindowRounding = 0.f;
-		style.ChildRounding = 0.f;
-		style.FrameRounding = 0.f;
-		style.PopupRounding = 0.f;
-		style.ScrollbarRounding = 0.f;
-		style.GrabRounding = 0.f;
-		style.TabRounding = 0.f;
+		// Abgerundete Ecken für ein modernes Aussehen
+		style.WindowRounding = 8.f;
+		style.ChildRounding = 6.f;
+		style.FrameRounding = 6.f;
+		style.PopupRounding = 6.f;
+		style.ScrollbarRounding = 6.f;
+		style.GrabRounding = 6.f;
+		style.TabRounding = 6.f;
 
-		// Minimal borders for a matte look
+		// Minimalistische Rahmen
 		style.WindowBorderSize = 1.f;
-		style.ChildBorderSize = 0.f;
+		style.ChildBorderSize = 1.f;
 		style.PopupBorderSize = 1.f;
 		style.FrameBorderSize = 1.f;
-		style.TabBorderSize = 0.f;
+		style.TabBorderSize = 1.f;
 
 		style.WindowTitleAlign = { 0.5f, 0.5f };
 		style.ButtonTextAlign = { 0.5f, 0.5f };
 
-		// Colors
+		// Modernes Farbschema
 		ImVec4* colors = style.Colors;
 
-		// Defining key colors
-		ImVec4 greenHighlight = ImVec4(0.22f, 0.69f, 0.2f, 1.00f);          // Green for active tab
-		ImVec4 darkBg = ImVec4(0.10f, 0.10f, 0.10f, 0.95f);                 // Increased alpha for less transparency
-		ImVec4 mediumBg = ImVec4(0.14f, 0.14f, 0.14f, 0.95f);               // Less transparent medium gray
-		ImVec4 deepBlueCheck = ImVec4(0.10f, 0.50f, 1.00f, 1.00f);          // Deeper blue for checkmarks
-
-		// Window and background colors
-		colors[ImGuiCol_WindowBg] = darkBg;
-		colors[ImGuiCol_ChildBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.00f);
-		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.95f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.95f); // Dunkler Hintergrund mit leichter Transparenz
+		colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+		colors[ImGuiCol_PopupBg] = ImVec4(0.18f, 0.18f, 0.18f, 0.95f);
 		colors[ImGuiCol_Border] = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
-		colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 
-		// Text colors
-		colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);         // Slightly off-white for less harsh contrast
+		// Textfarben
+		colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.20f, 0.40f, 0.70f, 0.35f);
 
-		// Frame colors (for checkboxes, etc.) - more matte look
-		colors[ImGuiCol_FrameBg] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);      // Solid color instead of transparent
-		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-		colors[ImGuiCol_FrameBgActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+		// Buttons
+		colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
 
-		// Tabs - match with EngineOwning style but less glossy
-		colors[ImGuiCol_Tab] = mediumBg;
-		colors[ImGuiCol_TabHovered] = ImVec4(0.22f, 0.22f, 0.22f, 0.95f);
-		colors[ImGuiCol_TabActive] = greenHighlight;
-		colors[ImGuiCol_TabUnfocused] = mediumBg;
-		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.18f, 0.18f, 0.18f, 0.95f);
+		// Tabs
+		colors[ImGuiCol_Tab] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+		colors[ImGuiCol_TabActive] = ImVec4(0.25f, 0.50f, 0.75f, 1.00f); // Blaue Akzentfarbe für aktive Tabs
 
-		// Checkmark color - deeper blue
-		colors[ImGuiCol_CheckMark] = deepBlueCheck;
-
-		// Title bar - darker, more matte look
-		colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.95f);
-		colors[ImGuiCol_TitleBgActive] = ImVec4(0.12f, 0.12f, 0.12f, 0.95f);
-		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.08f, 0.90f);
-
-		// Button colors - flat, matte appearance
-		colors[ImGuiCol_Button] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);       // Solid color for matte look
-		colors[ImGuiCol_ButtonHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-		colors[ImGuiCol_ButtonActive] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-
-		// Other elements - keeping consistent with matte dark theme
-		colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-		colors[ImGuiCol_HeaderHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-		colors[ImGuiCol_HeaderActive] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-		colors[ImGuiCol_Separator] = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
-		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.50f);
-		colors[ImGuiCol_SeparatorActive] = ImVec4(0.45f, 0.45f, 0.45f, 0.50f);
-		colors[ImGuiCol_ResizeGrip] = ImVec4(0.20f, 0.20f, 0.20f, 0.25f);
-		colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
-		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.20f, 0.20f, 0.20f, 0.70f);
-		colors[ImGuiCol_PlotLines] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-		colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.40f, 0.35f, 1.00f);
-		colors[ImGuiCol_PlotHistogram] = ImVec4(0.80f, 0.60f, 0.00f, 1.00f);
-		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.90f, 0.55f, 0.00f, 1.00f);
-		colors[ImGuiCol_DragDropTarget] = ImVec4(0.90f, 0.90f, 0.00f, 0.90f);
-		colors[ImGuiCol_NavHighlight] = ImVec4(0.20f, 0.40f, 0.70f, 1.00f);
-		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.90f, 0.90f, 0.90f, 0.70f);
-		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
-		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
-
-		// Slider/scrollbar colors - more solid/matte
-		colors[ImGuiCol_SliderGrab] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+		// Slider und Scrollbars
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.25f, 0.50f, 0.75f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.35f, 0.60f, 0.85f, 1.00f);
 		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.45f, 0.45f, 0.45f, 1.00f);
 
+		// Transparente Overlays
+		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.10f, 0.10f, 0.10f, 0.60f);
+
+		// Setze die Fenstergröße auf einen Standardwert
 		ImGui::SetNextWindowSize(ImVec2(850, 750));
 	}
 
 	void gui::dx_on_tick()
 	{
-		if (ImGui::Begin(xorstr_("Spankerfield"), nullptr, ImGuiWindowFlags_NoCollapse))
+		// Begrenzung der Fenstergröße auf 3/4 der Monitorgröße
+		ImVec2 display_size = ImGui::GetIO().DisplaySize;
+		ImVec2 max_size = ImVec2(display_size.x * 0.75f, display_size.y * 0.75f); // Manuelle Multiplikation
+
+		ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), max_size);
+
+		if (ImGui::Begin(xorstr_("Spankerfield"), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginTabBar(xorstr_("Tab bar"));
 
+			// Aimbot Tab
 			if (ImGui::BeginTabItem(xorstr_("Aimbot")))
 			{
-				ImGui::Checkbox(xorstr_("Aimbot"), &g_settings.aimbot);
-				ImGui::Checkbox(xorstr_("FOV target selection"), &g_settings.aim_fov_method);
-				ImGui::Checkbox(xorstr_("Aim through walls"), &g_settings.aim_must_be_visible);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Locks on targets without them being fully visible to you."));
-				ImGui::WarningTooltip(xorstr_("There is a PBSS/BF4DB risk while using this, play clean if you are using this"));
-				ImGui::Checkbox(xorstr_("Don't aim while reloading"), &g_settings.aim_must_not_reload);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Will not aim at enemies if your weapon is reloading."));
-				ImGui::Checkbox(xorstr_("Ignore friends"), &g_settings.aim_ignore_friends);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Will not aim at players that are in your friends list."));
-
-				ImGui::Separator();
-
-				ImGui::Checkbox(xorstr_("Draw aim point"), &g_settings.esp_draw_aim_point);
-
-				if (g_settings.esp_draw_aim_point)
+				if (ImGui::CollapsingHeader(xorstr_("General Settings"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("Point scale##AP"), &g_settings.esp_aim_point_size, 0.1f, 10.f);
-					ImGui::PopItemWidth();
+					ImGui::Checkbox(xorstr_("Enable Aimbot"), &g_settings.aimbot);
+					ImGui::Checkbox(xorstr_("Vehicle Aimbot"), &g_settings.aimbot_vehicle);
+					ImGui::Checkbox(xorstr_("Snap to Target"), &g_settings.aimbot_snap_to_target);
+					ImGui::Checkbox(xorstr_("Support Non-Standard Weapons"), &g_settings.aimbot_non_standart);
+				}
 
-					color_wrapper(xorstr_("Point color##AP"), &g_settings.esp_aim_point_color);
+				ImGui::Spacing();
+
+				if (ImGui::CollapsingHeader(xorstr_("Targeting Options"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Checkbox(xorstr_("FOV Target Selection"), &g_settings.aim_fov_method);
+					ImGui::Checkbox(xorstr_("Target Must Be Visible"), &g_settings.aim_must_be_visible);
+					ImGui::Checkbox(xorstr_("Ignore Friends"), &g_settings.aim_ignore_friends);
+				}
+
+				ImGui::Spacing();
+
+				if (ImGui::CollapsingHeader(xorstr_("Visual Aids"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Checkbox(xorstr_("Draw Aim Point"), &g_settings.esp_draw_aim_point);
+					if (g_settings.esp_draw_aim_point)
+					{
+						ImGui::SliderFloat(xorstr_("Point Scale"), &g_settings.esp_aim_point_size, 0.1f, 10.f);
+						color_wrapper(xorstr_("Point Color"), &g_settings.esp_aim_point_color);
+					}
 				}
 
 				if (g_settings.aim_fov_method)
@@ -237,12 +203,12 @@ namespace big
 				ImGui::SliderFloat(xorstr_("Minimum time to target (sec)##Aimbot"), &g_settings.aim_min_time_to_target, 0.01f, g_settings.aim_max_time_to_target);
 
 				if (g_settings.aim_min_time_to_target < 0.15f)
-					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+					ImGui::WarningTooltip(xorstr_("Having this option that low will most likely get you banned."));
 
 				ImGui::SliderFloat(xorstr_("Maximum time to target (sec)##Aimbot"), &g_settings.aim_max_time_to_target, g_settings.aim_min_time_to_target, 10.f);
 
 				if (g_settings.aim_max_time_to_target < 0.2f)
-					ImGui::WarningTooltip(xorstr_("Having this option low like this might get you banned."));
+					ImGui::WarningTooltip(xorstr_("Having this option that low will most likely get you banned."));
 
 				ImGui::PopItemWidth();
 
@@ -257,14 +223,15 @@ namespace big
 				ImGui::EndTabItem();
 			}
 
+			// Weapons Tab
 			if (ImGui::BeginTabItem(xorstr_("Weapons")))
 			{
-				if (ImGui::CollapsingHeader(xorstr_("C4 Bot"), ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(xorstr_("C4 Bot Settings"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					ImGui::Text(xorstr_("It's recommended to use the default settings, since they are tweaked specifically for the script."));
 
-					ImGui::Checkbox(xorstr_("C4 Bot##C4"), &g_settings.c4_bot);
-					ImGui::Checkbox(xorstr_("Always active"), &g_settings.c4_bot_always_active);
+					ImGui::Checkbox(xorstr_("Enable C4 Bot"), &g_settings.c4_bot);
+					ImGui::Checkbox(xorstr_("Always Active"), &g_settings.c4_bot_always_active);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(xorstr_("This will make the C4 Bot always active, even when not using a C4"));
 
@@ -428,8 +395,8 @@ namespace big
 
 								ImGui::Separator();
 
-								ImGui::Text(xorstr_("I dont know what this is"));
-								ImGui::WarningTooltip(xorstr_("You can test what it is at your own risk."));
+								ImGui::Text(xorstr_("These values are unknown to me"));
+								ImGui::WarningTooltip(xorstr_("You can test them at your own risk."));
 
 								ImGui::Checkbox(xorstr_("Relative target aiming"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_RelativeTargetAiming));
 								ImGui::Checkbox(xorstr_("Force spawn to camera"), reinterpret_cast<bool*>(&data->m_ShotConfigData.m_ForceSpawnToCamera));
@@ -443,51 +410,35 @@ namespace big
 				ImGui::EndTabItem();
 			}
 
+			// Visuals Tab
 			if (ImGui::BeginTabItem(xorstr_("Visuals")))
 			{
-				ImGui::Checkbox(xorstr_("Draw ESP"), &g_settings.esp);
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Distance##ESP"), &g_settings.esp_distance, 1.f, 10000.f);
-				ImGui::PopItemWidth();
+				if (ImGui::CollapsingHeader(xorstr_("ESP Settings"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Checkbox(xorstr_("Enable ESP"), &g_settings.esp);
+					ImGui::SliderFloat(xorstr_("ESP Distance"), &g_settings.esp_distance, 1.f, 10000.f);
+				}
 
-				ImGui::Separator();
+				ImGui::Spacing();
 
-				ImGui::Checkbox(xorstr_("Draw vehicles##ESP"), &g_settings.esp_draw_vehicles);
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Draw teammates##ESP"), &g_settings.esp_draw_teammates);
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Draw friends##ESP"), &g_settings.esp_draw_friends);
+				if (ImGui::CollapsingHeader(xorstr_("Box Settings"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Checkbox(xorstr_("Draw 2D Box"), &g_settings.esp_draw_box);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Draws a simple 2D box around the player/vehicle model."));
+					ImGui::SameLine();
+					ImGui::Checkbox(xorstr_("Fill box"), &g_settings.esp_box_fill);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Fills/paints the inside of a box with a solid color."));
+					ImGui::PushItemWidth(300.f);
+					ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
+					ImGui::PopItemWidth();
+					color_wrapper(xorstr_("Box color"), &g_settings.esp_box_color);
+					color_wrapper(xorstr_("Box color (occluded)"), &g_settings.esp_box_color_occluded);
 
-				ImGui::Text(xorstr_("Friends color"));
-				ImGui::Checkbox(xorstr_("Use tag instead of friendly colors##ESP"), &g_settings.esp_friend_color_to_tag);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will make the cheat not change any of the colors in the ESP, and only use the FRND friend tag."));
-
-				color_wrapper(xorstr_("Friend##ESP"), &g_settings.esp_friend_color);
-
-				ImGui::Text(xorstr_("Teammates color"));
-
-				color_wrapper(xorstr_("Teammate##ESP"), &g_settings.esp_teammate_color);
-
-				ImGui::Text(xorstr_("Additional tags color"));
-
-				color_wrapper(xorstr_("Tags##ESP"), &g_settings.esp_additional_tags_color);
-
-				ImGui::Separator();
-
-				ImGui::Checkbox(xorstr_("Draw 2D box"), &g_settings.esp_draw_box);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws a simple 2D box around the player/vehicle model."));
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Fill box"), &g_settings.esp_box_fill);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Fills/paints the inside of a box with a solid color."));
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderInt(xorstr_("Box style"), &g_settings.esp_box_style, 1, 6);
-				ImGui::PopItemWidth();
-				color_wrapper(xorstr_("Box color"), &g_settings.esp_box_color);
-				color_wrapper(xorstr_("Box color (occluded)"), &g_settings.esp_box_color_occluded);
-				color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
+					if (g_settings.esp_box_fill)
+					    color_wrapper(xorstr_("Box fill color"), &g_settings.esp_box_fill_color);
+				}
 
 				ImGui::Separator();
 
@@ -613,7 +564,7 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Draws a health bar indicating the local player/vehicle health state."));
 				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Player##HB"), &g_settings.health_bar_soldier);
+				ImGui::Checkbox(xorstr_("Soldier##HB"), &g_settings.health_bar_soldier);
 				ImGui::SameLine();
 				ImGui::Checkbox(xorstr_("Vehicle##HB"), &g_settings.health_bar_vehicle);
 
@@ -647,7 +598,10 @@ namespace big
 					ImGui::SetTooltip(xorstr_("This will make the health bar use the traditional red (being lowest) -> green (being highest) system for coloring."));
 				
 				if (!g_settings.health_bar_use_default_color)
+				{
+					ImGui::SameLine();
 					color_wrapper(xorstr_("Bar##HB"), &g_settings.health_bar_color);
+				}
 
 				// Add spacing UI only if both are activated
 				if (g_settings.health_bar_soldier && g_settings.health_bar_vehicle)
@@ -702,7 +656,19 @@ namespace big
 				ImGui::PopItemWidth();
 
 				ImGui::Checkbox(xorstr_("Draw cross##RDR"), &g_settings.radar_cross);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Draws lines on the radar for better orientation in space."));
 				ImGui::SameLine();
+				
+				// Show detailed cross only if the regular one is enabled
+				if (g_settings.radar_cross)
+				{
+					ImGui::Checkbox(xorstr_("Detailed cross##RDR"), &g_settings.radar_cross_detailed);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(xorstr_("Makes the radar cross have a more detailed and professional look."));
+					ImGui::SameLine();
+				}
+
 				ImGui::Checkbox(xorstr_("Draw outline##RDR"), &g_settings.radar_outline);
 
 				ImGui::Separator();
@@ -851,6 +817,23 @@ namespace big
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Big random chance of unspotting enemies when OBS, Streamlabs, Bandicam, Action... etc. is running."));
 
+				ImGui::Spacing();
+
+				ImGui::Checkbox(xorstr_("Spot-spam"), &g_settings.spot_spam);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This is not the same as auto-spot, this presses the spot key when needed, and the enemy is spotted for everyone."));
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(200.f);
+				ImGui::SliderFloat(xorstr_("Threshold"), &g_settings.spot_spam_threshold, 0.f, 100.f);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("This is the threshold of pixels in the screen center to analyze targest in."));
+				ImGui::SameLine();
+				ImGui::SliderInt(xorstr_("Cooldown"), &g_settings.spot_spam_cooldown, 0, 10000);
+				ImGui::PopItemWidth();
+
+				ImGui::Spacing();
+
 				ImGui::Checkbox(xorstr_("Auto jet speed"), &g_settings.jet_speed);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Automatically turns the jet to achieve the best possible speed."));
@@ -892,6 +875,7 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Friends")))
 			{
+				ImGui::PushItemFlag(ImGuiTreeNodeFlags_DefaultOpen, true);
 				if (ImGui::TreeNode(xorstr_("Friends list")))
 				{
 					int i = 0;
@@ -903,6 +887,7 @@ namespace big
 					}
 					ImGui::TreePop();
 				}
+				ImGui::PopItemFlag();
 
 				if (ImGui::Button(xorstr_("Delete friend")))
 				{
@@ -916,7 +901,7 @@ namespace big
 
 				ImGui::Separator();
 				static char friend_nick[50]{};
-				ImGui::PushItemWidth(300.f);
+				ImGui::PushItemWidth(250.f);
 				ImGui::InputText(xorstr_("Friend Nickname"), friend_nick, IM_ARRAYSIZE(friend_nick));
 				ImGui::PopItemWidth();
 				if (ImGui::Button(xorstr_("Add friend")))
@@ -927,16 +912,35 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Blacklist")))
 			{
-				ImGui::Checkbox(xorstr_("Draw blacklisted players"), &g_settings.blacklist);
+				ImGui::Checkbox(xorstr_("Blacklist##BL"), &g_settings.blacklist);
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Warn about blacklisted players"), &g_settings.blacklist_warn_on_screen);
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Draws blacklisted players in the center part of the screen."));
-				ImGui::PushItemWidth(300.f);
-				ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
-				ImGui::PopItemWidth();
+					ImGui::SetTooltip(xorstr_("Screen warning of blacklisted players on the server."));
+				ImGui::SameLine();
+				ImGui::Checkbox(xorstr_("Show blacklisted tag in ESP"), &g_settings.blacklist_tag_in_esp);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(xorstr_("Adds a tag to ESP if the player is blacklisted."));
 
-				ImGui::Text(xorstr_("Text color"));
+				if (g_settings.blacklist_warn_on_screen)
+				{
+					ImGui::PushItemWidth(300.f);
+				    ImGui::SliderFloat(xorstr_("Text size"), &g_settings.blacklist_text_size, 0.f, 150.f);
+				    ImGui::PopItemWidth();
+			    }
 
-				color_wrapper(xorstr_("Text##BL"), &g_settings.blacklist_color);
+				if (g_settings.blacklist_warn_on_screen || g_settings.blacklist_tag_in_esp)
+				{
+					ImGui::Text(xorstr_("Colors"));
+
+					if (g_settings.blacklist_warn_on_screen)
+						color_wrapper(xorstr_("Text##BL"), &g_settings.blacklist_color);
+
+					if (g_settings.blacklist_tag_in_esp)
+						color_wrapper(xorstr_("ESP##BL"), &g_settings.blacklist_tag_color);
+				}
+				else
+					ImGui::Text(xorstr_("Colors unavailable, no options selected."));
 
 				ImGui::Separator();
 
@@ -948,7 +952,7 @@ namespace big
 						if (ImGui::Selectable(rs.name.c_str(), false))
 							plugins::selected = i;
 
-						i++;
+					 i++;
 					}
 
 					ImGui::TreePop();
@@ -976,234 +980,21 @@ namespace big
 
 			if (ImGui::BeginTabItem(xorstr_("Settings")))
 			{
-				ImGui::Checkbox(xorstr_("Draw PB & FF screenshots amount"), &g_settings.screenshots);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Shows the total amount of times you've been screenshotted by FF or PB."));
-				ImGui::SameLine();
-				ImGui::Checkbox(xorstr_("Warn about new screenshots"), &g_settings.screenshots_warn);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Shows a warning message if you got screenshotted recently."));
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Reset counters")))
+				if (ImGui::CollapsingHeader(xorstr_("General Settings"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					g_globals.screenshots_ff = NULL;
-					g_globals.screenshots_pb = NULL;
+					ImGui::Checkbox(xorstr_("Streamer Mode"), &g_settings.streamer_mode);
+					ImGui::Checkbox(xorstr_("Disable Watermark"), &g_settings.disable_watermark);
 				}
-
-				if (g_settings.screenshots)
-					color_wrapper(xorstr_("Text##SC"), &g_settings.screenshots_color);
-
-				ImGui::Text(xorstr_("PBSS bypass method:"));
-
-				// We can't use xorstr_ in a regular array
-				std::vector<const char*> obfuscated_items;
-				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Temp Disable"));
-				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Clean"));
-
-				// Create an array of const char* pointers to pass to ImGui
-				const char** items_array = obfuscated_items.data();
-
-				// Update current_item based on the actual state of g_settings each frame
-				// This ensures the dropdown always reflects the current settings
-				int current_item = g_settings.screenshots_pb_clean ? 1 : 0;
-
-				ImGui::PushItemWidth(300.f);
-				if (ImGui::Combo(xorstr_("##bypass_method"), &current_item, items_array, (int)obfuscated_items.size()))
-				{
-					g_settings.screenshots_pb_clean = (current_item == 1);
-					g_settings.screenshots_pb_temp_disable = (current_item == 0);
-				}
-				ImGui::PopItemWidth();
-
-				ImGui::SameLine();
-
-				ImGui::Checkbox(xorstr_("Use both methods simultaneously"), &g_settings.screenshots_pb_use_both);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("Use both the temp disable and clean PBSS bypass methods for maximum security."));
-				ImGui::WarningTooltip(xorstr_("Using both methods may affect gameplay a bit but provides better protection."));
 
 				ImGui::Spacing();
 
-				if (g_settings.screenshots_pb_clean || g_settings.screenshots_pb_use_both)
+				if (ImGui::CollapsingHeader(xorstr_("Configuration"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					// Only show the "Save PBSS to folder" option when clean method is active
-					ImGui::Checkbox(xorstr_("Save PBSS to folder"), &g_settings.screenshots_pb_save_to_folder);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Saves captured PB screenshots to a folder. AppData\\Roaming\\Spankerfield\\PB Screenshots\\Timestamp.png."));
-
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderInt(xorstr_("Clean frame update delay (ms)"), &g_settings.screenshots_pb_clean_delay, 500, 60000);
-					ImGui::PopItemWidth();
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Delay between each clean frame update for the new method."));
-					ImGui::WarningTooltip(xorstr_("Setting it too low will cause a lot of flickering in the cheat, setting it too high might increase the chance of you getting banned."));
+					ImGui::Text(xorstr_("Current Config:"));
+					ImGui::InputText(xorstr_("##ConfigName"), g_config.current_config.data(), g_config.current_config.size());
+					if (ImGui::Button(xorstr_("Save Config")))
+						g_config.save();
 				}
-
-				if (g_settings.screenshots_pb_temp_disable || g_settings.screenshots_pb_use_both)
-				{
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderInt(xorstr_("Before taking screenshot (ms)"), &g_settings.screenhots_pb_delay, 50, 1000);
-					ImGui::PopItemWidth();
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Timing to disable visuals before the PunkBuster screenshot is taken, ensures visuals are disabled before the screenshot starts."));
-					ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
-
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderInt(xorstr_("After taking screenshot (ms)"), &g_settings.screenhots_post_pb_delay, 0, 500);
-					ImGui::PopItemWidth();
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Delay after the PunkBuster screenshot is taken. Ensures the screenshot is fully completed before re-enabling visuals."));
-					ImGui::WarningTooltip(xorstr_("Recommended: 300ms."));
-				}
-
-				ImGui::Separator();
-
-				ImGui::Checkbox(xorstr_("Spoof local name"), &g_settings.spoof_name);
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Restore local name")))
-				{
-					*g_settings.spoofed_name = '\0';
-
-					g_settings.spoof_restore = true;
-				}
-
-				ImGui::PushItemWidth(250.f);
-				ImGui::InputText(xorstr_("Nickname"), g_settings.spoofed_name, 16);
-				ImGui::PopItemWidth();
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This new nickname will only be visible to you."));
-
-				ImGui::Separator();			
-
-				ImGui::Checkbox(xorstr_("Use cheap drawing"), &g_settings.use_cheap_boxes);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will use the game's DebugRenderer for the most part instead of ImGui to render most of the visuals."));
-
-				ImGui::SameLine();
-
-				ImGui::Checkbox(xorstr_("Use cheap text"), &g_settings.use_cheap_text);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will use the game's DebugRenderer instead of ImGui to render text outside the menu."));
-
-				ImGui::SameLine();
-
-				ImGui::Checkbox(xorstr_("Streamer mode"), &g_settings.streamer_mode);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will use fake nicknames in ESP and censor out nicknames in Spectator List."));
-
-				ImGui::SameLine();
-
-				ImGui::Checkbox(xorstr_("Rainbow mode"), &g_settings.rainbow_mode);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This will make every visual color have the Rainbow effect."));
-
-				if (g_settings.rainbow_mode)
-				{
-					ImGui::SameLine(); // Want to keep it on the same line
-
-					ImGui::PushItemWidth(300.f);
-					ImGui::SliderFloat(xorstr_("Speed##RM"), &g_settings.rainbow_speed, 0.1f, 2.0f);
-					ImGui::PopItemWidth();
-				}
-
-				ImGui::Checkbox(xorstr_("Disable watermark"), &g_settings.disable_watermark);
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This option disables the cheat's watermark from showing on the screen from time to time."));
-
-				if (!g_settings.disable_watermark)
-				{
-					ImGui::SameLine();
-
-					static bool debug_watermark;
-					if (ImGui::Checkbox(xorstr_("Debug watermark"), &debug_watermark))
-					{
-						plugins::toggle_watermark_debug(debug_watermark);
-					}
-						
-
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(xorstr_("Lets you debug the watermark, mostly developer only."));
-				}
-
-				ImGui::Separator();
-				ImGui::Text(xorstr_("Configuration"));
-
-				// Config selection combo box
-				ImGui::PushItemWidth(200.f);
-
-				if (ImGui::BeginCombo(xorstr_("##ConfigSelection"), g_config.current_config.c_str()))
-				{
-					// Refresh available configs
-					g_config.refresh_configs();
-
-					for (const auto& config_name : g_config.available_configs)
-					{
-						bool is_selected = (g_config.current_config == config_name);
-
-						if (ImGui::Selectable(config_name.c_str(), is_selected))
-						{
-							g_config.current_config = config_name;
-						}
-
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-
-					ImGui::EndCombo();
-				}
-
-				ImGui::PopItemWidth();
-
-				// Config controls
-				if (ImGui::Button(xorstr_("Load")))
-					g_config.load();
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Save")))
-					g_config.save();
-
-				ImGui::SameLine();
-
-				// New config input
-				static char new_config_name[64] = "";
-				ImGui::PushItemWidth(150.0f);
-				ImGui::InputText(xorstr_("##NewConfigName"), new_config_name, IM_ARRAYSIZE(new_config_name));
-				ImGui::PopItemWidth();
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Create")))
-				{
-					if (strlen(new_config_name) > 0)
-					{
-						g_config.save(new_config_name);
-						g_config.current_config = new_config_name;
-						memset(new_config_name, 0, sizeof(new_config_name));
-					}
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Delete")) && g_config.current_config != "default")
-					g_config.delete_config(g_config.current_config);
-
-				ImGui::Separator();
-
-				render_hotkey_selector(xorstr_("Open key"), &g_globals.open_key, 200.f, true);
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(xorstr_("Unload")))
-					g_globals.g_running = false;
-
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(xorstr_("This function is not safe at all, there is a big chance your game might crash when injecting the cheat again."));
-
-				ImGui::Text(fmt::format(xorstr_("Release rev: {}"), xorstr_(__DATE__)).c_str());
 
 				ImGui::EndTabItem();
 			}

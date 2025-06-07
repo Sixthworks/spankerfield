@@ -36,7 +36,7 @@ namespace plugins
 		if (!IsValidPtr(local_vehicle)) return;
 
 		const auto vehicle_data = get_vehicle_data(local_vehicle);
-		if (!IsValidPtr(vehicle_data)) return;
+		if (!IsValidPtrWithVTable(vehicle_data)) return;
 
 		if (vehicle_data->IsInJet())
 		{

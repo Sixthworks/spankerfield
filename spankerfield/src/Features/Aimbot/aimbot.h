@@ -29,18 +29,43 @@ namespace big
 			bool valid = false;
 		};
 
-		void PredictLinearMove(const Vector3& linearVelocity, const double predictionTime, const Vector3& curPosition, Vector3* out);
-		void PredictRotation(const Vector3& angularVelocity, const Quaternion& orientation, const double predictionTime, Quaternion* out);
-		void PredictFinalRotation(const Vector3& linearVel, const Vector3& angularVel, const double predTime, const Quaternion& orientation, const Vector3& curPosition, Quaternion* predOrientationOut, Vector3* predLinearVelOut);
+		void PredictLinearMove(
+			const Vector3& linearVelocity,
+			const double predictionTime,
+			const Vector3& curPosition,
+			Vector3* out);
+
+		void PredictRotation(
+			const Vector3& angularVelocity,
+			const Quaternion& orientation,
+			const double predictionTime,
+			Quaternion* out);
+
+		void PredictFinalRotation(
+			const Vector3& linearVel,
+			const Vector3& angularVel,
+		    const double predTime,
+			const Quaternion& orientation,
+			const Vector3& curPosition,
+			Quaternion* predOrientationOut,
+			Vector3* predLinearVelOut);
+		
+		float ComputeMissileFinalVelocity(
+			float initSpd,
+			float maxSpd,
+			float accel,
+			float engIgnTime,
+			float dist,
+			float* travelTime);
 
 		bool DoPrediction(const Vector3& shoot_space,
-						  Vector3& aim_point, 
-						  const Vector3& my_velocity, 
-						  const Vector3& enemy_velocity, 
-						  const Vector3& bullet_speed, 
-						  const float gravity,
-						  const WeaponZeroingEntry& zero_entry,
-			              const AngularPredictionData_s* angular_data);
+			Vector3& aim_point, 
+			const Vector3& my_velocity, 
+			const Vector3& enemy_velocity, 
+			const Vector3& bullet_speed, 
+			const float gravity,
+			const WeaponZeroingEntry& zero_entry,
+			const AngularPredictionData_s* angular_data);
 	};
 
 	// Smoother
@@ -62,6 +87,7 @@ namespace big
 		ClientPlayer* m_Player;
 		Vector3 m_WorldPosition;
 		bool m_HasTarget;
+
 		AimbotTarget()
 		{
 			m_Player = nullptr;
@@ -80,6 +106,7 @@ namespace big
 	protected:
 		void update_all_player_list();
 		void update_closest_crosshair_list();
+		bool get_bone_position(RagdollComponent* ragdoll, Vector3& position);
 		float get_screen_distance(Vector3& EnemyScreen, Vector2 ScreenSize);
 	private:
 		std::vector<ClientPlayer*> m_PlayerList;

@@ -14,10 +14,8 @@ namespace big
         plugins::draw_spectators();
         plugins::draw_health_bar();
         plugins::draw_esp();
-
-        if (g_settings.aimbot)
-            plugins::draw_fov();
-
+        plugins::draw_aim_point(); // Draw after ESP so that it doesn't get covered
+        plugins::draw_fov();
         plugins::draw_radar();
         plugins::draw_explosives();
         plugins::draw_missiles();
@@ -35,9 +33,10 @@ namespace big
         plugins::no_hc_restrictions();
         plugins::sway_modify();
         plugins::overheat_control();
+        plugins::spot_spam();
         plugins::kill_sound();
 
-        if (g_settings.aimbot)
+        if (g_settings.aimbot || g_settings.aimbot_vehicle)
         {
             m_PlayerManager.update_players();
             plugins::aimbot(delta_time);

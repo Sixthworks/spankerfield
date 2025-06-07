@@ -18,12 +18,13 @@ namespace plugins
 		const auto local_player = player_manager->m_pLocalPlayer;
 		if (!IsValidPtr(local_player)) return;
 
-		// There can be some game crashes if you use this function in vehicles, for example when firing rockets with an AA
-		if (local_player->GetVehicle()) return;
-
 		const auto local_soldier = local_player->GetSoldier();
 		if (!IsValidPtr(local_soldier)) return;
 
+		// There can be some game crashes if you use this function in vehicles, for example when firing rockets with an AA
+		if (local_player->GetVehicle()) return;
+
+		// Only when alive
 		if (local_soldier->IsAlive())
 		{
 			const auto weapon = WeaponFiring::GetInstance();

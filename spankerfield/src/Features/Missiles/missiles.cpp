@@ -7,6 +7,56 @@
 using namespace big;
 namespace plugins
 {
+
+    VeniceClientMissileEntity* get_local_missile()
+    {
+        VeniceClientMissileEntity* placeholder{ nullptr };
+
+        const auto game_context = ClientGameContext::GetInstance();
+        if (!game_context) return placeholder;
+
+        const auto level = game_context->m_pLevel;
+        if (!level) return placeholder;
+
+        const auto game_world = level->m_pGameWorld;
+        if (!game_world) return placeholder;
+
+        const auto player_manager = game_context->m_pPlayerManager;
+        if (!player_manager) return placeholder;
+
+        const auto local_player = player_manager->m_pLocalPlayer;
+        if (!IsValidPtr(local_player)) return placeholder;
+
+        const auto local_soldier = local_player->GetSoldier();
+        if (!IsValidPtr(local_soldier)) return placeholder;
+
+        if (!local_soldier->IsAlive()) return placeholder;
+    
+        if (!class_info.MissileEntity)
+        {
+            update_class_info();
+            return placeholder;
+        }
+
+        EntityIterator<VeniceClientMissileEntity> missiles(game_world, class_info.MissileEntity);
+        if (missiles.front())
+        {
+            for (auto it = missiles.front(); it != nullptr; it = missiles.next())
+            {
+                auto* missile = missiles.front()->getObject();
+                if (!IsValidPtr(missile)) continue;
+
+                if (missile->m_pOwner.GetData() == local_player)
+                {
+                    placeholder = missile;
+                    break;
+                }
+            }
+        }
+
+        return placeholder;
+    }
+
     void draw_missiles()
     {
         if (!g_settings.missiles_own) return;
@@ -21,46 +71,20 @@ namespace plugins
         if (!IsValidPtr(local_player)) return;
 
         const auto local_soldier = local_player->GetSoldier();
-        if (!IsValidPtr(local_soldier) || !local_soldier->IsAlive()) return;
+        if (!IsValidPtr(local_soldier)) return;
 
-        if (!class_info.MissileEntity)
-        {
-            update_class_info();
-            return;
-        }
+        if (!local_soldier->IsAlive()) return;
 
-        const auto level = game_context->m_pLevel;
-        if (!level) return;
+        const auto missile = get_local_missile();
+        if (!IsValidPtr(missile)) return;
 
-        const auto game_world = level->m_pGameWorld;
-        if (!game_world) return;
-
-        EntityIterator<VeniceClientMissileEntity> missiles(game_world, class_info.MissileEntity);
-        if (!missiles.front()) return;
-
-        VeniceClientMissileEntity* local_missile = nullptr;
-        do
-        {
-            auto* missile = missiles.front()->getObject();
-            if (!IsValidPtr(missile)) continue;
-
-            if (missile->m_pOwner.GetData() == local_player)
-            {
-                local_missile = missile;
-                break;
-            }
-        } while (missiles.next());
-
-        if (!IsValidPtr(local_missile)) return;
-
-        const auto data = local_missile->m_pMissileEntityData;
+        const auto data = missile->m_pMissileEntityData;
         if (!IsValidPtr(data)) return;
 
         if (data->IsLockable()) return;
-
         if (!data->IsLaserGuided()) return;
 
-        ClientControllableEntity* missile_controllable = (ClientControllableEntity*)local_missile;
+        ClientControllableEntity* missile_controllable = (ClientControllableEntity*)missile;
         if (!IsValidPtr(missile_controllable)) return;
 
         TransformAABBStruct transform;

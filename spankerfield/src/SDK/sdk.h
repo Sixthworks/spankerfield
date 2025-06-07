@@ -19,7 +19,7 @@
 #define OFFSET_FLAG					  0x142385A98 // \x48\x8B\x05\x00\x00\x00\x00\x48\x3B\x05\x00\x00\x00\x00\x74\x10\x48\x8B\xD8\x48\x83\xC0\x48
 #define OFFSET_SSMODULE				  0x14273D6E8 // \x48\x8B\x0D\x00\x00\x00\x00\x48\x85\xC9\x74\x24
 #define OFFSET_CONSOLECOMMANDS		  0x140663A20 // \x40\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x00\x00\x00\x00\x48\x81\xEC\x00\x00\x00\x00\x48\xC7\x45\x00\x00\x00\x00\x00\x48\x89\x9C\x24\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x85\x00\x00\x00\x00\x44\x88\x44\x24\x00\x4C\x8B\xEA\x48\x8B\xF9\x48\x89\x8D\x00\x00\x00\x00\x45\x33\xFF\x44\x89\x7C\x24\x00\x8B\x05\x00\x00\x00\x00\x48\x8D\x1D\x00\x00\x00\x00
-#define OFFSET_FIRSTTYPEINFO		  0x1423E41B8
+#define OFFSET_FIRSTTYPEINFO		  0x1423E41B8 // \x48\x8B\x05\x00\x00\x00\x00\x48\x89\x41\x08\x48\x89\x0D\x00\x00\x00\x00\xC3
 #define OFFSET_GETENTITYLIST		  0x1407CD5D0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x74\x0C\x48\x8B\x03\x48\x89\x05\x00\x00\x00\x00\xEB\x3F (not sure)
 #define OFFSET_SYNCEDBFSETTINGS		  0x1423717C0 // \x48\x8B\x1D\x00\x00\x00\x00\x48\x85\xDB\x75\x26\x48\x8D\x15\x00\x00\x00\x00\x48\x8B\x0D\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x48\x8B\xD8\x48\x89\x05\x00\x00\x00\x00\x48\x85\xC0\x0F\x84\x00\x00\x00\x00\x0F\xB6\x4B\x54\x88\x4D\xD7\x0F\xB6\x4B\x55\x88\x4D\xD9
 #define OFFSET_WEAPONSHOOTSPACE       OFFSET_FIRING_WEAPON + 0x28
@@ -29,37 +29,41 @@
 #define MAX_PLAYERS                            70
 #define MAX_EXPLOSIVES                        128
 
-#define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
+constexpr uintptr_t PTR_MIN_VALUE = 0x10000;
+constexpr uintptr_t PTR_MAX_VALUE = 0x000F000000000000;
+constexpr uintptr_t VTABLE_MIN_VALUE = 0x140000000;
+constexpr uintptr_t VTABLE_MAX_VALUE = 0x14FFFFFFF;
 
-constexpr bool IsValidPtr(PVOID p)
+template<typename T = void*>
+[[nodiscard]] constexpr bool IsValidPtr(T* p) noexcept
 {
-	return (p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && p != nullptr;
+	static_assert(std::is_pointer_v<T*>, "Must be a pointer type");
+
+	// Reinterpret as uintptr_t for range checks
+	auto ptr_value = reinterpret_cast<uintptr_t>(p);
+
+	// Comprehensive pointer validation
+	return p != nullptr &&                  // Not null
+		ptr_value >= PTR_MIN_VALUE &&    // Above minimum valid address
+		ptr_value < PTR_MAX_VALUE &&     // Below maximum valid address
+		(ptr_value % alignof(std::max_align_t) == 0);  // Aligned to system's max alignment
 }
 
-#define MIN_VTABLE ((uint64_t)0x140000000)
-#define MAX_VTABLE ((uint64_t)0x14FFFFFFF)
-
-constexpr bool IsValidPtrWithVTable(PVOID p)
+// Enhanced vtable validation with additional checks
+template<typename T = void*>
+[[nodiscard]] constexpr bool IsValidPtrWithVTable(T* p) noexcept
 {
-	if (IsValidPtr(p))
-	{
-		void* vtable = *reinterpret_cast<PVOID*>(p);
-		if (IsValidPtr(vtable) && reinterpret_cast<uint64_t>(vtable) > MIN_VTABLE && reinterpret_cast<uint64_t>(vtable) < MAX_VTABLE)
-			return true;
-	}
+	// Preliminary pointer check
+	if (!IsValidPtr(p))
+		return false;
 
-	return false;
-}
+	// Safely retrieve vtable pointer
+	auto vtable_ptr = *reinterpret_cast<uintptr_t*>(p);
 
-constexpr bool IsValidMemory(PVOID p, size_t size = sizeof(void*))
-{
-	if (!p) return false;
-
-	MEMORY_BASIC_INFORMATION mbi;
-	if (VirtualQuery(p, &mbi, sizeof(mbi)) == 0) return false;
-	if (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) return false;
-
-	return true;
+	// Comprehensive vtable validation
+	return IsValidPtr(reinterpret_cast<void*>(vtable_ptr)) &&
+		vtable_ptr >= VTABLE_MIN_VALUE &&
+		vtable_ptr < VTABLE_MAX_VALUE;
 }
 
 using namespace DirectX::SimpleMath;

@@ -159,7 +159,7 @@ namespace plugins
 			// Start position for warnings - default start position for blacklist, will be changed (look blacklist support later)
 			float y_pos = 75.f;
 
-			if (g_settings.blacklist)
+			if (g_settings.blacklist && g_settings.blacklist_warn_on_screen)
 			{
 				for (const auto& bl : blacklisted)
 				{

@@ -12,6 +12,9 @@ namespace big
 		bool use_cheap_boxes; // DebugRenderer2 boxes instead of ImGui
 
 		bool blacklist{ true };
+		bool blacklist_warn_on_screen{ true };
+		bool blacklist_tag_in_esp{ true };
+		ImColor blacklist_tag_color{ 255, 0, 0, 255 };
 		ImColor blacklist_color{ 255, 0, 0, 255 };
 		float blacklist_text_size{ 26.f };
 
@@ -25,6 +28,9 @@ namespace big
 		char spoofed_name[16];
 
 		bool aimbot;
+		bool aimbot_snap_to_target{ true };
+		bool aimbot_non_standart{ true };
+		bool aimbot_vehicle;
 		bool aim_support_controller;
 		bool aim_must_be_visible{ true };
 		bool aim_must_not_reload{ true };
@@ -133,7 +139,7 @@ namespace big
 		float crosshair_thickness{ 1.f };
 		ImColor crosshair_color{ 0, 0, 0, 255 };
 
-		bool draw_health_bar;
+		bool draw_health_bar{ true };
 		bool health_bar_soldier{ true };
 		bool health_bar_vehicle{ true };
 		float health_bar_width{ 285.f };
@@ -151,6 +157,7 @@ namespace big
 		bool radar_draw_teammates{ true };
 		bool radar_draw_you{ true };
 		bool radar_cross{ true };
+		bool radar_cross_detailed;
 		bool radar_outline{ true };
 		float radar_x{ 20.f };
 		float radar_y{ 245.f };
@@ -184,6 +191,10 @@ namespace big
 		bool c4_bot_prevent_self_damage{ true };
 		bool c4_bot_smart_self_damage{ true };
 		float c4_bot_health_buffer{ 35.0f };
+
+		bool spot_spam{ true };
+		float spot_spam_threshold{ 65.f };
+		int spot_spam_cooldown{ 1500 };
 
 		bool missiles_own{ true };
 		ImColor missiles_color{ 14, 231, 231, 255 };
@@ -256,6 +267,9 @@ namespace big
 			g_settings.use_cheap_boxes = j[xorstr_("settings")][xorstr_("use_cheap_boxes")];
 
 			g_settings.blacklist = j[xorstr_("settings")][xorstr_("blacklist")];
+			g_settings.blacklist_warn_on_screen = j[xorstr_("settings")][xorstr_("blacklist_warn_on_screen")];
+			g_settings.blacklist_tag_in_esp = j[xorstr_("settings")][xorstr_("blacklist_tag_in_esp")];
+			g_settings.blacklist_tag_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_tag_color")]);
 			g_settings.blacklist_color = string_to_color(j[xorstr_("settings")][xorstr_("blacklist_color")]);
 			g_settings.blacklist_text_size = j[xorstr_("settings")][xorstr_("blacklist_text_size")];
 
@@ -264,6 +278,9 @@ namespace big
 			g_settings.rainbow_speed = j[xorstr_("settings")][xorstr_("rainbow_speed")];
 
 			g_settings.aimbot = j[xorstr_("settings")][xorstr_("aimbot")];
+			g_settings.aimbot_snap_to_target = j[xorstr_("settings")][xorstr_("aimbot_snap_to_target")];
+			g_settings.aimbot_non_standart = j[xorstr_("settings")][xorstr_("aimbot_non_standart")];
+			g_settings.aimbot_vehicle = j[xorstr_("settings")][xorstr_("aimbot_vehicle")];
 			g_settings.aim_support_controller = j[xorstr_("settings")][xorstr_("aim_support_controller")];
 			g_settings.aim_must_be_visible = j[xorstr_("settings")][xorstr_("aim_must_be_visible")];
 			g_settings.aim_must_not_reload = j[xorstr_("settings")][xorstr_("aim_must_not_reload")];
@@ -392,6 +409,7 @@ namespace big
 			g_settings.radar_draw_teammates = j[xorstr_("settings")][xorstr_("radar_draw_teammates")];
 			g_settings.radar_draw_you = j[xorstr_("settings")][xorstr_("radar_draw_you")];
 			g_settings.radar_cross = j[xorstr_("settings")][xorstr_("radar_cross")];
+			g_settings.radar_cross_detailed = j[xorstr_("settings")][xorstr_("radar_cross_detailed")];
 			g_settings.radar_outline = j[xorstr_("settings")][xorstr_("radar_outline")];
 			g_settings.radar_x = j[xorstr_("settings")][xorstr_("radar_x")];
 			g_settings.radar_y = j[xorstr_("settings")][xorstr_("radar_y")];
@@ -425,6 +443,10 @@ namespace big
 			g_settings.c4_bot_prevent_self_damage = j[xorstr_("settings")][xorstr_("c4_bot_prevent_self_damage")];
 			g_settings.c4_bot_smart_self_damage = j[xorstr_("settings")][xorstr_("c4_bot_smart_self_damage")];
 			g_settings.c4_bot_health_buffer = j[xorstr_("settings")][xorstr_("c4_bot_health_buffer")];
+
+			g_settings.spot_spam = j[xorstr_("settings")][xorstr_("spot_spam")];
+			g_settings.spot_spam_threshold = j[xorstr_("settings")][xorstr_("spot_spam_threshold")];
+			g_settings.spot_spam_cooldown = j[xorstr_("settings")][xorstr_("spot_spam_cooldown")];
 
 			g_settings.missiles_own = j[xorstr_("settings")][xorstr_("missiles_own")];
 			g_settings.missiles_color = string_to_color(j[xorstr_("settings")][xorstr_("missiles_color")]);
@@ -460,7 +482,7 @@ namespace big
 			g_settings.screenhots_post_pb_delay = j[xorstr_("settings")][xorstr_("screenhots_post_pb_delay")];
 
 			g_settings.disable_watermark = j[xorstr_("settings")][xorstr_("disable_watermark")];
-			g_globals.open_key = j[xorstr_("settings")][xorstr_("open_key")];
+			g_globals.g_open_key = j[xorstr_("settings")][xorstr_("open_key")];
 		}
 
 		nlohmann::json to_json()
@@ -472,6 +494,9 @@ namespace big
 			            { xorstr_("use_cheap_text"), g_settings.use_cheap_text },
 						{ xorstr_("use_cheap_boxes"), g_settings.use_cheap_boxes },
 						{ xorstr_("blacklist"), g_settings.blacklist },
+						{ xorstr_("blacklist_warn_on_screen"), g_settings.blacklist_warn_on_screen },
+						{ xorstr_("blacklist_tag_in_esp"), g_settings.blacklist_tag_in_esp },
+						{ xorstr_("blacklist_tag_color"), color_to_string(g_settings.blacklist_tag_color) },
 						{ xorstr_("blacklist_color"), color_to_string(g_settings.blacklist_color) },
 						{ xorstr_("blacklist_text_size"), g_settings.blacklist_text_size },
 						{ xorstr_("streamer_mode"), g_settings.streamer_mode },
@@ -542,6 +567,9 @@ namespace big
 						{ xorstr_("health_bar_use_default_color"), g_settings.health_bar_use_default_color },
 						{ xorstr_("health_bar_color"), color_to_string(g_settings.health_bar_color) },
 						{ xorstr_("aimbot"), g_settings.aimbot },
+						{ xorstr_("aimbot_snap_to_target"), g_settings.aimbot_snap_to_target },
+						{ xorstr_("aimbot_non_standart"), g_settings.aimbot_non_standart },
+						{ xorstr_("aimbot_vehicle"), g_settings.aimbot_vehicle },
 						{ xorstr_("aim_support_controller"), g_settings.aim_support_controller },
 						{ xorstr_("aim_must_be_visible"), g_settings.aim_must_be_visible },
 						{ xorstr_("aim_must_not_reload"), g_settings.aim_must_not_reload },
@@ -586,6 +614,7 @@ namespace big
 						{ xorstr_("radar_draw_teammates"), g_settings.radar_draw_teammates },
 						{ xorstr_("radar_draw_you"), g_settings.radar_draw_you },
 						{ xorstr_("radar_cross"), g_settings.radar_cross },
+						{ xorstr_("radar_cross_detailed"), g_settings.radar_cross_detailed },
 						{ xorstr_("radar_outline"), g_settings.radar_outline },
 						{ xorstr_("radar_x"), g_settings.radar_x },
 						{ xorstr_("radar_y"), g_settings.radar_y },
@@ -617,6 +646,9 @@ namespace big
 						{ xorstr_("c4_bot_prevent_self_damage"), g_settings.c4_bot_prevent_self_damage },
 						{ xorstr_("c4_bot_smart_self_damage"), g_settings.c4_bot_smart_self_damage },
 						{ xorstr_("c4_bot_health_buffer"), g_settings.c4_bot_health_buffer },
+						{ xorstr_("spot_spam"), g_settings.spot_spam },
+						{ xorstr_("spot_spam_threshold"), g_settings.spot_spam_threshold },
+						{ xorstr_("spot_spam_cooldown"), g_settings.spot_spam_cooldown },
 						{ xorstr_("missiles_own"), g_settings.missiles_own },
 						{ xorstr_("missiles_color"), color_to_string(g_settings.missiles_color) },
 						{ xorstr_("jet_speed"), g_settings.jet_speed },
@@ -644,7 +676,7 @@ namespace big
 						{ xorstr_("screenhots_pb_delay"), g_settings.screenhots_pb_delay },
 						{ xorstr_("screenhots_post_pb_delay"), g_settings.screenhots_post_pb_delay },
 						{ xorstr_("disable_watermark"), g_settings.disable_watermark },
-						{ xorstr_("open_key"), g_globals.open_key },
+						{ xorstr_("open_key"), g_globals.g_open_key },
 					},
 				},
 

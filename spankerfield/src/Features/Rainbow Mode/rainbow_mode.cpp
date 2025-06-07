@@ -98,6 +98,7 @@ namespace plugins
     {
         // These are the only ones that need to be changed in my opinion
         g_rainbow_manager.add_color(g_settings.aim_fov_color);
+        g_rainbow_manager.add_color(g_settings.esp_aim_point_color);
         g_rainbow_manager.add_color(g_settings.esp_box_color);
         g_rainbow_manager.add_color(g_settings.esp_box_color_occluded);
         g_rainbow_manager.add_color(g_settings.esp_3d_box_color);
@@ -121,7 +122,9 @@ namespace plugins
         g_rainbow_manager.add_color(g_settings.radar_enemies_color);
         g_rainbow_manager.add_color(g_settings.radar_enemy_vehicles_color);
         g_rainbow_manager.add_color(g_settings.blacklist_color);
+        g_rainbow_manager.add_color(g_settings.blacklist_tag_color);
         g_rainbow_manager.add_color(g_settings.infantry_alert_color);
+        g_rainbow_manager.add_color(g_settings.infantry_alert_indicator_color);
         g_rainbow_manager.add_color(g_settings.health_bar_color);
         g_rainbow_manager.add_color(g_settings.explosives_color);
         g_rainbow_manager.add_color(g_settings.missiles_color);

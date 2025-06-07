@@ -22,6 +22,7 @@
 #include "Watermark/watermark.h"
 #include "Friend List/friend_list.h"
 #include "C4 Bot/c4_bot.h"
+#include "Spot spam/spot_spam.h"
 
 namespace big
 {

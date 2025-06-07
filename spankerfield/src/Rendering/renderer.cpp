@@ -89,46 +89,47 @@ namespace big
 	void renderer::on_present()
 	{
 		// Store original render target and its state
-		ID3D11RenderTargetView* ppRenderTargetViews[1] = { nullptr };
-		m_d3d_device_context->OMGetRenderTargets(1, ppRenderTargetViews, nullptr);
-
+		ID3D11RenderTargetView* pp_render_target_views[1] = { nullptr };
+		m_d3d_device_context->OMGetRenderTargets(1, pp_render_target_views, nullptr);
+		
 		// Get the resource from render target view
-		ID3D11Resource* pResource = nullptr;
-		ID3D11RenderTargetView* pNonSRGBRTV = nullptr;
+		ID3D11Resource* p_resource = nullptr;
+		ID3D11RenderTargetView* p_non_srgb_rtv = nullptr;
 
-		if (ppRenderTargetViews[0])
+		if (pp_render_target_views[0])
 		{
-			ppRenderTargetViews[0]->GetResource(&pResource);
+			pp_render_target_views[0]->GetResource(&p_resource);
 
 			// Create a new render target view with SRGB disabled
-			if (pResource)
+			if (p_resource)
 			{
 				// Get texture description
-				ID3D11Texture2D* pTexture = nullptr;
-				HRESULT hr = pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTexture);
-				if (SUCCEEDED(hr) && pTexture)
+				ID3D11Texture2D* p_texture = nullptr;
+				HRESULT hr = p_resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&p_texture);
+
+				if (SUCCEEDED(hr) && p_texture)
 				{
-					D3D11_TEXTURE2D_DESC textureDesc;
-					pTexture->GetDesc(&textureDesc);
+					D3D11_TEXTURE2D_DESC texture_desc;
+					p_texture->GetDesc(&texture_desc);
 
 					// Create render target view desc to disable SRGB
-					D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-					ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-					rtvDesc.Format = make_srgb_unaware_format(textureDesc.Format);
-					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
+					D3D11_RENDER_TARGET_VIEW_DESC rtv_desc;
+					ZeroMemory(&rtv_desc, sizeof(rtv_desc));
+					rtv_desc.Format = make_srgb_unaware_format(texture_desc.Format);
+					rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+					
 					// Create non-sRGB render target view
-					hr = m_d3d_device->CreateRenderTargetView(pResource, &rtvDesc, &pNonSRGBRTV);
+					hr = m_d3d_device->CreateRenderTargetView(p_resource, &rtv_desc, &p_non_srgb_rtv);
 					if (SUCCEEDED(hr))
 					{
 						// Set the non-sRGB render target
-						m_d3d_device_context->OMSetRenderTargets(1, &pNonSRGBRTV, nullptr);
+						m_d3d_device_context->OMSetRenderTargets(1, &p_non_srgb_rtv, nullptr);
 					}
 
-					pTexture->Release();
+					p_texture->Release();
 				}
 
-				pResource->Release();
+				p_resource->Release();
 			}
 		}
 
@@ -150,15 +151,15 @@ namespace big
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 		// Restore original render target if we changed it
-		if (pNonSRGBRTV)
+		if (p_non_srgb_rtv)
 		{
-			m_d3d_device_context->OMSetRenderTargets(1, ppRenderTargetViews, nullptr);
-			pNonSRGBRTV->Release();
+			m_d3d_device_context->OMSetRenderTargets(1, pp_render_target_views, nullptr);
+			p_non_srgb_rtv->Release();
 		}
 
 		// Release the original render target view
-		if (ppRenderTargetViews[0])
-			ppRenderTargetViews[0]->Release();
+		if (pp_render_target_views[0])
+			pp_render_target_views[0]->Release();
 	}
 
 	DXGI_FORMAT renderer::make_srgb_unaware_format(DXGI_FORMAT format)
@@ -202,7 +203,7 @@ namespace big
 
 	void renderer::wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
-		if (msg == WM_KEYUP && wparam == g_globals.open_key)
+		if (msg == WM_KEYUP && wparam == g_globals.g_open_key)
 		{
 			// Persist and restore the cursor position between menu instances.
 			static POINT cursor_coords{};

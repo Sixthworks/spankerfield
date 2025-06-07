@@ -7,6 +7,9 @@
 #include "../../Utilities/w2s.h"
 #include "../../Utilities/other.h"
 #include "../../Features/Friend List/friend_list.h"
+#include "../../Features/Blacklist\blacklist.h"
+
+#define PI 3.14159265f
 
 using namespace big;
 namespace plugins
@@ -125,6 +128,63 @@ namespace plugins
     ULONGLONG last_aim_point_change_time = 0;
     bool aim_point_changed = false;
 
+    void draw_aim_point()
+    {
+        // Aim Point, credit VincentVega, upgraded by nloginov
+        if (g_settings.esp_draw_aim_point)
+        {
+            if (g_globals.g_has_pred_aim_point)
+            {
+                ULONGLONG current_time = GetTickCount64();
+
+                // Check if aim point has changed
+                if (g_globals.g_pred_aim_point.x != last_aim_point.x ||
+                    g_globals.g_pred_aim_point.y != last_aim_point.y ||
+                    g_globals.g_pred_aim_point.z != last_aim_point.z)
+                {
+                    // Aim point has changed, update last position and time
+                    last_aim_point = g_globals.g_pred_aim_point;
+                    last_aim_point_change_time = current_time;
+                    aim_point_changed = true;
+                }
+
+                // Only draw if less than 500ms has passed since last change
+                if (aim_point_changed && (current_time - last_aim_point_change_time <= 500))
+                {
+                    Vector2 aimpoint_screen_coords;
+                    if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
+                    {
+                        // Calculate smooth alpha fade using cosine interpolation for smoother transitions
+                        float time_elapsed = static_cast<float>(current_time - last_aim_point_change_time);
+                        float alpha_multiplier = 1.0f;
+
+                        if (time_elapsed > 300.0f)
+                        {
+                            // Smooth fade out using cosine interpolation
+                            float fade_progress = (time_elapsed - 300.0f) / 200.0f;
+                            fade_progress = std::clamp(fade_progress, 0.0f, 1.0f);
+                            alpha_multiplier = 0.5f + 0.5f * cosf(fade_progress * PI); // Cosine curve
+                        }
+
+                        // Apply alpha to color with smooth transition
+                        ImColor aim_point_color = g_settings.esp_aim_point_color;
+                        aim_point_color.Value.w *= alpha_multiplier * alpha_multiplier; // Quadratic fade for more natural look
+
+                        m_drawing->AddCircleFilled(
+                            ImVec2(aimpoint_screen_coords.x, aimpoint_screen_coords.y),
+                            g_settings.esp_aim_point_size,
+                            aim_point_color);
+                    }
+                }
+            }
+            else
+            {
+                // Reset changed flag if we don't have a prediction point
+                aim_point_changed = false;
+            }
+        }
+    }
+
     void draw_esp()
     {
         if (!g_settings.esp) return;
@@ -150,6 +210,7 @@ namespace plugins
             // Player status
             uint64_t persona_id = player->m_onlineId.m_personaid;
             bool is_friend = plugins::is_friend(persona_id);
+            bool is_blacklisted = plugins::is_blacklisted(persona_id);
             bool teammate = player->m_TeamId == local_player->m_TeamId;
 
             // Don't question such logic
@@ -358,6 +419,7 @@ namespace plugins
                         g_settings.esp_draw_name,
                         g_settings.esp_draw_distance,
                         is_friend && g_settings.esp_friend_color_to_tag,
+                        is_blacklisted && g_settings.blacklist_tag_in_esp,
                         g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle)
                     };
 
@@ -403,59 +465,8 @@ namespace plugins
                     draw_text_if(g_settings.esp_draw_name, nickname, text_color);
                     draw_text_if(g_settings.esp_draw_distance, fmt::format(xorstr_("{}m"), abs(ceil(distance))).c_str(), text_color);
                     draw_text_if(is_friend && g_settings.esp_friend_color_to_tag, xorstr_("FRND"), g_settings.esp_friend_color);
+                    draw_text_if(is_blacklisted && g_settings.blacklist_tag_in_esp, xorstr_("BLKLST"), g_settings.blacklist_color);
                     draw_text_if(g_settings.esp_draw_vehicle_tag && IsValidPtr(vehicle), xorstr_("VEH"), g_settings.esp_additional_tags_color);
-                }
-
-                // Aim Point, credit VincentVega
-                if (g_settings.esp_draw_aim_point)
-                {
-                    if (g_globals.g_has_pred_aim_point)
-                    {
-                        ULONGLONG current_time = GetTickCount64();
-
-                        // Check if aim point has changed
-                        if (g_globals.g_pred_aim_point.x != last_aim_point.x ||
-                            g_globals.g_pred_aim_point.y != last_aim_point.y ||
-                            g_globals.g_pred_aim_point.z != last_aim_point.z)
-                        {
-                            // Aim point has changed, update last position and time
-                            last_aim_point = g_globals.g_pred_aim_point;
-                            last_aim_point_change_time = current_time;
-                            aim_point_changed = true;
-                        }
-
-                        // Only draw if less than 500ms has passed since last change
-                        if (aim_point_changed && (current_time - last_aim_point_change_time <= 500))
-                        {
-                            Vector2 aimpoint_screen_coords;
-                            if (world_to_screen(g_globals.g_pred_aim_point, aimpoint_screen_coords))
-                            {
-                                // Calculate alpha based on time elapsed
-                                float alpha_multiplier = 1.0f;
-
-                                // Start fading out
-                                if (current_time - last_aim_point_change_time > 300)
-                                {
-                                    alpha_multiplier = 1.0f - ((current_time - last_aim_point_change_time - 300) / 200.0f);
-                                    if (alpha_multiplier < 0.0f) alpha_multiplier = 0.0f;
-                                }
-
-                                // Apply alpha to color
-                                ImColor aim_point_color = g_settings.esp_aim_point_color;
-                                aim_point_color.Value.w *= alpha_multiplier;
-
-                                m_drawing->AddCircleFilled(
-                                    ImVec2(aimpoint_screen_coords.x, aimpoint_screen_coords.y),
-                                    g_settings.esp_aim_point_size,
-                                    aim_point_color);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Reset changed flag if we don't have a prediction point
-                        aim_point_changed = false;
-                    }
                 }
 
                 if (g_settings.skeleton)
