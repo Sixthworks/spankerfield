@@ -44,14 +44,14 @@ namespace big
 
 	void thread_pool::push(std::function<void()> func)
 	{
-		if (func)
-		{
-			std::unique_lock<std::mutex> lock(this->m_lock);
-			this->m_job_stack.push(std::move(func));
-
-			lock.unlock();
-			this->m_data_condition.notify_all();
-		}
+		 constexpr size_t MAX_QUEUE_SIZE = 1000;
+		 
+		 std::unique_lock<std::mutex> lock(m_lock);
+		 if (m_job_stack.size() >= MAX_QUEUE_SIZE)
+			 return;
+		 m_job_stack.push(std::move(func));
+		 lock.unlock();
+		 m_data_condition.notify_one();
 	}
 
 	void thread_pool::run()

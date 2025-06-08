@@ -23,10 +23,16 @@ namespace plugins
 
 	void draw_spectators()
 	{
-		if (!g_settings.spectator_list) return;
+		if (!g_settings.spectator_list)
+			return;
 
 		const auto game_context = ClientGameContext::GetInstance();
-		if (!game_context) return;
+		if (!game_context)
+			return;
+
+		// Proper implementation to prevent crashes
+		if (!IsValidPtr(game_context->m_pPlayerManager))
+			return;
 
 		const auto player_manager = game_context->m_pPlayerManager;
 		if (!player_manager) return;

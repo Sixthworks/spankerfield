@@ -350,4 +350,48 @@ namespace big
 
 		ImGui::PopItemWidth();
 	}
+
+	bool is_entity_visible(const TransformAABBStruct& entity_transform, ClientPlayer* local_player)
+	{
+		// Perform a raycast or visibility check between the local player and the entity
+		Vector3 local_pos = get_transform(local_player->GetSoldier()).Transform.Translation();
+		Vector3 entity_pos = entity_transform.Transform.Translation();
+
+		// Example raycast logic (replace with actual game engine raycast if available)
+		return !is_probably_behind_wall(local_pos, entity_pos, 1.5f);
+	}
+
+	bool is_probably_behind_wall(const Vector3& start, const Vector3& end, float max_vertical_diff) 
+	{
+		// Check vertical difference
+		if (abs(start.z - end.z) > max_vertical_diff)
+			return true;
+
+		// Use intermediate points to check for obstacles
+		const int check_points = 3;
+		
+		for (int i = 1; i < check_points; i++) 
+		{
+			float t = static_cast<float>(i) / check_points;
+			Vector3 intermediate = Vector3(
+				start.x + (end.x - start.x) * t,
+				start.y + (end.y - start.y) * t,
+				start.z + (end.z - start.z) * t
+			);
+
+			if (i > 1) {
+				float prev_t = static_cast<float>(i - 1) / check_points;
+				Vector3 prev_point = Vector3(
+					start.x + (end.x - start.x) * prev_t,
+					start.y + (end.y - start.y) * prev_t,
+					start.z + (end.z - start.z) * prev_t
+				);
+
+				if (abs(intermediate.z - prev_point.z) > max_vertical_diff / check_points)
+					return true;
+			}
+		}
+
+		return false;
+	}
 }

@@ -613,6 +613,14 @@ namespace big
 			if (!in_vehicle && g_settings.aim_must_be_visible && soldier->m_Occluded)
 				continue;
 
+			// Visibility check for vehicles
+			if (in_vehicle && g_settings.aim_must_be_visible)
+			{
+				TransformAABBStruct vehicle_transform = get_transform(vehicle);
+				if (!is_entity_visible(vehicle_transform, local_player))
+					continue;
+			}
+
 			// Try to get bone position
 			got_bone = get_bone_position(ragdoll, head_vec);
 

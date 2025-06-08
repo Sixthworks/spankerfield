@@ -2,189 +2,115 @@
 
 namespace big
 {
-	void VMTHook::Hook(int index, void* fnPointer)
-	{
-		if ((int)index >= 0 && (int)index <= (int)vmtLenght) {
-			DWORD oldProtect;
-			VirtualProtect(&pNewVmt[EXTRA_SPACE + (int)index + 1], sizeof(std::uintptr_t), PAGE_EXECUTE_READWRITE, &oldProtect);
-			pNewVmt[EXTRA_SPACE + (int)index + 1] = reinterpret_cast<std::uintptr_t>(fnPointer);
-			VirtualProtect(&pNewVmt[EXTRA_SPACE + (int)index + 1], sizeof(std::uintptr_t), oldProtect, &oldProtect);
-			FlushInstructionCache(GetCurrentProcess(), nullptr, 0);
-		}
-	}
+    bool VMTHook::Setup(void* pclass)
+    {
+        ppClassBase = reinterpret_cast<uintptr_t**>(pclass);
+        pClassVmt = reinterpret_cast<uintptr_t*>(*ppClassBase);
 
-	bool VMTHook::Release()
-	{
-		if (pClassVmt == nullptr) return false;
+        // Get vmt length
+        vmtLenght = 0;
+        while (reinterpret_cast<void*>(pClassVmt[vmtLenght]) != nullptr)
+        {
+            vmtLenght++;
+        }
 
-		// Use VirtualProtect for safe pointer modification
-		DWORD oldProtect;
-		VirtualProtect(ppClassBase, sizeof(std::uintptr_t*), PAGE_EXECUTE_READWRITE, &oldProtect);
-		*(std::uintptr_t**)ppClassBase = pClassVmt;
-		VirtualProtect(ppClassBase, sizeof(std::uintptr_t*), oldProtect, &oldProtect);
+        // Allocate new vmt
+        pNewVmt = new uintptr_t[vmtLenght + EXTRA_SPACE];
+        memcpy(pNewVmt, pClassVmt, sizeof(uintptr_t) * vmtLenght);
 
-		// Flush the cache to ensure instruction consistency
-		FlushInstructionCache(GetCurrentProcess(), nullptr, 0);
+        DWORD old_protect;
+        VirtualProtect(ppClassBase, sizeof(uintptr_t*), PAGE_READWRITE, &old_protect);
+        *ppClassBase = pNewVmt;
+        VirtualProtect(ppClassBase, sizeof(uintptr_t*), old_protect, &old_protect);
 
-		std::memset(pNewVmt, NULL, vmtLenght * sizeof(std::uintptr_t) + (sizeof(std::uintptr_t) * (EXTRA_SPACE + 1)));
+        return true;
+    }
 
-		pClassVmt = nullptr;
-		pNewVmt = nullptr;
-		ppClassBase = nullptr;
-		vmtLenght = NULL;
+    void VMTHook::Hook(int index, void* fnPointer)
+    {
+        pNewVmt[index] = reinterpret_cast<uintptr_t>(fnPointer);
+    }
 
-		return true;
-	}
+    bool VMTHook::Release()
+    {
+        if (ppClassBase && pClassVmt && pNewVmt)
+        {
+			DWORD old_protect;
+			VirtualProtect(*ppClassBase, sizeof(uintptr_t*) * vmtLenght, PAGE_READWRITE, &old_protect);
+            *ppClassBase = pClassVmt;
+			VirtualProtect(*ppClassBase, sizeof(uintptr_t*) * vmtLenght, old_protect, &old_protect);
+            delete[] pNewVmt;
+            return true;
+        }
+        return false;
+    }
+    bool VMTHook::hook_function(void* original_function, void* hook_function, size_t index)
+    {
+        DWORD old_protect;
+        VirtualProtect(&pClassVmt[index], sizeof(uintptr_t), PAGE_READWRITE, &old_protect);
 
-	bool VMTHook::Setup(void* pclass)
-	{
-		if (pclass == nullptr)
-			return false;
+        m_pOriginalVmt = reinterpret_cast<uintptr_t*>(pClassVmt[index]);
+        pClassVmt[index] = reinterpret_cast<uintptr_t>(hook_function);
 
-		ppClassBase = reinterpret_cast<uintptr_t**>(pclass);
-		if (ppClassBase == nullptr)
-			return false;
+        VirtualProtect(&pClassVmt[index], sizeof(uintptr_t), old_protect, &old_protect);
 
-		pClassVmt = *ppClassBase;
-		if (pClassVmt == nullptr)
-			return false;
+        return true;
+    }
 
-		// Safer VMT length detection
-		vmtLenght = 0;
+    void VMTHook::unhook()
+    {
+        if (m_pOriginalVmt)
+        {
+            DWORD old_protect;
+            VirtualProtect(m_pOriginalVmt, sizeof(uintptr_t) * MAX_VMT_SIZE, PAGE_READWRITE, &old_protect);
 
-		// Safer approach to find VMT length
-		// Most VMTs don't exceed 100 entries, and the entries must be valid function pointers
-		// We'll check if the pointer is within reasonable executable memory
-		const size_t MAX_VMT_SIZE = 150; // Reasonable upper limit
+            HMODULE module_handle;
+            if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                (LPCSTR)m_pOriginalVmt,
+                &module_handle))
+            {
+                // Handle module
+            }
 
-		for (size_t i = 0; i < MAX_VMT_SIZE; i++) {
-			MEMORY_BASIC_INFORMATION mbi = { 0 };
-			void* funcPtr = reinterpret_cast<void*>(pClassVmt[i]);
+            // Fix type conversion
+            *reinterpret_cast<uintptr_t**>(m_pOriginalVmt) = pClassVmt;
 
-			// Check if the pointer value is within a reasonable range
-			// This avoids crashes by ensuring the pointer is vaguely valid
-			if (reinterpret_cast<uintptr_t>(funcPtr) < 0x10000 ||
-				reinterpret_cast<uintptr_t>(funcPtr) > 0x7FFFFFFFFFFFFFFF)
-				break;
+            VirtualProtect(m_pOriginalVmt, sizeof(uintptr_t) * MAX_VMT_SIZE, old_protect, &old_protect);
+        }
+    }
 
-			// Attempt to query the function pointer's memory info
-			if (!VirtualQuery(funcPtr, &mbi, sizeof(mbi)))
-				break;
+    class VmtHook
+    {
+    public:
+        bool Setup(void** instance)
+        {
+            m_Instance = instance;
 
-			// Only count if the memory has executable permissions
-			if (!(mbi.Protect & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)))
-				break;
+            if (*m_Instance == nullptr)
+                return false;
 
-			vmtLenght++;
-		}
+            m_OldTable = reinterpret_cast<uintptr_t*>(*m_Instance);
+            size_t tableLength = CalculateTableLength(m_OldTable);
+            m_NewTable = new uintptr_t[tableLength];
+            memcpy(m_NewTable, m_OldTable, tableLength * sizeof(uintptr_t));
+            *m_Instance = reinterpret_cast<void*>(m_NewTable);
 
-		if (vmtLenght <= 0)
-			return false;
+            return true;
+        }
 
-		auto vmtSize = vmtLenght * sizeof(std::uintptr_t);
+    private:
+        size_t CalculateTableLength(uintptr_t* vmtTable)
+        {
+            size_t index = 0;
+            while (vmtTable[index] != 0)
+            {
+                index++;
+            }
+            return index;
+        }
 
-		HMODULE hModule = NULL;
-		if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-			GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-			(LPCSTR)pClassVmt, &hModule) == NULL)
-			return false;
-
-		char path[MAX_PATH];
-		if (GetModuleFileNameA(hModule, path, sizeof(path)) == NULL)
-			return false;
-
-		std::string modulePath = path;
-		if (modulePath.empty())
-			return false;
-
-		std::size_t found = modulePath.find_last_of("/\\");
-		modulePath.erase(0, found + 1);
-
-		auto newVmtSizeExt = vmtSize + (sizeof(std::uintptr_t) * (EXTRA_SPACE + 1));
-		pNewVmt = this->SearchFreeDataPage(modulePath.c_str(), newVmtSizeExt);
-		if (pNewVmt == nullptr)
-			return false;
-
-		// Always use VirtualProtect for better stability
-		DWORD old;
-		VirtualProtect(pNewVmt, newVmtSizeExt, PAGE_READWRITE, &old);
-
-		std::memset(pNewVmt, NULL, newVmtSizeExt);
-		std::memcpy(&pNewVmt[EXTRA_SPACE + 1], pClassVmt, vmtSize);
-
-		// Safely copy the RTTI pointer
-		try {
-			pNewVmt[EXTRA_SPACE] = pClassVmt[-1];
-		}
-		catch (...) {
-			// If RTTI copy fails, it's not critical, we can continue
-		}
-
-		VirtualProtect(pNewVmt, newVmtSizeExt, old, &old);
-
-		try {
-			// Properly protect memory while modifying the vtable pointer
-			DWORD origProtect;
-			if (VirtualProtect(ppClassBase, sizeof(uintptr_t*), PAGE_EXECUTE_READWRITE, &origProtect)) {
-				*(std::uintptr_t**)ppClassBase = &pNewVmt[EXTRA_SPACE + 1];
-				VirtualProtect(ppClassBase, sizeof(uintptr_t*), origProtect, &origProtect);
-				FlushInstructionCache(GetCurrentProcess(), nullptr, 0);
-			}
-			else {
-				delete[] pNewVmt;
-				return false;
-			}
-		}
-		catch (...)
-		{
-			delete[] pNewVmt;
-			return false;
-		}
-		return true;
-	}
-
-	std::uintptr_t* VMTHook::SearchFreeDataPage(const char* moduleName, const size_t vmtSize)
-	{
-		auto CheckDataSection = [&](LPCVOID address, const std::size_t vmt_size) -> bool
-			{
-				const DWORD dataProtection = (PAGE_EXECUTE_READWRITE | PAGE_READWRITE);
-				MEMORY_BASIC_INFORMATION mbi = { 0 };
-
-				if (VirtualQuery(address, &mbi, sizeof(mbi)) == sizeof(mbi) && mbi.AllocationBase && mbi.BaseAddress &&
-					mbi.State == MEM_COMMIT && !(mbi.Protect & PAGE_GUARD) && mbi.Protect != PAGE_NOACCESS)
-				{
-					if ((mbi.Protect & dataProtection) && mbi.RegionSize >= vmt_size)
-						return ((mbi.Protect & dataProtection) && mbi.RegionSize >= vmt_size) ? true : false;
-				}
-				return false;
-			};
-
-		auto hModule = GetModuleHandleA(moduleName);
-
-		if (hModule == nullptr) return nullptr;
-
-		const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER> (hModule);
-		const auto ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS> (reinterpret_cast<std::uint8_t*>(hModule) + dosHeader->e_lfanew);
-		const auto moduleEnd = reinterpret_cast<std::uintptr_t>(hModule) + ntHeader->OptionalHeader.SizeOfImage - sizeof(std::uintptr_t);
-
-		for (auto currAddress = moduleEnd; currAddress > (DWORD)hModule; currAddress -= sizeof(std::uintptr_t))
-		{
-			if (*reinterpret_cast<std::uintptr_t*>(currAddress) == 0 && CheckDataSection(reinterpret_cast<LPCVOID>(currAddress), vmtSize))
-			{
-				bool isGoodVmt = true;
-				auto pageCount = 0u;
-
-				for (; pageCount < vmtSize && isGoodVmt; pageCount += sizeof(std::uintptr_t))
-				{
-					if (*reinterpret_cast<std::uintptr_t*>(currAddress + pageCount) != 0)
-						isGoodVmt = false;
-				}
-
-				if (isGoodVmt && pageCount >= vmtSize)
-					return (uintptr_t*)currAddress;
-			}
-		}
-
-		return nullptr;
-	}
+        void** m_Instance = nullptr;  // Changed from void** to match Setup parameter
+        uintptr_t* m_OldTable = nullptr;
+        uintptr_t* m_NewTable = nullptr;
+    };
 }

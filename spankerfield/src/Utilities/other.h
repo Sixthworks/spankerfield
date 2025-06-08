@@ -36,4 +36,7 @@ namespace big
 	bool has_rivatuner_hooking_zero(const std::filesystem::path& config_path);
 
 	void render_hotkey_selector(const char* name, int* pkey, float width, bool restricted);
+
+	bool is_entity_visible(const TransformAABBStruct& entity_transform, ClientPlayer* local_player);
+	bool is_probably_behind_wall(const Vector3& start, const Vector3& end, float max_vertical_diff);
 }

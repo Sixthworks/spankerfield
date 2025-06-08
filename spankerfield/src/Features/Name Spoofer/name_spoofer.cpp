@@ -40,14 +40,18 @@ namespace plugins
 			return;
 		}
 
+		// Add bounds checking for safer string operations
+		if (strlen(g_settings.spoofed_name) >= 64) // Max name length
+			return;
+
 		// Apply spoof if enabled and player is alive
 		if (g_settings.spoof_name && local_soldier->IsAlive())
 		{
 			if (strcmp(local_player->m_Name, g_settings.spoofed_name) != NULL)
 			{
-				strcpy(local_player->m_Name, g_settings.spoofed_name);
-				strcpy(reinterpret_cast<char*>(local_player) + 0x0040, g_settings.spoofed_name);
-				strcpy(reinterpret_cast<char*>(local_player) + 0x1836, g_settings.spoofed_name);
+				strncpy_s(local_player->m_Name, 64, g_settings.spoofed_name, _TRUNCATE);
+				strncpy_s(reinterpret_cast<char*>(local_player) + 0x0040, 64, g_settings.spoofed_name, _TRUNCATE);
+				strncpy_s(reinterpret_cast<char*>(local_player) + 0x1836, 64, g_settings.spoofed_name, _TRUNCATE);
 			}
 		}
 	}
