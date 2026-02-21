@@ -32,12 +32,12 @@ namespace big
 		bool aimbot_non_standart{ true };
 		bool aimbot_vehicle;
 		bool aim_support_controller;
-		bool aim_must_be_visible{ true };
+		bool aim_must_be_visible;
 		bool aim_must_not_reload{ true };
 		bool aim_fov_method{ true };
 		bool aim_bone_priority;
 		bool aim_draw_fov;
-		float aim_fov{ 35.f };
+		float aim_fov{ 15.f };
 		ImColor aim_fov_color{ 255, 255, 255, 200 };
 		float aim_min_time_to_target{ 0.25f };
 		float aim_max_time_to_target{ 0.7f };
@@ -46,7 +46,7 @@ namespace big
 		int aim_bone{ UpdatePoseResultData::BONES::Spine1 };
 		int aim_target_selection{ 1 };
 		bool aim_ignore_friends{ true };
-		bool aim_auto_bone{ true };
+		bool aim_auto_bone;
 		float aim_zeroing_correction{ 0.5f };
 
 		bool no_recoil;

@@ -177,9 +177,6 @@
     <ClCompile Include="include\g3log\time.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="include\ImGui\imgui_freetype.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\texture_saver.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

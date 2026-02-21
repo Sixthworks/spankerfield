@@ -1067,29 +1067,44 @@ namespace big
 
 				ImGui::Text(xorstr_("PBSS bypass method:"));
 
-				// We can't use xorstr_ in a regular array
 				std::vector<const char*> obfuscated_items;
 				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Temp Disable"));
 				obfuscated_items.push_back(xorstr_("PunkBuster Screenshot: Clean"));
-
-				// Create an array of const char* pointers to pass to ImGui
 				const char** items_array = obfuscated_items.data();
 
-				// Update current_item based on the actual state of g_settings each frame
-				// This ensures the dropdown always reflects the current settings
+				// Reflect actual state each frame.
 				int current_item = g_settings.screenshots_pb_clean ? 1 : 0;
 
 				ImGui::PushItemWidth(300.f);
+
+				//  Only allow the combo to change method flags when use_both is NOT active.
+				bool combo_disabled = g_settings.screenshots_pb_use_both;
+				
+				if (combo_disabled) ImGui::BeginDisabled();
+
 				if (ImGui::Combo(xorstr_("##bypass_method"), &current_item, items_array, (int)obfuscated_items.size()))
 				{
-					g_settings.screenshots_pb_clean = (current_item == 1);
+					// Only reached when use_both is false (control is enabled).
+					g_settings.screenshots_pb_clean        = (current_item == 1);
 					g_settings.screenshots_pb_temp_disable = (current_item == 0);
 				}
+
+				if (combo_disabled) ImGui::EndDisabled();
+
 				ImGui::PopItemWidth();
 
 				ImGui::SameLine();
 
+				bool prev_use_both = g_settings.screenshots_pb_use_both;
 				ImGui::Checkbox(xorstr_("Use both methods simultaneously"), &g_settings.screenshots_pb_use_both);
+
+				// When use_both is turned on, ensure both flags are true
+				if (g_settings.screenshots_pb_use_both && !prev_use_both)
+				{
+					g_settings.screenshots_pb_clean        = true;
+					g_settings.screenshots_pb_temp_disable = true;
+				}
+
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip(xorstr_("Use both the temp disable and clean PBSS bypass methods for maximum security."));
 				ImGui::WarningTooltip(xorstr_("Using both methods may affect gameplay a bit but provides better protection."));

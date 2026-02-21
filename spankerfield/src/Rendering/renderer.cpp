@@ -40,8 +40,6 @@ namespace big
 		std::strcpy(font_cfg.Name, xorstr_("Open Sans"));
 		
 		ImFontAtlas* atlas = ImGui::GetIO().Fonts;
-		atlas->FontBuilderIO = ImGuiFreeType::GetBuilderForFreeType();
-		atlas->FontBuilderFlags = ImGuiFreeTypeBuilderFlags_NoHinting;
 		const ImWchar font_range[] = { 0x0020, 0x00FF, 0x0400, 0x044F, 0 }; // Basic Latin, Latin Supplement and Cyrillic
 
 		m_font = atlas->AddFontFromMemoryTTF(
