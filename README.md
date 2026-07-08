@@ -1,7 +1,7 @@
 > [!NOTE]
 > If you are going to use / share this, pack the compiled dll with VMProtect / Themida or anything else.
 
-![image](https://i.imgur.com/9aj6wfa.png)
+<img width="2124" height="480" alt="lulkzzzz" src="https://github.com/user-attachments/assets/c16296c2-4ef3-443e-9e77-8855dba7031c" />
 
 ### Images
 ![image](https://i.imgur.com/oIAjluQ.gif)
